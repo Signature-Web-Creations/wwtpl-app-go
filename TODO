@@ -1,0 +1,69 @@
+
+[ ] Models
+  [ ] Create a User Table 
+  [ ] Create a User_Roles Table
+  [ ] Create a Roles Table
+  [ ] 
+
+[ ] User Management
+  [ ] Models
+    [ ] Create a user table
+    [ ] Create a user_roles table
+    [ ] Create a roles table
+  [ ] Views 
+    [ ] Create a template for login form
+    [ ] Create a template for home page 
+    [ ] Create a template for admins to create users
+    [ ] Create a template for admins to disable users 
+  [ ] Controllers
+    [ ] Create a handler for the login form
+    [ ] Create a handler for the create users form
+    [ ] Create a handler for the disable users for
+ 
+[ ] History Archive
+  [ ] Models
+    [ ] Create an attachment_type table
+    [ ] Populate the attachment_type table
+    [ ] Create a record_type table
+    [ ] Populate the record_type table
+    [ ] Create the source_archive table
+    [ ] Populate the source_archive table
+    [ ] Create a collection table
+    [ ] Populate the collection table
+    [ ] Denormalize the history_record table
+      [ ] Add attachment_type_id (fk) to history_record
+      [ ] Update attachment_type_id based on the current attachment_type
+      [ ] Remove attachment_type 
+      [ ] Add record_type_id (fk) to history_record
+      [ ] Update record_type_id based on the current record_type
+      [ ] Remove record_type 
+      [ ] Add source_archive_id to history_record
+      [ ] Update source_archive_id based on the current source_archive 
+      [ ] Remove source_archive
+      [ ] Add collection_id to history_record
+      [ ] Update collection_id based on the current collection
+      [ ] Remove collection 
+    [ ] Add deleted_at field to history_record - default NULL 
+    [ ] Create a record_status table
+    [ ] Populate the record_status table (in_progress, pending_approval, published, unpublished)
+    [ ] Add a record_status_id field to history_record table (default id of in_progress state)
+    [ ] Update record_status_id to id of published 
+    [ ] Create functions for creating history records
+    [ ] Create functions for transitioning between states for history_record
+    [ ] Create functions for updating a history_record
+    [ ] Create functions for saving media in a folder  
+    [ ] Create functions for saving history_records
+    [ ] Create function for deleting history_records  
+    [ ] Create a handler for querying history_records
+  [ ] Views
+    [ ] Create a template for viewing history_records (50 at a time)
+    [ ] Create a template for creating history_records
+    [ ] Create a template for editing history_records
+  [ ] Controllers
+    [ ] Create a handler that shows users their in progress records
+    [ ] Create a handler that saves history_records
+    [ ] Create a handler that changes history_record from in_progess to pending_review
+    [ ] Create a handler that publishes history_record
+    [ ] Create a handler that unpublishes a history_record
+    [ ] Create a handler that deletes a history_record
+    [ ] Create a handler that rejects a history record
