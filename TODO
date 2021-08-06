@@ -69,7 +69,7 @@
     [ ] Create a handler that rejects a history record
 
 [ ] Prototyping
-  [ ] Connect to the sqlite database
+  [x] Connect to the sqlite database
   [ ] Select information from a history_record
   [ ] Display history_record in a html template
   [ ] Run a server and view that record
@@ -77,3 +77,4 @@
     [ ] Add a login template
     [ ] Add a function for authenticating users
     [ ] Add a function for creating users
+  [ ] Compile and run app on windows and linux
