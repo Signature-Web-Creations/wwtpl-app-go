@@ -19,4 +19,8 @@ so it needs to be compiled:
 * Install with `go get .`
 * `export CGO_ENABLED=1`
 * Have gcc installed and on the path (Need to download gcc for windows)  
- 
+
+Development Notes:
+Because history records will be represented by a struct, it is important to get
+the database tables correct before writing code to access the database. So, the 
+next priority will be doing that. 
