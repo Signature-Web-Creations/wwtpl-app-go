@@ -67,3 +67,13 @@
     [ ] Create a handler that unpublishes a history_record
     [ ] Create a handler that deletes a history_record
     [ ] Create a handler that rejects a history record
+
+[ ] Prototyping
+  [ ] Connect to the sqlite database
+  [ ] Select information from a history_record
+  [ ] Display history_record in a html template
+  [ ] Run a server and view that record
+  [ ] After users table has been created:
+    [ ] Add a login template
+    [ ] Add a function for authenticating users
+    [ ] Add a function for creating users
