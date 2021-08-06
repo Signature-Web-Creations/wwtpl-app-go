@@ -12,4 +12,11 @@ Requirements:
 * Able to serve html templates that received data from a database
 * Able to create sessions to handle user authentication
 
+Installation:
+
+This project uses [go-sqlite3](github.com/mattn/go-sqlite3) as a database driver. This is a cgo package
+so it needs to be compiled:
+* Install with `go get .`
+* `export CGO_ENABLED=1`
+* Have gcc installed and on the path (Need to download gcc for windows)  
  
