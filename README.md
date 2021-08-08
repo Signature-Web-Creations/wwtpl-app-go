@@ -24,3 +24,15 @@ Development Notes:
 Because history records will be represented by a struct, it is important to get
 the database tables correct before writing code to access the database. So, the 
 next priority will be doing that. 
+
+To make sure that it compiles on Windows, development was moved from 
+Ubuntu to Windows. GCC had to be installed [tdm-gcc](https://sourceforge.net/projects/tdm-gcc/) was used. The same would have to be installed on the target environment, 
+but the if the target architecture is the same, it should work. 
+
+GCC needs to be on the path and the environment variable 
+CGO_ENABLED needs to be set to 1. In Windows this is done with 
+`set CGO_ENABLED=1`. After that run `go build` to create an executable. 
+
+The sqlite database has to be in the same folder. For deploying the app the 
+plan is to create a zip file and download it onto the server. Double-clicking
+the executable should be enough to get it to run
