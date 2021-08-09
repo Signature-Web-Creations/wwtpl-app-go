@@ -43,8 +43,8 @@
       [ ] Update collection_id based on the current collection
       [ ] Remove collection 
     [x] Add deleted_at field to history_record - default NULL 
-    [ ] Create a record_status table
-    [ ] Populate the record_status table (in_progress, pending_approval, published, unpublished)
+    [x] Create a record_status table
+    [x] Populate the record_status table (in_progress, pending_approval, published, unpublished)
     [ ] Add a record_status_id field to history_record table (default id of in_progress state)
     [ ] Update record_status_id to id of published 
     [ ] Create functions for creating history records
