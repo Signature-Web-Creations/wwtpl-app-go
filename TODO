@@ -23,8 +23,8 @@
   [ ] Models
     [x] Create an attachment_type table
     [x] Populate the attachment_type table
-    [ ] Create a record_type table
-    [ ] Populate the record_type table
+    [x] Create a record_type table
+    [x] Populate the record_type table
     [ ] Create the source_archive table
     [ ] Populate the source_archive table
     [ ] Create a collection table
