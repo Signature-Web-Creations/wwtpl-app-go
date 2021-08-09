@@ -3,7 +3,6 @@
   [ ] Create a User Table 
   [ ] Create a User_Roles Table
   [ ] Create a Roles Table
-  [ ] 
 
 [ ] User Management
   [ ] Models
@@ -22,8 +21,8 @@
  
 [ ] History Archive
   [ ] Models
-    [ ] Create an attachment_type table
-    [ ] Populate the attachment_type table
+    [x] Create an attachment_type table
+    [x] Populate the attachment_type table
     [ ] Create a record_type table
     [ ] Populate the record_type table
     [ ] Create the source_archive table
@@ -77,4 +76,4 @@
     [ ] Add a login template
     [ ] Add a function for authenticating users
     [ ] Add a function for creating users
-  [ ] Compile and run app on windows and linux
+  [x] Compile and run app on windows and linux
