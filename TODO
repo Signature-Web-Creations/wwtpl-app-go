@@ -25,8 +25,8 @@
     [x] Populate the attachment_type table
     [x] Create a record_type table
     [x] Populate the record_type table
-    [ ] Create the source_archive table
-    [ ] Populate the source_archive table
+    [x] Create the source_archive table
+    [x] Populate the source_archive table
     [ ] Create a collection table
     [ ] Populate the collection table
     [ ] Denormalize the history_record table
