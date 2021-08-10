@@ -4,10 +4,10 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/mattn/go-sqlite3"
+	"html/template"
 	"log"
 	"net/http"
-  "strconv"
-  "html/template"
+	"strconv"
 )
 
 var db *sql.DB
@@ -36,26 +36,26 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 
-  fmt.Println(record.Title)
+	fmt.Println(record.Title)
 }
 
 func recordHandler(w http.ResponseWriter, r *http.Request) {
-  id, err := strconv.Atoi(r.URL.Path[len("/record/"):])
+	id, err := strconv.Atoi(r.URL.Path[len("/record/"):])
 
-  if err != nil {
-    fmt.Fprintf(w, "Can't find record: %v", err)
-  } else {
-    record, err := historyRecordByID(int64(id))
+	if err != nil {
+		fmt.Fprintf(w, "Can't find record: %v", err)
+	} else {
+		record, err := historyRecordByID(int64(id))
 
-    if err != nil {
-      fmt.Fprintf(w, "Couldn't find record for: %d", id)
-    } else {
-      tmpl := template.Must(template.ParseFiles("templates/record.html"))
-      fmt.Println("Rendering template")
-      fmt.Println(record)
-      tmpl.Execute(w, record)
-    }
-  }
+		if err != nil {
+			fmt.Fprintf(w, "Couldn't find record for: %d", id)
+		} else {
+			tmpl := template.Must(template.ParseFiles("templates/record.html"))
+			fmt.Println("Rendering template")
+			fmt.Println(record)
+			tmpl.Execute(w, record)
+		}
+	}
 }
 
 func main() {
@@ -73,12 +73,12 @@ func main() {
 		log.Fatal(pingErr)
 	}
 
-  fmt.Println("Running Williamsport-Washington Township Public Library - History Database")
-  fmt.Println("Server is listening on localhost:8080")
+	fmt.Println("Running Williamsport-Washington Township Public Library - History Database")
+	fmt.Println("Server is listening on localhost:8080")
 	fmt.Println("Successfuly connected to Database")
-  fmt.Println("Close this window or enter Ctrl+C to quit")
+	fmt.Println("Close this window or enter Ctrl+C to quit")
 
-  http.HandleFunc("/record/", recordHandler)
+	http.HandleFunc("/record/", recordHandler)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
