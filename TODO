@@ -69,9 +69,9 @@
 
 [ ] Prototyping
   [x] Connect to the sqlite database
-  [ ] Select information from a history_record
-  [ ] Display history_record in a html template
-  [ ] Run a server and view that record
+  [x] Select information from a history_record
+  [x] Display history_record in a html template
+  [x] Run a server and view that record
   [ ] After users table has been created:
     [ ] Add a login template
     [ ] Add a function for authenticating users

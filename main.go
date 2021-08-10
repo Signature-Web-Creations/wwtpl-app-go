@@ -1,116 +1,113 @@
 package main
 
 import (
-  "database/sql"
-  "fmt"
-  "log"
-
-  _ "github.com/mattn/go-sqlite3"
+	"database/sql"
+	"fmt"
+	_ "github.com/mattn/go-sqlite3"
+	"log"
+	"net/http"
+  "strconv"
+  "html/template"
 )
 
 var db *sql.DB
 
-type Album struct {
-  ID int64
-  Title string
-  Artist string
-  Album string
-  Price float32
+type HistoryRecord struct {
+	ID             int64
+	Title          string
+	FileAttachment *string
+	AttachmentType *string
+	Content        string
+	Date           string
+	Origin         string
+	Author         *string
+	RecordType     *string
+	SourceArchive  *string
+	DateEntered    *string
+	Collection     *string
+	EnteredBy      string
+}
+
+func handler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Hi there, I love %s!", r.URL.Path[1:])
+
+	record, err := historyRecordByID(1)
+	if err != nil {
+		log.Fatal(err)
+	}
+  
+  fmt.Println(record.Title)
+}
+
+func recordHandler(w http.ResponseWriter, r *http.Request) {
+  id, err := strconv.Atoi(r.URL.Path[len("/record/"):])
+  
+  if err != nil {
+    fmt.Fprintf(w, "Can't find record: %v", err)
+  } else {
+    record, err := historyRecordByID(int64(id))
+
+    if err != nil {
+      fmt.Fprintf(w, "Couldn't find record for: %d", id)
+    } else {
+      tmpl := template.Must(template.ParseFiles("templates/record.html"))
+      fmt.Println("Rendering template")
+      fmt.Println(record)
+      tmpl.Execute(w, record)
+    }
+  }
 }
 
 func main() {
-  dsn := "file:test.db"
+	dsn := "file:archive.db"
 
-  var err error
-  db, err = sql.Open("sqlite3", dsn)
+	var err error
+	db, err = sql.Open("sqlite3", dsn)
 
-  if err != nil {
-    log.Fatal(err)
-  }
+	if err != nil {
+		log.Fatal(err)
+	}
 
-  pingErr := db.Ping()
-  if pingErr != nil {
-    log.Fatal(pingErr)
-  }
+	pingErr := db.Ping()
+	if pingErr != nil {
+		log.Fatal(pingErr)
+	}
 
-  fmt.Println("Connected")
+	fmt.Println("Connected")
 
-  albums, err := albumsByArtist("John Coltrane")
-  if err != nil {
-    log.Fatal(err)
-  }
-  fmt.Println("Albums found: %v\n", albums)
-
-  alb, err := albumByID(2)
-  if err != nil {
-    log.Fatal(err)
-  }
-
-  fmt.Printf("Album found: %v\n", alb)
-
-  albID, err := addAlbum(Album{
-    Title: "The Modern Sound of Betty Carter",
-    Artist: "Betty Carter",
-    Price: 49.99,
-  })
-
-  if err != nil {
-    log.Fatal(err)
-  }
-  fmt.Printf("ID of added album: %v\n", albID)
+  http.HandleFunc("/record/", recordHandler)
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
-func albumsByArtist(name string) ([]Album, error) {
-  // An albums slice to hold the data from returned rows.
-  var albums []Album
+func updateAttachmentType(attachment_type_id int64, attachment_type string) (bool, error) {
+	_, err := db.Exec(
+		"UPDATE history_record SET attachment_type_id=? WHERE attachment_type=?",
+		attachment_type_id,
+		attachment_type)
 
-  rows, err := db.Query("SELECT * FROM album WHERE artist = ?", name)
-  if err != nil {
-    return nil, fmt.Errorf("albumsByArtist %q: %v", name, err)
-  }
+	if err != nil {
+		return false, fmt.Errorf("updateAttachmentType: %v", err)
+	}
 
-  defer rows.Close()
-
-  // Loop through rows, using Scan to assign column data to struct fields
-  for rows.Next() {
-    var alb Album
-    if err := rows.Scan(&alb.ID, &alb.Title, &alb.Artist, &alb.Price); err != nil {
-      return nil, fmt.Errorf("albumsByArtist %q: %v", name, err)
-    }
-    albums = append(albums, alb)
-  }
-
-  if err := rows.Err(); err != nil {
-    return nil, fmt.Errorf("albumsByArtist %q: %v", name, err)
-  }
-
-  return albums, nil
+	return true, nil
 }
 
-func albumByID(id int64) (Album, error) {
-  // An album to hold data from the return row.
-  var alb Album
+func historyRecordByID(id int64) (HistoryRecord, error) {
+	var record HistoryRecord
 
-  row := db.QueryRow("SELECT * FROM album WHERE id = ?", id)
-  if err := row.Scan(&alb.ID, &alb.Title, &alb.Artist, &alb.Price); err != nil {
-    if err == sql.ErrNoRows {
-      return  alb, fmt.Errorf("albumsByID %d: no such album", id)
-    }
-    return alb, fmt.Errorf("albumsByID %d: %v", id, err)
-  }
+	row := db.QueryRow(`
+  SELECT title, file_attachment, attachment_type, content, date, origin, author, record_type, collection, entered_by
+  FROM history_record
+  WHERE id=?`, id)
 
-  return alb, nil
-}
+	err := row.Scan(&record.Title, &record.FileAttachment, &record.AttachmentType, &record.Content, &record.Date,
+		&record.Origin, &record.Author, &record.RecordType, &record.Collection, &record.EnteredBy)
 
-func addAlbum(alb Album) (int64, error) {
-  result, err := db.Exec("INSERT INTO album (title, artist, price) VALUES (?, ?, ?)", alb.Title, alb.Artist, alb.Price)
-  if err != nil {
-    return 0, fmt.Errorf("addAlbum: %v", err)
-  }
-
-  id, err := result.LastInsertId()
-  if err != nil {
-    return 0, fmt.Errorf("addAlbum: %v", err)
-  }
-  return id, nil
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return record, fmt.Errorf("historyRecordById %d: no such record", id)
+		}
+		return record, fmt.Errorf("historyRecordById %d: %v", id, err)
+	}
+	return record, nil
 }
