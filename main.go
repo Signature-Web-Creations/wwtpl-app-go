@@ -35,13 +35,13 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-  
+
   fmt.Println(record.Title)
 }
 
 func recordHandler(w http.ResponseWriter, r *http.Request) {
   id, err := strconv.Atoi(r.URL.Path[len("/record/"):])
-  
+
   if err != nil {
     fmt.Fprintf(w, "Can't find record: %v", err)
   } else {
@@ -73,7 +73,10 @@ func main() {
 		log.Fatal(pingErr)
 	}
 
-	fmt.Println("Connected")
+  fmt.Println("Running Williamsport-Washington Township Public Library - History Database")
+  fmt.Println("Server is listening on localhost:8080")
+	fmt.Println("Successfuly connected to Database")
+  fmt.Println("Close this window or enter Ctrl+C to quit")
 
   http.HandleFunc("/record/", recordHandler)
 	log.Fatal(http.ListenAndServe(":8080", nil))
