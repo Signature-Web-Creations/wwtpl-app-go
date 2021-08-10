@@ -42,3 +42,8 @@ During development assuming that you have everything installed (go, go-sqlite3)
 run the server with `go run .` 
 
 You can view an example page by visiting: localhost:8080/record/1 
+
+## Maintainability
+Since the database is a single file, we can backup the database by copying the file. 
+The database should be backuped every week and stores for up to 5 weeks before 
+it deletes the oldest backup 
