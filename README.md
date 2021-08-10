@@ -36,3 +36,9 @@ CGO_ENABLED needs to be set to 1. In Windows this is done with
 The sqlite database has to be in the same folder. For deploying the app the 
 plan is to create a zip file and download it onto the server. Double-clicking
 the executable should be enough to get it to run
+
+## Running the server
+During development assuming that you have everything installed (go, go-sqlite3) 
+run the server with `go run .` 
+
+You can view an example page by visiting: localhost:8080/record/1 
