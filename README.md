@@ -14,7 +14,7 @@ Requirements:
 
 Installation:
 
-This project uses [go-sqlite3](github.com/mattn/go-sqlite3) as a database driver. This is a cgo package
+This project uses [go-sqlite3](https://github.com/mattn/go-sqlite3) as a database driver. This is a cgo package
 so it needs to be compiled:
 * Install with `go get .`
 * `export CGO_ENABLED=1`
