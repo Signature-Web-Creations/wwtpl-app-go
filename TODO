@@ -29,9 +29,9 @@
     [ ] Create a collection table
     [ ] Populate the collection table
     [ ] Denormalize the history_record table
-      [ ] Add attachment_type_id (fk) to history_record
-      [ ] Update attachment_type_id based on the current attachment_type
-      [ ] Remove attachment_type 
+      [x] Add attachment_type_id (fk) to history_record
+      [x] Update attachment_type_id based on the current attachment_type
+      [x] Remove attachment_type 
       [ ] Add record_type_id (fk) to history_record
       [ ] Update record_type_id based on the current record_type
       [ ] Remove record_type 
