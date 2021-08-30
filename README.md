@@ -39,11 +39,26 @@ the executable should be enough to get it to run
 
 ## Running the server
 During development assuming that you have everything installed (go, go-sqlite3) 
-run the server with `go run .` 
+switch to the api directory and run the server with `go run .` 
 
 You can view an example page by visiting: localhost:8080/record/1 
 
 ## Maintainability
+
 Since the database is a single file, we can backup the database by copying the file. 
 The database should be backuped every week and stores for up to 5 weeks before 
 it deletes the oldest backup 
+
+## Source Archive and Collections
+
+Source Archive is where the archive is physically located and stored.
+
+One record can belong to multiple collections. 
+But a record will only belong to one source archive. 
+
+Every record should have at least one collection. 
+That is a validation constraint more than an database one. 
+
+There is a many to many relationship between Collections and Records. 
+
+Admins need the ability to add collections. 

@@ -26,21 +26,25 @@
     [x] Populate the record_type table
     [x] Create the source_archive table
     [x] Populate the source_archive table
-    [ ] Create a collection table
-    [ ] Populate the collection table
+    [x] Create a collection table
+    [x] Populate the collection table
     [ ] Denormalize the history_record table
       [x] Add attachment_type_id (fk) to history_record
       [x] Update attachment_type_id based on the current attachment_type
       [x] Remove attachment_type 
+      [ ] Create a file_attachment table
+      [ ] Move file_attachment to file_attachment_table
+      [ ] Add file_attachment_id to history_record
+      [ ] Remove file_attachment from history_record
       [ ] Add record_type_id (fk) to history_record
       [ ] Update record_type_id based on the current record_type
       [ ] Remove record_type 
       [ ] Add source_archive_id to history_record
       [ ] Update source_archive_id based on the current source_archive 
       [ ] Remove source_archive
-      [ ] Add collection_id to history_record
-      [ ] Update collection_id based on the current collection
-      [ ] Remove collection 
+      [x] Add collection_id to history_record
+      [x] Update collection_id based on the current collection
+      [x] Remove collection 
     [x] Add deleted_at field to history_record - default NULL 
     [x] Create a record_status table
     [x] Populate the record_status table (in_progress, pending_approval, published, unpublished)
@@ -57,6 +61,7 @@
     [ ] Create a template for viewing history_records (50 at a time)
     [ ] Create a template for creating history_records
     [ ] Create a template for editing history_records
+    [ ] Create a template for logging in
   [ ] Controllers
     [ ] Create a handler that shows users their in progress records
     [ ] Create a handler that saves history_records
