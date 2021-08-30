@@ -39,12 +39,12 @@
       [ ] Add record_type_id (fk) to history_record
       [ ] Update record_type_id based on the current record_type
       [ ] Remove record_type 
-      [ ] Add source_archive_id to history_record
-      [ ] Update source_archive_id based on the current source_archive 
+      [x] Add source_archive_id to history_record
+      [x] Update source_archive_id based on the current source_archive 
       [ ] Remove source_archive
       [x] Add collection_id to history_record
       [x] Update collection_id based on the current collection
-      [x] Remove collection 
+      [ ] Remove collection 
     [x] Add deleted_at field to history_record - default NULL 
     [x] Create a record_status table
     [x] Populate the record_status table (in_progress, pending_approval, published, unpublished)
