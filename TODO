@@ -81,3 +81,9 @@
     [ ] Add a function for authenticating users
     [ ] Add a function for creating users
   [x] Compile and run app on windows and linux
+[ ] API  
+  [x] Create GET /records for getting records
+  [ ] Create GET /records?offset= for paginating records
+  [ ] Create POST /records for creating record
+  [ ] Create GET /records/:id for getting a single record  
+  [ ] Create POST /records/:id for updating records

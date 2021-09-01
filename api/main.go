@@ -8,15 +8,25 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+  "github.com/gin-gonic/gin"
 )
 
 var db *sql.DB
 
 type HistoryRecord struct {
-	ID             int64
-	Title          string
+	ID    int64 `json:"id"`
+	Title string `json:"title"`
+  Date string `json:"date"`
 }
 
+func getRecords(c *gin.Context) {
+  records, err := allHistoryRecords(0)
+  if (err != nil) {
+    fmt.Printf("Error: %v", err)
+    c.IndentedJSON(http.StatusOK, records)
+  }
+  c.IndentedJSON(http.StatusOK, records)
+}
 
 func recordHandler(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(r.URL.Path[len("/record/"):])
@@ -36,6 +46,7 @@ func recordHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 }
+
 
 func main() {
 	dsn := "file:archive.db"
@@ -57,8 +68,43 @@ func main() {
 	fmt.Println("Successfuly connected to Database")
 	fmt.Println("Close this window or enter Ctrl+C to quit")
 
-	http.HandleFunc("/record/", recordHandler)
-	log.Fatal(http.ListenAndServe(":8080", nil))
+  router := gin.Default()
+  router.GET("/records", getRecords)
+  router.Run("localhost:8080")
+}
+
+func allHistoryRecords(offset int) ([]HistoryRecord, error) {
+  var records []HistoryRecord
+
+  rows, err := db.Query(`
+  SELECT id, date, title
+  FROM history_record
+  WHERE deleted_at IS NULL
+    AND record_status_id = 3
+  ORDER BY date(date), title ASC
+  LIMIT 50
+  OFFSET ?
+  ;`, offset)
+
+  if err != nil {
+    return nil, fmt.Errorf("allHistoryRecords: %v", err)
+  }
+
+  defer rows.Close()
+
+  for rows.Next() {
+    var record HistoryRecord
+    if err := rows.Scan(&record.ID, &record.Title, &record.Date); err != nil {
+      return nil, fmt.Errorf("allHistoryRecords: %v", err)
+    }
+    records = append(records, record)
+  }
+
+  if err := rows.Err(); err != nil {
+    return nil, fmt.Errorf("allHistoryRecords: %v", err)
+  }
+
+  return records, nil
 }
 
 func historyRecordByID(id int64) (HistoryRecord, error) {
@@ -69,8 +115,8 @@ func historyRecordByID(id int64) (HistoryRecord, error) {
   FROM history_record
   WHERE id=?`, id)
 
-	err := row.Scan(&record.Title);
-  record.ID = id;
+	err := row.Scan(&record.Title)
+	record.ID = id
 
 	if err != nil {
 		if err == sql.ErrNoRows {
