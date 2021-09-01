@@ -28,7 +28,7 @@
     [x] Populate the source_archive table
     [x] Create a collection table
     [x] Populate the collection table
-    [ ] Denormalize the history_record table
+    [ ] Normalize the history_record table
       [x] Add attachment_type_id (fk) to history_record
       [x] Update attachment_type_id based on the current attachment_type
       [x] Remove attachment_type 
@@ -36,8 +36,8 @@
       [ ] Move file_attachment to file_attachment_table
       [ ] Add file_attachment_id to history_record
       [ ] Remove file_attachment from history_record
-      [ ] Add record_type_id (fk) to history_record
-      [ ] Update record_type_id based on the current record_type
+      [x] Add record_type_id (fk) to history_record
+      [x] Update record_type_id based on the current record_type
       [ ] Remove record_type 
       [x] Add source_archive_id to history_record
       [x] Update source_archive_id based on the current source_archive 
