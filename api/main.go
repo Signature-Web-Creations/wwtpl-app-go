@@ -94,7 +94,7 @@ func allHistoryRecords(offset int) ([]HistoryRecord, error) {
 
   for rows.Next() {
     var record HistoryRecord
-    if err := rows.Scan(&record.ID, &record.Title, &record.Date); err != nil {
+    if err := rows.Scan(&record.ID, &record.Date, &record.Title); err != nil {
       return nil, fmt.Errorf("allHistoryRecords: %v", err)
     }
     records = append(records, record)

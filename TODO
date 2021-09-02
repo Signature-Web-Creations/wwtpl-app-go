@@ -32,7 +32,7 @@
       [x] Add attachment_type_id (fk) to history_record
       [x] Update attachment_type_id based on the current attachment_type
       [x] Remove attachment_type 
-      [ ] Create a file_attachment table
+      [x] Create a file_attachment table
       [ ] Move file_attachment to file_attachment_table
       [ ] Add file_attachment_id to history_record
       [ ] Remove file_attachment from history_record
@@ -83,6 +83,7 @@
   [x] Compile and run app on windows and linux
 [ ] API  
   [x] Create GET /records for getting records
+  [ ] GET /records should return all fields not just id, title, and date
   [ ] Create GET /records?offset= for paginating records
   [ ] Create POST /records for creating record
   [ ] Create GET /records/:id for getting a single record  
