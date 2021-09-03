@@ -7,7 +7,7 @@ export default function RecordTable(props) {
         <span> Date </span>
         <span> Title </span>
       </div>
-      {props.records.map(({date, title}) => <RecordRow date={date} title={title} />)}
+      {props.records.map(({id, date, title}) => <RecordRow id={id} key={id} date={date} title={title} />)}
     </div>
   );
 }

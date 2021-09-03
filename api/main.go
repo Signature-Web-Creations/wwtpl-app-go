@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	_ "github.com/mattn/go-sqlite3"
-	"html/template"
 	"log"
 	"net/http"
 	"strconv"
@@ -35,23 +34,20 @@ func getRecords(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, records)
 }
 
-func recordHandler(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(r.URL.Path[len("/record/"):])
-
+func getRecordByID(c *gin.Context) {
+	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
-		fmt.Fprintf(w, "Can't find record: %v", err)
-	} else {
-		record, err := historyRecordByID(int64(id))
-
-		if err != nil {
-			fmt.Fprintf(w, "Couldn't find record for: %d", id)
-		} else {
-			tmpl := template.Must(template.ParseFiles("templates/record.html"))
-			fmt.Println("Rendering template")
-			fmt.Println(record)
-			tmpl.Execute(w, record)
-		}
+		fmt.Printf("Error: %v", err)
+		return
 	}
+
+	record, err := historyRecordByID(id)
+	if err != nil {
+		fmt.Printf("Error: %v", err)
+		c.IndentedJSON(http.StatusOK, record)
+	} else {
+	  c.IndentedJSON(http.StatusOK, record)
+  }
 }
 
 func main() {
@@ -76,6 +72,7 @@ func main() {
 
 	router := gin.Default()
 	router.GET("/records", getRecords)
+	router.GET("/records/:id", getRecordByID)
 	router.Run("localhost:8080")
 }
 
@@ -180,12 +177,33 @@ func historyRecordByID(id int64) (HistoryRecord, error) {
 	var record HistoryRecord
 
 	row := db.QueryRow(`
-  SELECT title 
+  SELECT
+    history_record.id,
+    history_record.date,
+    history_record.title,
+    history_record.content,
+    history_record.origin,
+    history_record.author,
+    source_archive.name,
+    attachment_type_name,
+    file_name,
+    record_type.name
   FROM history_record
-  WHERE id=?`, id)
+  LEFT OUTER JOIN (
+    SELECT record_id, file_name, attachment_type.name as attachment_type_name
+    FROM file_attachment
+    INNER JOIN attachment_type
+    ON attachment_type.id = attachment_type_id
+  ) ON history_record.id = record_id
+  LEFT OUTER JOIN record_type ON history_record.id = record_type.id
+  LEFT OUTER JOIN source_archive ON history_record.source_archive_id = source_archive.id
+  WHERE record_status_id = 3
+   AND deleted_at IS NULL
+   AND history_record.id = ? 
+  `, id)
 
-	err := row.Scan(&record.Title)
-	record.ID = id
+	err := row.Scan(&record.ID, &record.Date, &record.Title, &record.Content, &record.Origin,
+		&record.Author, &record.SourceArchive, &record.AttachmentType, &record.FileName, &record.RecordType)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
