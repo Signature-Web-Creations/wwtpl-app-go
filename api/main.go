@@ -3,29 +3,36 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	_ "github.com/mattn/go-sqlite3"
 	"html/template"
 	"log"
 	"net/http"
 	"strconv"
-  "github.com/gin-gonic/gin"
 )
 
 var db *sql.DB
 
 type HistoryRecord struct {
-	ID    int64 `json:"id"`
-	Title string `json:"title"`
-  Date string `json:"date"`
+	ID             int64   `json:"id"`
+	Date           string  `json:"date"`
+	Title          string  `json:"title"`
+	Content        string  `json:"content"`
+	Origin         string  `json:"origin"`
+	Author         string  `json:"author"`
+	SourceArchive  *string `json:"sourceArchive"`
+	AttachmentType *string `json:"attachmentType"`
+	FileName       *string `json:"fileName"`
+	RecordType     *string `json:"recordType"`
 }
 
 func getRecords(c *gin.Context) {
-  records, err := allHistoryRecords(0)
-  if (err != nil) {
-    fmt.Printf("Error: %v", err)
-    c.IndentedJSON(http.StatusOK, records)
-  }
-  c.IndentedJSON(http.StatusOK, records)
+	records, err := publishedHistoryRecords()
+	if err != nil {
+		fmt.Printf("Error: %v", err)
+		c.IndentedJSON(http.StatusOK, records)
+	}
+	c.IndentedJSON(http.StatusOK, records)
 }
 
 func recordHandler(w http.ResponseWriter, r *http.Request) {
@@ -47,7 +54,6 @@ func recordHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-
 func main() {
 	dsn := "file:archive.db"
 
@@ -68,15 +74,15 @@ func main() {
 	fmt.Println("Successfuly connected to Database")
 	fmt.Println("Close this window or enter Ctrl+C to quit")
 
-  router := gin.Default()
-  router.GET("/records", getRecords)
-  router.Run("localhost:8080")
+	router := gin.Default()
+	router.GET("/records", getRecords)
+	router.Run("localhost:8080")
 }
 
 func allHistoryRecords(offset int) ([]HistoryRecord, error) {
-  var records []HistoryRecord
+	var records []HistoryRecord
 
-  rows, err := db.Query(`
+	rows, err := db.Query(`
   SELECT id, date, title
   FROM history_record
   WHERE deleted_at IS NULL
@@ -86,25 +92,88 @@ func allHistoryRecords(offset int) ([]HistoryRecord, error) {
   OFFSET ?
   ;`, offset)
 
-  if err != nil {
-    return nil, fmt.Errorf("allHistoryRecords: %v", err)
-  }
+	if err != nil {
+		return nil, fmt.Errorf("allHistoryRecords: %v", err)
+	}
 
-  defer rows.Close()
+	defer rows.Close()
 
-  for rows.Next() {
-    var record HistoryRecord
-    if err := rows.Scan(&record.ID, &record.Date, &record.Title); err != nil {
-      return nil, fmt.Errorf("allHistoryRecords: %v", err)
-    }
-    records = append(records, record)
-  }
+	for rows.Next() {
+		var record HistoryRecord
+		if err := rows.Scan(&record.ID, &record.Date, &record.Title); err != nil {
+			return nil, fmt.Errorf("allHistoryRecords: %v", err)
+		}
+		records = append(records, record)
+	}
 
-  if err := rows.Err(); err != nil {
-    return nil, fmt.Errorf("allHistoryRecords: %v", err)
-  }
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("allHistoryRecords: %v", err)
+	}
 
-  return records, nil
+	return records, nil
+}
+
+func publishedHistoryRecords() ([]HistoryRecord, error) {
+
+	var records []HistoryRecord
+
+	rows, err := db.Query(`
+  SELECT
+    history_record.id,
+    history_record.date,
+    history_record.title,
+    history_record.content,
+    history_record.origin,
+    history_record.author,
+    source_archive.name,
+    attachment_type_name,
+    file_name,
+    record_type.name
+  FROM history_record
+  LEFT OUTER JOIN (
+    SELECT record_id, file_name, attachment_type.name as attachment_type_name
+    FROM file_attachment
+    INNER JOIN attachment_type
+    ON attachment_type.id = attachment_type_id
+  ) ON history_record.id = record_id
+  LEFT OUTER JOIN record_type ON history_record.id = record_type.id
+  LEFT OUTER JOIN source_archive ON history_record.source_archive_id = source_archive.id
+  WHERE record_status_id = 3
+   AND deleted_at IS NULL
+  ORDER BY date(history_record.date), history_record.title
+  LIMIT 50
+  `)
+
+	if err != nil {
+		return nil, fmt.Errorf("publishedHistoryRecords: %v", err)
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var record HistoryRecord
+		err := rows.Scan(
+			&record.ID,
+			&record.Date,
+			&record.Title,
+			&record.Content,
+			&record.Origin,
+			&record.Author,
+			&record.SourceArchive,
+			&record.AttachmentType,
+			&record.FileName,
+			&record.RecordType)
+		if err != nil {
+			return nil, fmt.Errorf("publishedHistoryRecords: %v", err)
+		}
+		records = append(records, record)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("publishedHistoryRecords: %v", err)
+	}
+
+	return records, nil
 }
 
 func historyRecordByID(id int64) (HistoryRecord, error) {
