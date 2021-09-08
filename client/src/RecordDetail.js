@@ -1,7 +1,13 @@
-import {useState, useEffect} from 'react'; 
+import { useParams } from 'react-router-dom'; 
+import { useState, useEffect } from 'react';
+import { getRecordByID } from './api';
 
 function Loading() {
   return <h1> Loading </h1> 
+}
+
+function ParamError() {
+  return <h1> Couldn't parse parameter </h1>
 }
 
 function Detail(props) {
@@ -16,16 +22,15 @@ function Detail(props) {
   
 
 function RecordDetail(props) {
-  const id = props.id;
-  const [record, setRecord] = useState(null); 
-  
-  useEffect(() => {
-    fetch(`/records/${id}`)
-      .then((res) => res.json())
-      .then((data) => setRecord(data))
-  }); 
+  let {id} = useParams();
 
-  if (record === null) {
+  const [record, setRecord] = useState(null)
+
+  useEffect(() => {
+    getRecordByID(id).then(setRecord)
+  }, [])
+
+  if (!record) {
     return <Loading />
   } else {
     return <Detail record={record} />
