@@ -6,10 +6,6 @@ function Loading() {
   return <h1> Loading </h1> 
 }
 
-function ParamError() {
-  return <h1> Couldn't parse parameter </h1>
-}
-
 function Detail(props) {
   const record = props.record;
   return (
@@ -28,7 +24,7 @@ function RecordDetail(props) {
 
   useEffect(() => {
     getRecordByID(id).then(setRecord)
-  }, [])
+  }, [id])
 
   if (!record) {
     return <Loading />
