@@ -1,6 +1,7 @@
 import {useState, useEffect} from 'react';
 import { BrowserRouter, Route} from 'react-router-dom'; 
 
+import Header from './Header';
 import RecordTable from './RecordTable';
 import RecordDetail from './RecordDetail';
 
@@ -17,12 +18,13 @@ function App() {
 
   return (
       <BrowserRouter>
-        <div className="App">
+        <div className="uk-marign-top">
           <Route path="/record/:id">
             <RecordDetail records={records} />
           </Route> 
 
           <Route exact path="/"> 
+            <Header text={"History List"} />
             <RecordTable records={!records ? [] : records} />
           </Route>
 
