@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Internal Edit Template</title>
+
+    <!-- UIkit CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/uikit@3.7.2/dist/css/uikit.min.css"
+    />
+
+    <!-- UIkit JS -->
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.7.2/dist/js/uikit.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.7.2/dist/js/uikit-icons.min.js"></script>
+  </head>
+  <body>
+    <div class="uk-container uk-container-medium">
+      <div class="uk-margin-top">
+        <div class="uk-text-lead">Edit a Record</div>
+      </div>
+
+      <table class="uk-table uk-table-small uk-table-divider uk-margin-medium">
+        <tbody>
+          <tr>
+            <td class="uk-width-medium"><strong>Title</strong></td>
+            <td><input class="uk-input" type="text" placeholder="Title" /></td>
+          </tr>
+          <tr>
+            <td><strong>File Attachment</strong></td>
+            <td>
+              <div uk-form-custom="target: true">
+                <input type="file" />
+                <input
+                  class="uk-input uk-form-width-medium"
+                  type="text"
+                  placeholder="Select file"
+                  disabled
+                />
+              </div>
+              <button class="uk-button uk-button-default">Submit</button>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <strong>
+                Attachment Type
+              </strong>
+            </td>
+            <td>
+              <select class="uk-select">
+                <option value="">Select One</option>
+                <option>Image</option>
+                <option>Video</option>
+                <option>Document/PDF</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <strong>
+                Content
+              </strong>
+            </td>
+            <td>
+              <textarea
+                class="uk-textarea"
+                rows="5"
+                placeholder="Description"
+              ></textarea>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <strong>
+                Date
+              </strong>
+            </td>
+            <td><input class="uk-input" type="date" placeholder="Input" /></td>
+          </tr>
+          <tr>
+            <td>
+              <strong>
+                Origin
+              </strong>
+            </td>
+            <td>
+              <select class="uk-select">
+                <option value="">Select One</option>
+                <option>Option 1</option>
+                <option>Option 2</option>
+                <option>Option 3</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <strong>
+                Author
+              </strong>
+            </td>
+            <td><input class="uk-input" type="text" placeholder="Author" /></td>
+          </tr>
+          <tr>
+            <td>
+              <strong>
+                Record ID
+              </strong>
+            </td>
+            <td>
+              <input
+                class="uk-input"
+                type="text"
+                disabled
+                placeholder="Record ID"
+              />
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <strong>
+                Type
+              </strong>
+            </td>
+            <td>
+              <select class="uk-select">
+                <option value="">Select One</option>
+                <option>Option 1</option>
+                <option>Option 2</option>
+                <option>Option 3</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <strong>
+                Source Archive
+              </strong>
+            </td>
+            <td>
+              <select class="uk-select">
+                <option value="">Select One</option>
+                <option>Option 1</option>
+                <option>Option 2</option>
+                <option>Option 3</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <strong>
+                Date Entered
+              </strong>
+            </td>
+            <td><input class="uk-input" type="date" placeholder="Input" /></td>
+          </tr>
+          <tr>
+            <td>
+              <strong>
+                Collection
+              </strong>
+            </td>
+            <td>
+              <label>
+                <input class="uk-checkbox" type="checkbox" />
+                &nbsp;&nbsp; Option 01
+              </label>
+              <br />
+              <label>
+                <input class="uk-checkbox" type="checkbox" />
+                &nbsp;&nbsp; Option 02
+              </label>
+              <br />
+              <label>
+                <input class="uk-checkbox" type="checkbox" />
+                &nbsp;&nbsp; Option 03
+              </label>
+              <br />
+              <label>
+                <input class="uk-checkbox" type="checkbox" />
+                &nbsp;&nbsp; Option 04
+              </label>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>
