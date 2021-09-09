@@ -5,7 +5,7 @@ export default function RecordRow(props) {
       <td>{props.date}</td>
       <td>{props.title}</td>
       <td>
-        <a className="uk-button uk-button-primary" type="button"> View </a>
+        <a href={href} className="uk-button uk-button-primary"> View </a>
       </td>
     </tr>
   );
