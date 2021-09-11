@@ -205,7 +205,7 @@ func historyRecordByID(id int64) (HistoryRecord, error) {
     INNER JOIN attachment_type
     ON attachment_type.id = attachment_type_id
   ) ON history_record.id = file_attachment_record_id
-  LEFT OUTER JOIN record_type ON history_record.id = record_type.id
+  LEFT OUTER JOIN record_type ON history_record.record_type_id = record_type.id
   LEFT OUTER JOIN source_archive ON history_record.source_archive_id = source_archive.id
   WHERE record_status_id = 3
   AND deleted_at IS NULL
