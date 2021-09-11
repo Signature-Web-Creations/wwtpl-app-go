@@ -2,6 +2,14 @@ import { useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { getRecordByID } from './api';
 
+const getValueOrDefault = (value, defaultValue) => {
+  if (value) {
+    return value
+  } else {
+    return defaultValue;
+  }
+}
+
 function Loading() {
   return <h1> Loading </h1> 
 }
@@ -15,11 +23,24 @@ function TitleRow(props) {
   )
 }
 
+function ImageRow(props) {
+  return (
+    <tr>
+      <td><strong>Image</strong></td>
+      <td><img alt="image" src={`/media/${props.src}`} /></td>
+    </tr>
+  )
+}
+
 function FileAttachmentRow(props) {
-  if (props.fileAttachment === null) {
+  if (props.attachmentType === null) {
     return null;
   }
-  return null;
+  else if (props.attachmentType === 'image') {
+    return <ImageRow src={props.fileName} />
+  } else {
+    return null;
+  }
 }
 
 function ContentRow(props) {
@@ -74,7 +95,7 @@ function OriginRow(props) {
         Origin
       </strong>
      </td>
-     <td>Warren County Centennial</td>
+     <td>{getValueOrDefault(props.origin, "Origin Unknown")}</td>
     </tr>
   )
 }
@@ -87,7 +108,7 @@ function AuthorRow(props) {
           Author
         </strong>
       </td>
-      <td>Name of the Author</td>
+      <td>{getValueOrDefault(props.author, "Unknown")}</td>
     </tr>
   );
 }
@@ -100,7 +121,7 @@ function RecordTypeRow(props) {
           Type
         </strong>
       </td>
-      <td>Photograph</td>
+      <td>{getValueOrDefault(props.recordType, "Unknown")}</td>
     </tr>
   );
 }
@@ -113,12 +134,32 @@ function SourceArchiveRow(props) {
           Source Archive
         </strong>
       </td>
-      <td>Williamsport-Washington Township Public Library</td>
+      <td>{getValueOrDefault(props.sourceArchive, "Unknown")}</td>
     </tr>
   );
 }
 
+function getCollectionArray(collections){
+  if (collections) {
+    return collections.split(';');
+  } else {
+    return [];
+  }
+}
+
 function CollectionRow(props) {
+  let collections = getCollectionArray(props.collections)
+
+  const collectionLabel = (collection) => {
+    return (
+      <span className="uk-label"> {collection} </span>
+    )
+  }
+  
+  if (collections.length === 0) {
+    collections.push('Collection Unknown');
+  }
+
   return (
     <tr>
       <td>
@@ -126,16 +167,8 @@ function CollectionRow(props) {
           Collection
         </strong>
       </td>
-      <td>
-        <span class="uk-label">
-          Williamsport-Washington Township Public Library
-        </span>
-        <span class="uk-label">
-          Warren County Schools
-        </span>
-        <span class="uk-label">
-          West Lebanon Public Library
-        </span>
+      <td> 
+        {collections.map(collectionLabel)}
       </td>
     </tr>
   );
@@ -147,14 +180,14 @@ function Detail(props) {
     <table className="uk-table uk-table-small uk-table-divider uk-margin-medium">
       <tbody>
         <TitleRow title={record.title} />
-        <FileAttachmentRow attachmentType={record.attachmentType} attachmentName={record.attachmentName} />
+        <FileAttachmentRow attachmentType={record.attachmentType} fileName={record.fileName} />
         <ContentRow content={record.content} />
         <DateRow date={record.date} />
         <OriginRow origin={record.origin} />
         <AuthorRow author={record.author} />
         <RecordTypeRow recordType={record.recordType} />
         <SourceArchiveRow sourceArchive={record.sourceArchive} />
-        <CollectionRow colletions={record.collections} />
+        <CollectionRow collections={record.collections} />
       </tbody>
     </table>
   );
