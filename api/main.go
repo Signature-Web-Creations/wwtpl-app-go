@@ -23,11 +23,11 @@ type HistoryRecord struct {
 	AttachmentType *string `json:"attachmentType"`
 	FileName       *string `json:"fileName"`
 	RecordType     *string `json:"recordType"`
-  Collections    *string  `json:"collections"`
+	Collections    *string `json:"collections"`
 }
 
 func getRecords(c *gin.Context) {
-	records, err := publishedHistoryRecords()
+	records, err := publishedHistoryRecords(0)
 	if err != nil {
 		fmt.Printf("Error: %v", err)
 		c.IndentedJSON(http.StatusOK, records)
@@ -111,7 +111,7 @@ func allHistoryRecords(offset int) ([]HistoryRecord, error) {
 	return records, nil
 }
 
-func publishedHistoryRecords() ([]HistoryRecord, error) {
+func publishedHistoryRecords(offset int) ([]HistoryRecord, error) {
 
 	var records []HistoryRecord
 
@@ -126,21 +126,26 @@ func publishedHistoryRecords() ([]HistoryRecord, error) {
     source_archive.name,
     attachment_type_name,
     file_name,
-    record_type.name
+    record_type.name,
+    (SELECT GROUP_CONCAT(collection.name, ';')
+     FROM history_record hr
+     LEFT OUTER JOIN record_collections ON hr.id = record_collections.record_id
+     LEFT OUTER JOIN collection ON record_collections.collection_id = collection.id
+     WHERE history_record.id = hr.id) AS collections  
   FROM history_record
   LEFT OUTER JOIN (
     SELECT record_id as file_attachment_record_id, file_name, attachment_type.name as attachment_type_name
     FROM file_attachment
     INNER JOIN attachment_type
     ON attachment_type.id = attachment_type_id
-  ) ON history_record.id = file_attachment_record_id
-  LEFT OUTER JOIN record_type ON history_record.id = record_type.id
+    ) ON history_record.id = file_attachment_record_id
+  LEFT OUTER JOIN record_type ON history_record.record_type_id = record_type.id
   LEFT OUTER JOIN source_archive ON history_record.source_archive_id = source_archive.id
   WHERE record_status_id = 3
-   AND deleted_at IS NULL
+  AND deleted_at IS NULL
   ORDER BY date(history_record.date), history_record.title
-  LIMIT 50
-  `)
+  LIMIT 50 OFFSET 0
+  `, offset)
 
 	if err != nil {
 		return nil, fmt.Errorf("publishedHistoryRecords: %v", err)
@@ -160,7 +165,8 @@ func publishedHistoryRecords() ([]HistoryRecord, error) {
 			&record.SourceArchive,
 			&record.AttachmentType,
 			&record.FileName,
-			&record.RecordType)
+			&record.RecordType,
+      &record.Collections)
 		if err != nil {
 			return nil, fmt.Errorf("publishedHistoryRecords: %v", err)
 		}
@@ -208,7 +214,7 @@ func historyRecordByID(id int64) (HistoryRecord, error) {
 
 	err := row.Scan(&record.ID, &record.Date, &record.Title, &record.Content, &record.Origin,
 		&record.Author, &record.SourceArchive, &record.AttachmentType, &record.FileName, &record.RecordType,
-    &record.Collections)
+		&record.Collections)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
