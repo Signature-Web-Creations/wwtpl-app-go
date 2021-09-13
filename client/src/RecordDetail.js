@@ -27,7 +27,7 @@ function ImageRow(props) {
   return (
     <tr>
       <td><strong>Image</strong></td>
-      <td><img alt="image" src={`/media/${props.src}`} /></td>
+      <td><img alt={props.alt} src={`/media/${props.src}`} /></td>
     </tr>
   )
 }
@@ -37,7 +37,7 @@ function FileAttachmentRow(props) {
     return null;
   }
   else if (props.attachmentType === 'image') {
-    return <ImageRow src={props.fileName} />
+    return <ImageRow alt={props.title} src={props.fileName} />
   } else {
     return null;
   }
@@ -180,7 +180,7 @@ function Detail(props) {
     <table className="uk-table uk-table-small uk-table-divider uk-margin-medium">
       <tbody>
         <TitleRow title={record.title} />
-        <FileAttachmentRow attachmentType={record.attachmentType} fileName={record.fileName} />
+        <FileAttachmentRow title={record.title} attachmentType={record.attachmentType} fileName={record.fileName} />
         <ContentRow content={record.content} />
         <DateRow date={record.date} />
         <OriginRow origin={record.origin} />
