@@ -1,10 +1,11 @@
 import {useState, useEffect} from 'react';
-import { BrowserRouter, Route} from 'react-router-dom'; 
+import {BrowserRouter, Link, Route} from 'react-router-dom'; 
 
 import Header from './Header';
 import SearchForm from './SearchForm'; 
 import RecordTable from './RecordTable';
 import RecordDetail from './RecordDetail';
+import LoginForm from './LoginForm';
 
 import {getRecords} from './api';
 
@@ -20,6 +21,21 @@ function App() {
   return (
       <BrowserRouter>
         <div className="uk-marign-top">
+          <header>
+            <h1> History Database </h1>
+            <nav class="uk-navbar">
+              <div class="uk-nav-bar-left">
+                <ul class="uk-navbar-nav">
+                  <li><Link to="/"> Home </Link></li>
+                </ul>
+              </div>
+              <div class="uk-navbar-right">
+                <ul class="uk-navbar-nav">
+                  <li><Link to="/login"> Login </Link></li>
+                </ul>
+              </div>
+            </nav>
+          </header>
           <Route path="/record/:id">
             <Header>
                <h1 className="uk-text-lead"> History Record </h1>
@@ -28,6 +44,9 @@ function App() {
             <RecordDetail records={records} />
           </Route> 
 
+          <Route path="/login">
+            <LoginForm />
+          </Route>
           <Route exact path="/"> 
             <Header>
                <h1 className="uk-text-lead"> History Listing </h1>
