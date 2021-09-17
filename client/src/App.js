@@ -3,20 +3,26 @@ import {BrowserRouter, Link, Route} from 'react-router-dom';
 
 import Header from './Header';
 import SearchForm from './SearchForm'; 
+import TableNavigation from './TableNavigation';
 import RecordTable from './RecordTable';
 import RecordDetail from './RecordDetail';
 import LoginForm from './LoginForm';
 
-import {getRecords} from './api';
-
+import {getRecords, getPageCount} from './api';
 
 function App() {
   const [records, setRecords] = useState(null);
+  const [pages, setPages] = useState(null);
 
   useEffect(() => {
     getRecords().then(setRecords)
   }, [])
 
+  useEffect(() => {
+    getPageCount().then(data => {
+      setPages(data.pages)
+    })
+  }, [])
 
   return (
       <BrowserRouter>
