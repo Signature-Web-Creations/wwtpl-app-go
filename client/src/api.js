@@ -1,4 +1,24 @@
 
+export function getListingData(params) {
+  const queryParameters = []
+  const baseUri = '/records'
+  if (params.query && params.query !== '') {
+    queryParameters.push(`query=${encodeURIComponent(params.query)}`)
+  }
+
+  if (params.searchYear && params.searchYear !== '') {
+    queryParameters.push(`year=${encodeURIComponent(params.searchYear)}`)
+  }
+
+  let uri;
+  if (queryParameters.length !== 0) {
+    uri = baseUri + `?${queryParameters.join('&')}`
+  } else {
+    uri = baseUri 
+  }
+  return fetch(uri)
+    .then(res => res.json())
+}
 
 export function getRecords(params) {
 

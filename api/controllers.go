@@ -48,10 +48,32 @@ func PublicRecords(c *gin.Context) {
 	params["year"] = c.Query("year") 
 	
 	records, err := PublishedHistoryRecords(offset, params)
+	results := make(map[string]interface{})
+
 	if err != nil {
 		fmt.Printf("Error: %v", err)
-		c.IndentedJSON(http.StatusOK, records)
+		c.IndentedJSON(http.StatusOK, nil)
+		return
+	} else {
+		results["records"] = records
 	}
-	c.IndentedJSON(http.StatusOK, records)
+
+	pages, err := CountPages(50)
+	if err != nil {
+		c.IndentedJSON(http.StatusOK, nil)
+		return
+	} else {
+		results["pages"] = pages
+	}
+
+	years, err := GetYears()
+	if err != nil {
+		c.IndentedJSON(http.StatusOK, nil)
+		return 
+	} else {
+		results["years"] = years
+	}
+
+	c.IndentedJSON(http.StatusOK, results)
 }
 

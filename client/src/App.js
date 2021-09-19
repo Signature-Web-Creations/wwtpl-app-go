@@ -7,20 +7,28 @@ import RecordTable from './RecordTable';
 import RecordDetail from './RecordDetail';
 import LoginForm from './LoginForm';
 
-import {getRecords} from './api';
+import {getListingData} from './api';
 
 
 function App() {
   const [records, setRecords] = useState(null)
+  const [years, setYears] = useState([])
+  const [pages, setPages] = useState([])
+
   const [query, setQuery] = useState("")
+  const [searchYear, setSearchYear] = useState("")
 
   const handleSearch = (e) => {
     e.preventDefault()
-    getRecords({query}).then(setRecords)
+    getListingData({query, searchYear}).then(({records}) => setRecords(records))
   }
 
   useEffect(() => {
-    getRecords({}).then(setRecords)
+    getListingData({}).then(({records, pages, years}) => {
+      setRecords(records)
+      setPages(pages)
+      setYears(years)
+    })
   }, [])
 
 
@@ -29,14 +37,14 @@ function App() {
         <div className="uk-marign-top">
           <header>
             <h1> History Database </h1>
-            <nav class="uk-navbar">
-              <div class="uk-nav-bar-left">
-                <ul class="uk-navbar-nav">
+            <nav className="uk-navbar">
+              <div className="uk-nav-bar-left">
+                <ul className="uk-navbar-nav">
                   <li><Link to="/"> Home </Link></li>
                 </ul>
               </div>
-              <div class="uk-navbar-right">
-                <ul class="uk-navbar-nav">
+              <div className="uk-navbar-right">
+                <ul className="uk-navbar-nav">
                   <li><Link to="/login"> Login </Link></li>
                 </ul>
               </div>
@@ -56,9 +64,16 @@ function App() {
           <Route exact path="/"> 
             <Header>
                <h1 className="uk-text-lead"> History Listing </h1>
-              <SearchForm onChange={(e) => {
-                setQuery(e.target.value)
-              }} onSubmit={handleSearch}/>
+              <SearchForm
+                years={!years ? [] : years}
+                changeYear={(e) => {
+                  console.log("Selected year ", e.target.value)
+                  setSearchYear(e.target.value)
+                }}
+                changeQuery={(e) => {
+                  setQuery(e.target.value)
+                }}
+                onSubmit={handleSearch}/>
             </Header>
             <RecordTable records={!records ? [] : records} />
           </Route>

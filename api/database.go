@@ -136,6 +136,36 @@ func HistoryRecordByID(id int64) (HistoryRecord, error) {
 	return record, nil
 }
 
+func GetYears() ([]string, error) {
+	var years []string
+	rows, err := db.Query(
+		`SELECT DISTINCT(strftime("%Y", date))
+		 FROM history_record
+		 ORDER BY strftime("%Y", date)
+	`)
+
+	if err != nil {
+		return nil, fmt.Errorf("GetYears: %v", err)
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var year string
+		err := rows.Scan(&year)
+		if err != nil {
+			return nil, fmt.Errorf("GetYears: %v", err)
+		}
+		years = append(years, year)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("GetYears: %v", err)
+	}
+
+	return years, nil
+}
+
 func CountPages(records_per_page int) (int, error) {
 	var pages int
 	row := db.QueryRow(
