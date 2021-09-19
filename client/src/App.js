@@ -1,7 +1,8 @@
 import {useState, useEffect} from 'react';
-import {BrowserRouter, Link, Route} from 'react-router-dom'; 
+import {Link, Route, useLocation} from 'react-router-dom'; 
 
 import Header from './Header';
+import PaginationButtons from './PaginationButton';
 import SearchForm from './SearchForm'; 
 import RecordTable from './RecordTable';
 import RecordDetail from './RecordDetail';
@@ -9,31 +10,49 @@ import LoginForm from './LoginForm';
 
 import {getListingData} from './api';
 
+function useSearchParams() {
+  return new URLSearchParams(useLocation().search);
+}
+
+function getOffset(searchParameters) {
+  let offsetParam = searchParameters.get("offset") 
+  if (offsetParam === null) {
+    return 0
+  } 
+  let offset = parseInt(offsetParam) 
+  if (isNaN(offset)) {
+    return 0
+  } 
+
+  return offset;
+}
 
 function App() {
+  const searchParameters = useSearchParams()
+  const offset = getOffset(searchParameters)
+
   const [records, setRecords] = useState(null)
   const [years, setYears] = useState([])
-  const [pages, setPages] = useState([])
+  const [pages, setPages] = useState(null)
 
   const [query, setQuery] = useState("")
   const [searchYear, setSearchYear] = useState("")
 
   const handleSearch = (e) => {
     e.preventDefault()
-    getListingData({query, searchYear}).then(({records}) => setRecords(records))
+    getListingData({offset, query, searchYear}).then(({records}) => setRecords(records))
   }
 
   useEffect(() => {
-    getListingData({}).then(({records, pages, years}) => {
+    getListingData({offset}).then(({records, pages, years}) => {
       setRecords(records)
       setPages(pages)
       setYears(years)
     })
-  }, [])
+  }, [offset])
 
 
   return (
-      <BrowserRouter>
         <div className="uk-marign-top">
           <header>
             <h1> History Database </h1>
@@ -74,12 +93,12 @@ function App() {
                   setQuery(e.target.value)
                 }}
                 onSubmit={handleSearch}/>
+              <PaginationButtons currentPage={!offset ? 0 : offset} pages={pages} />
             </Header>
             <RecordTable records={!records ? [] : records} />
           </Route>
 
         </div>
-      </BrowserRouter>
   );
 }
 

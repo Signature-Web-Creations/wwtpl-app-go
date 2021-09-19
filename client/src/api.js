@@ -2,6 +2,10 @@
 export function getListingData(params) {
   const queryParameters = []
   const baseUri = '/records'
+  if (params.offset && params.offset !== null) {
+    queryParameters.push(`offset=${encodeURIComponent(params.offset)}`)
+  }
+
   if (params.query && params.query !== '') {
     queryParameters.push(`query=${encodeURIComponent(params.query)}`)
   }
