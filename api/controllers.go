@@ -37,7 +37,17 @@ func PublicRecordDetail(c *gin.Context) {
 }
 
 func PublicRecords(c *gin.Context) {
-	records, err := PublishedHistoryRecords(0)
+	params := make(map[string]string)
+
+	offset, err := strconv.Atoi(c.Query("offset"))
+	if err != nil {
+		offset = 0
+	}
+
+	params["query"] = c.Query("query") 
+	params["year"] = c.Query("year") 
+	
+	records, err := PublishedHistoryRecords(offset, params)
 	if err != nil {
 		fmt.Printf("Error: %v", err)
 		c.IndentedJSON(http.StatusOK, records)

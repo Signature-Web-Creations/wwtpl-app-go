@@ -62,11 +62,24 @@ func PublishedRecords() (sq.SelectBuilder) {
 		sq.Eq{`deleted_at`: nil})
 }
 
-func PublishedHistoryRecords(offset int) ([]HistoryRecord, error) {
+func PublishedHistoryRecords(offset int, params map[string]string) ([]HistoryRecord, error) {
 
 	var records []HistoryRecord
 
-	query := PublishedRecords().OrderBy("date(history_record.date)").OrderBy("history_record.title")
+	query := PublishedRecords()
+	if params["query"] != "" {
+		queryParam := fmt.Sprintf("%%%s%%", params["query"])
+		query = query.Where(sq.Or{
+			sq.Like{"history_record.title": queryParam},
+			sq.Like{"history_record.content": queryParam}})
+	}
+
+	if params["year"] != "" {
+		query = query.Where(`strftime('%Y', history_record.date) = ?`, params["year"]); 
+	}
+
+
+	query = query.OrderBy("date(history_record.date)").OrderBy("history_record.title")
 	query = query.Limit(50)
 	query = query.Offset(uint64(offset))
 

@@ -1,0 +1,15 @@
+.searchBar {
+  display: flex;
+  justify-content: space-between;
+}
+
+.searchBar .searchInput {
+  margin-right: 10px;
+}
+
+.searchBar .yearSelect {
+  margin-right: 10px;
+}
+
+.searchBar .searchButton {
+}

@@ -1,6 +1,20 @@
 
-export function getRecords() {
-  return fetch("/records")
+
+export function getRecords(params) {
+
+  const queryParameters = []
+  const baseUri = '/records'
+  if (params.query && params.query !== '') {
+    queryParameters.push(`query=${encodeURIComponent(params.query)}`)
+  }
+
+  let uri;
+  if (queryParameters.length !== 0) {
+    uri = baseUri + `?${queryParameters.join('&')}`
+  } else {
+    uri = baseUri 
+  }
+  return fetch(uri)
     .then(res => res.json())
 }
 

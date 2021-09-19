@@ -3,26 +3,26 @@ import {BrowserRouter, Link, Route} from 'react-router-dom';
 
 import Header from './Header';
 import SearchForm from './SearchForm'; 
-import TableNavigation from './TableNavigation';
 import RecordTable from './RecordTable';
 import RecordDetail from './RecordDetail';
 import LoginForm from './LoginForm';
 
-import {getRecords, getPageCount} from './api';
+import {getRecords} from './api';
+
 
 function App() {
-  const [records, setRecords] = useState(null);
-  const [pages, setPages] = useState(null);
+  const [records, setRecords] = useState(null)
+  const [query, setQuery] = useState("")
+
+  const handleSearch = (e) => {
+    e.preventDefault()
+    getRecords({query}).then(setRecords)
+  }
 
   useEffect(() => {
-    getRecords().then(setRecords)
+    getRecords({}).then(setRecords)
   }, [])
 
-  useEffect(() => {
-    getPageCount().then(data => {
-      setPages(data.pages)
-    })
-  }, [])
 
   return (
       <BrowserRouter>
@@ -56,7 +56,9 @@ function App() {
           <Route exact path="/"> 
             <Header>
                <h1 className="uk-text-lead"> History Listing </h1>
-               <SearchForm />
+              <SearchForm onChange={(e) => {
+                setQuery(e.target.value)
+              }} onSubmit={handleSearch}/>
             </Header>
             <RecordTable records={!records ? [] : records} />
           </Route>
