@@ -38,9 +38,16 @@ function App() {
   const [query, setQuery] = useState("")
   const [searchYear, setSearchYear] = useState("")
 
+  // stores whether a search was run or not
+  // used to show different error messages in record table
+  const [searched, setSearched] = useState(false)
+
   const handleSearch = (e) => {
     e.preventDefault()
-    getListingData({offset, query, searchYear}).then(({records}) => setRecords(records))
+    getListingData({offset, query, searchYear}).then(({records}) => {
+      setRecords(records)
+      setSearched(true)
+    })
   }
 
   useEffect(() => {
@@ -82,7 +89,7 @@ function App() {
           </Route>
           <Route exact path="/"> 
             <Header>
-               <h1 className="uk-text-lead"> History Listing </h1>
+              <h1 className="uk-text-lead"> History Listing </h1>
               <SearchForm
                 years={!years ? [] : years}
                 changeYear={(e) => {
@@ -95,7 +102,7 @@ function App() {
                 onSubmit={handleSearch}/>
               <PaginationButtons currentPage={!offset ? 0 : offset} pages={pages} />
             </Header>
-            <RecordTable records={!records ? [] : records} />
+            <RecordTable searched={searched} records={records} />
           </Route>
 
         </div>

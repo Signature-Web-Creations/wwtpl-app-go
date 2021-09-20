@@ -1,6 +1,10 @@
 import RecordRow from './RecordRow'; 
 
-export default function RecordTable(props) {
+function NoResultsPage() {
+  return (<h1> Your search did not return any results. </h1>) 
+}
+
+function PublicListings(props) {
   return (
     <table className="uk-table uk-table-middle uk-table-divider uk-table-hover uk-margin-medium">
       <thead>
@@ -14,5 +18,17 @@ export default function RecordTable(props) {
         { props.records.map(({id, date, title}) => <RecordRow id={id} key={id} date={date} title={title} />)} 
       </tbody>
     </table>
-  );
+  )
+}
+
+export default function RecordTable(props) {
+  if (props.records === null) {
+    if (props.searched) {
+      return <NoResultsPage /> 
+    } else {
+      return null;
+    }
+  } else {
+    return <PublicListings records={props.records} /> 
+  }
 }
