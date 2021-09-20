@@ -64,12 +64,7 @@ func PublishedRecords() (sq.SelectBuilder) {
 		sq.Eq{`deleted_at`: nil})
 }
 
-
-func PublishedHistoryRecords(offset int, params map[string]string) ([]HistoryRecord, error) {
-
-	var records []HistoryRecord
-
-	query := PublishedRecords()
+func addFilters(query sq.SelectBuilder, params map[string]string) sq.SelectBuilder {
 	if params["query"] != "" {
 		queryParam := fmt.Sprintf("%%%s%%", params["query"])
 		query = query.Where(sq.Or{
@@ -81,6 +76,14 @@ func PublishedHistoryRecords(offset int, params map[string]string) ([]HistoryRec
 		query = query.Where(`strftime('%Y', history_record.date) = ?`, params["year"]); 
 	}
 
+	return query
+}
+
+func PublishedHistoryRecords(offset int, params map[string]string) ([]HistoryRecord, error) {
+
+	var records []HistoryRecord
+
+	query := addFilters(PublishedRecords(), params)
 
 	query = query.OrderBy("date(history_record.date)").OrderBy("history_record.title")
 	query = query.Limit(uint64(recordsPerPage))
@@ -169,15 +172,14 @@ func GetYears() ([]string, error) {
 	return years, nil
 }
 
-func CountPages() (int, error) {
+func CountPages(params map[string]string) (int, error) {
 	var pages int
-	row := db.QueryRow(
-		`SELECT COUNT(*)
-		 FROM history_record
-		 WHERE deleted_at IS NULL 
-		   AND record_status_id = 3
-	`)
 
+	query := sq.Select("COUNT(*)").From("history_record") 
+	query = query.Where(sq.Eq{"deleted_at": nil})
+	query = query.Where(sq.Eq{"record_status_id": 3}) 
+	query = addFilters(query, params) 
+	row := query.RunWith(db).QueryRow()
 	err := row.Scan(&pages)
 
 	if err != nil {

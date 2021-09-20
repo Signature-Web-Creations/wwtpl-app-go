@@ -7,18 +7,6 @@ import (
 	"strconv"
 )
 
-func TotalPages(c *gin.Context) {
-	pages, err := CountPages()
-
-	if err != nil {
-		fmt.Printf("Total Pages: %v\n", err)
-		c.IndentedJSON(http.StatusOK, gin.H{"error": "Couldn't get number of pages"})
-		return
-	}
-
-	c.IndentedJSON(http.StatusOK, gin.H{"pages": pages})
-}
-
 func PublicRecordDetail(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
@@ -35,16 +23,23 @@ func PublicRecordDetail(c *gin.Context) {
 	}
 }
 
-func PublicRecords(c *gin.Context) {
+func getQueryParams(c *gin.Context) map[string]string {
+	// Get query parameters from url
+	// if query parameters is absent return an empty string
 	params := make(map[string]string)
+	params["query"] = c.Query("query")
+	params["year"] = c.Query("year") 
+	return params
+}
+
+func PublicRecords(c *gin.Context) {
+	params := getQueryParams(c) 
 
 	offset, err := strconv.Atoi(c.Query("offset"))
 	if err != nil {
 		offset = 0
 	}
 
-	params["query"] = c.Query("query") 
-	params["year"] = c.Query("year") 
 	
 	records, err := PublishedHistoryRecords(offset, params)
 	results := make(map[string]interface{})
@@ -57,7 +52,7 @@ func PublicRecords(c *gin.Context) {
 		results["records"] = records
 	}
 
-	pages, err := CountPages()
+	pages, err := CountPages(params)
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, nil)
 		return

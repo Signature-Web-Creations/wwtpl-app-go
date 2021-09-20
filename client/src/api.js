@@ -47,11 +47,6 @@ export function getRecordByID(id) {
     .then(res => res.json())
 }
 
-export function getPageCount() {
-  return fetch('/pages/')
-    .then(res => res.json())
-}
-
 export async function login(username, password) {
   const data = {username, password} 
 

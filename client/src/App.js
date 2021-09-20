@@ -44,8 +44,10 @@ function App() {
 
   const handleSearch = (e) => {
     e.preventDefault()
-    getListingData({offset, query, searchYear}).then(({records}) => {
+    getListingData({offset, query, searchYear}).then(({records, pages, years}) => {
       setRecords(records)
+      setPages(pages)
+      setYears(years)
       setSearched(true)
     })
   }
