@@ -10,8 +10,10 @@ import (
 
 var db *sql.DB
 var historyRecords sq.SelectBuilder
+var recordsPerPage int
 
 func init() {
+	recordsPerPage = 50
 	historyRecords = sq.Select(`
     history_record.id,
     history_record.date,
@@ -62,6 +64,7 @@ func PublishedRecords() (sq.SelectBuilder) {
 		sq.Eq{`deleted_at`: nil})
 }
 
+
 func PublishedHistoryRecords(offset int, params map[string]string) ([]HistoryRecord, error) {
 
 	var records []HistoryRecord
@@ -80,8 +83,8 @@ func PublishedHistoryRecords(offset int, params map[string]string) ([]HistoryRec
 
 
 	query = query.OrderBy("date(history_record.date)").OrderBy("history_record.title")
-	query = query.Limit(50)
-	query = query.Offset(uint64(offset))
+	query = query.Limit(uint64(recordsPerPage))
+	query = query.Offset(uint64(offset * recordsPerPage))
 
 	rows, err := query.RunWith(db).Query()
 
@@ -166,7 +169,7 @@ func GetYears() ([]string, error) {
 	return years, nil
 }
 
-func CountPages(records_per_page int) (int, error) {
+func CountPages() (int, error) {
 	var pages int
 	row := db.QueryRow(
 		`SELECT COUNT(*)
@@ -181,5 +184,5 @@ func CountPages(records_per_page int) (int, error) {
 		return 0, err
 	}
 
-	return pages / records_per_page, nil
+	return pages / recordsPerPage, nil
 }

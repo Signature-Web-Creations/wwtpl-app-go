@@ -8,8 +8,7 @@ import (
 )
 
 func TotalPages(c *gin.Context) {
-	records_per_page := 50
-	pages, err := CountPages(records_per_page)
+	pages, err := CountPages()
 
 	if err != nil {
 		fmt.Printf("Total Pages: %v\n", err)
@@ -58,7 +57,7 @@ func PublicRecords(c *gin.Context) {
 		results["records"] = records
 	}
 
-	pages, err := CountPages(50)
+	pages, err := CountPages()
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, nil)
 		return
