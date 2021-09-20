@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
 )
@@ -28,19 +28,21 @@ func getQueryParams(c *gin.Context) map[string]string {
 	// if query parameters is absent return an empty string
 	params := make(map[string]string)
 	params["query"] = c.Query("query")
-	params["year"] = c.Query("year") 
+	params["year"] = c.Query("year")
+	params["recordType"] = c.Query("recordType")
+	params["collection"] = c.Query("collection")
+	params["sourceArchive"] = c.Query("sourceArchive")
 	return params
 }
 
 func PublicRecords(c *gin.Context) {
-	params := getQueryParams(c) 
+	params := getQueryParams(c)
 
 	offset, err := strconv.Atoi(c.Query("offset"))
 	if err != nil {
 		offset = 0
 	}
 
-	
 	records, err := PublishedHistoryRecords(offset, params)
 	results := make(map[string]interface{})
 
@@ -63,11 +65,33 @@ func PublicRecords(c *gin.Context) {
 	years, err := GetYears()
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, nil)
-		return 
+		return
 	} else {
 		results["years"] = years
 	}
 
+	collections, err := GetCollections()
+	if err != nil {
+		c.IndentedJSON(http.StatusOK, nil)
+		return 
+	} else {
+		results["collections"] = collections
+	}
+
+	sourceArchives, err := GetSourceArchives()
+	if err != nil {
+		c.IndentedJSON(http.StatusOK, nil)
+		return 
+	} else {
+		results["sourceArchives"] = sourceArchives
+	}
+
+	recordTypes, err := GetRecordTypes()
+	if err != nil {
+		c.IndentedJSON(http.StatusOK, nil)
+		return
+	} else {
+		results["recordTypes"] = recordTypes 
+	}
 	c.IndentedJSON(http.StatusOK, results)
 }
-

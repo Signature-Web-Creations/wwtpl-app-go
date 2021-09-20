@@ -6,19 +6,18 @@ import (
 	"net/http"
 )
 
-
 type Login struct {
 	Username string `json:"username" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
 
 type LoginResult struct {
-	Succeeded bool `json:"succeeded"`
+	Succeeded    bool   `json:"succeeded"`
 	ErrorMessage string `json:"errorMessage"`
 }
 
 func authenticate(login Login) bool {
-	// TODO: 
+	// TODO:
 	// need to hash password, get user and then check that the
 	// has stored in the database matches up with the hash stored
 	// in the databse
@@ -30,10 +29,9 @@ func loginHandler(c *gin.Context) {
 	var result LoginResult
 
 	if err := c.ShouldBindJSON(&json); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H {"error": "invalid username/password"})
-		return 
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid username/password"})
+		return
 	}
-
 
 	if authenticate(json) {
 		result.Succeeded = true
@@ -47,9 +45,6 @@ func loginHandler(c *gin.Context) {
 	}
 }
 
-
-
-
 func main() {
 	Connect()
 	fmt.Println("Running Williamsport-Washington Township Public Library - History Database")
@@ -57,8 +52,6 @@ func main() {
 	fmt.Println("Successfuly connected to Database")
 	fmt.Println("Close this window or enter Ctrl+C to quit")
 
-
 	router := initRouter()
 	router.Run("localhost:8080")
 }
-
