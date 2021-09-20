@@ -34,9 +34,16 @@ function App() {
   const [records, setRecords] = useState(null)
   const [years, setYears] = useState([])
   const [pages, setPages] = useState(null)
+  const [recordTypes, setRecordTypes] = useState([])
+  const [collections, setCollections] = useState([])
+  const [sourceArchives, setSourceArchives] = useState([])
 
+  // Search Parameters
   const [query, setQuery] = useState("")
   const [searchYear, setSearchYear] = useState("")
+  const [searchCollection, setSearchCollection] = useState("")
+  const [searchSourceArchive, setSearchSourceArchive] = useState("")
+  const [searchRecordType, setSearchRecordType] = useState("")
 
   // stores whether a search was run or not
   // used to show different error messages in record table
@@ -44,7 +51,7 @@ function App() {
 
   const handleSearch = (e) => {
     e.preventDefault()
-    getListingData({offset, query, searchYear}).then(({records, pages, years}) => {
+    getListingData({offset, query, searchYear, searchCollection, searchSourceArchive, searchRecordType}).then(({records, pages, years}) => {
       setRecords(records)
       setPages(pages)
       setYears(years)
@@ -53,10 +60,13 @@ function App() {
   }
 
   useEffect(() => {
-    getListingData({offset}).then(({records, pages, years}) => {
+    getListingData({offset}).then(({records, pages, years, collections, sourceArchives, recordTypes}) => {
       setRecords(records)
       setPages(pages)
       setYears(years)
+      setCollections(collections)
+      setSourceArchives(sourceArchives)
+      setRecordTypes(recordTypes)
     })
   }, [offset])
 
@@ -100,6 +110,18 @@ function App() {
                 }}
                 changeQuery={(e) => {
                   setQuery(e.target.value)
+                }}
+                recordTypes={recordTypes}
+                changeRecordType={(e) => {
+                  setSearchRecordType(e.target.value)
+                }}
+                collections={collections}
+                changeCollection={(e) => {
+                  setSearchCollection(e.target.value)
+                }}
+                sourceArchives={sourceArchives}
+                changeSourceArchive={(e) => {
+                  setSearchSourceArchive(e.target.value)
                 }}
                 onSubmit={handleSearch}/>
               <PaginationButtons currentPage={!offset ? 0 : offset} pages={pages} />

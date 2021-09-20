@@ -14,6 +14,17 @@ export function getListingData(params) {
     queryParameters.push(`year=${encodeURIComponent(params.searchYear)}`)
   }
 
+  if (params.searchCollection && params.searchCollection !== '') {
+    queryParameters.push(`collection=${encodeURIComponent(params.searchCollection)}`)
+  }
+
+  if (params.searchSourceArchive && params.searchSourceArchive !== '') {
+    queryParameters.push(`sourceArchive=${encodeURIComponent(params.searchSourceArchive)}`)
+  }
+  
+  if (params.searchRecordType && params.searchRecordType !== '') {
+    queryParameters.push(`recordType=${encodeURIComponent(params.searchRecordType)}`)
+  }
   let uri;
   if (queryParameters.length !== 0) {
     uri = baseUri + `?${queryParameters.join('&')}`

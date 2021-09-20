@@ -13,3 +13,8 @@
 
 .searchBar .searchButton {
 }
+
+.advancedSearchOptions {
+  display: flex;
+  justify-content: space-between;
+}

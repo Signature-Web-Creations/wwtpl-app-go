@@ -11,6 +11,20 @@ export default function SearchForm(props) {
           </select>
           <input className="uk-button uk-button-primary searchButton" type="submit" value="search" /> 
         </div>
+        <div className="advancedSearchOptions"> 
+          <select className="uk-select" onChange={props.changeRecordType}>
+            <option value=""> Type </option>
+            { props.recordTypes.map(({id, name}) => <option key={id} value={id}> {name} </option>) }
+          </select>
+          <select className="uk-select" onChange={props.changeSourceArchive}>
+            <option value=""> Source Archive </option>
+            { props.sourceArchives.map(({id, name}) => <option key={id} value={id}> {name} </option>) }
+          </select>
+          <select className="uk-select" onChange={props.changeCollection}>
+            <option value=""> Collection </option>
+            { props.collections.map(({id, name}) => <option key={id} value={id}> {name} </option>) }
+          </select>
+        </div>
       </form>
   );
 }
