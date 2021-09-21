@@ -95,3 +95,28 @@ func PublicRecords(c *gin.Context) {
 	}
 	c.IndentedJSON(http.StatusOK, results)
 }
+
+// User Authentication Controllers
+
+type NewUser struct {
+	FirstName string `json:"firstName" binding:"required"`
+	LastName string `json:"lastName" binding:"required"`
+	Username string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
+
+func RegisterUser(c *gin.Context) {
+	var json NewUser
+
+	if err := c.ShouldBindJSON(&json); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	err := CreateUser(json) 
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return 
+	}
+	c.JSON(http.StatusOK, gin.H{"success": "Successfully created user"})
+}
