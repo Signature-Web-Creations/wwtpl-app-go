@@ -20,26 +20,99 @@
     <div class="uk-container uk-container-medium">
       <div class="uk-margin-top">
         <div class="uk-text-lead">History List</div>
-        <form class="uk-grid-small uk-margin-top" uk-grid>
-          <div class="uk-width-2-3@s">
-            <input class="uk-input" type="text" placeholder="Search" />
+
+        <form class="uk-margin-top">
+          <div class="searchBar uk-grid-small" uk-grid>
+            <div class="uk-width-expand@s">
+              <input class="uk-input" type="text" placeholder="Search" />
+            </div>
+            <div class="uk-width-1-3@s">
+              <select class="uk-select">
+                <option value="">Year</option>
+                <option>2012</option>
+                <option>2011</option>
+                <option>2010</option>
+                <option>2009</option>
+                <option>2008</option>
+              </select>
+            </div>
+            <div class="uk-width-auto@s uk-grid-small" uk-grid>
+              <div class="uk-width-auto">
+                <a
+                  class="uk-button uk-button-default"
+                  uk-icon="more"
+                  uk-toggle="target: .advancedSearchOptions; animation: uk-animation-fade"
+                  uk-tooltip="Advanced Search Options"
+                ></a>
+              </div>
+              <div class="uk-width-auto">
+                <button
+                  class="uk-button uk-button-primary searchButton"
+                  type="submit"
+                  uk-icon="search"
+                  uk-tooltip="Search"
+                />
+              </div>
+            </div>
           </div>
-          <div class="uk-width-1-3@s">
-            <select class="uk-select">
-              <option value="">Year</option>
-              <option>2012</option>
-              <option>2011</option>
-              <option>2010</option>
-              <option>2009</option>
-              <option>2008</option>
-            </select>
+
+          <div class="advancedSearchOptions uk-grid-small" uk-grid hidden>
+            <div class="uk-width-1-3@s">
+              <select class="uk-select">
+                <option value="">Type</option>
+                <option>2012</option>
+                <option>2011</option>
+                <option>2010</option>
+                <option>2009</option>
+                <option>2008</option>
+              </select>
+            </div>
+            <div class="uk-width-1-3@s">
+              <select class="uk-select">
+                <option value="">Source Archive</option>
+                <option>2012</option>
+                <option>2011</option>
+                <option>2010</option>
+                <option>2009</option>
+                <option>2008</option>
+              </select>
+            </div>
+            <div class="uk-width-1-3@s">
+              <select class="uk-select">
+                <option value="">Collection</option>
+                <option>2012</option>
+                <option>2011</option>
+                <option>2010</option>
+                <option>2009</option>
+                <option>2008</option>
+              </select>
+            </div>
           </div>
         </form>
       </div>
 
-      <table
-        class="uk-table uk-table-middle uk-table-divider uk-table-hover uk-margin-medium"
-      >
+      <ul class="uk-pagination uk-margin-large-top">
+        <li>
+          <a href="#">
+            <span class="uk-margin-small-right" uk-pagination-previous></span>
+            Previous
+          </a>
+        </li>
+        <li>
+          <hr
+            class="uk-divider-vertical"
+            style="height: 30px; padding: 4px 0; border-width: 2px;"
+          />
+        </li>
+        <li>
+          <a href="#">
+            Next
+            <span class="uk-margin-small-left" uk-pagination-next></span>
+          </a>
+        </li>
+      </ul>
+
+      <table class="uk-table uk-table-middle uk-table-divider uk-table-hover">
         <thead>
           <tr>
             <th class="uk-width-small">Date</th>
