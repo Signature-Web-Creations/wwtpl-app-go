@@ -313,7 +313,7 @@ func CreateUser(user NewUser) error {
 	return nil
 }
 
-func GetUser(username string) (User, error) {
+func GetUserByUsername(username string) (User, error) {
 	var user User
 
 	query := sq.Select("user.id, firstName, lastName, username, password, user_roles.name")
@@ -326,9 +326,30 @@ func GetUser(username string) (User, error) {
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return user, fmt.Errorf("GetUser: no user with username '%s'", username)
+			return user, fmt.Errorf("GetUserByUsername: no user with username '%s'", username)
 		}
-		return user, fmt.Errorf("GetUser %s: %v", username, err)
+		return user, fmt.Errorf("GetUserByUsername %s: %v", username, err)
+	}
+
+	return user, nil
+}
+
+func GetUserByID(id int) (User, error) {
+	var user User
+
+	query := sq.Select("user.id, firstName, lastName, username, password, user_roles.name")
+	query = query.From("user")
+	query = query.InnerJoin("user_roles on user.role_id = user_roles.id")
+	query = query.Where("user.id = ?", id)
+
+	row := query.RunWith(db).QueryRow()
+	err := row.Scan(&user.ID, &user.FirstName, &user.LastName, &user.Username, &user.Password, &user.Role)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return user, fmt.Errorf("GetUserByID: no user with username '%d'", id)
+		}
+		return user, fmt.Errorf("GetUserByID %d: %v", id, err)
 	}
 
 	return user, nil
