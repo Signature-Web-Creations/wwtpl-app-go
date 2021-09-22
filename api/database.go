@@ -5,6 +5,7 @@ import (
 	"fmt"
 	sq "github.com/Masterminds/squirrel"
 	_ "github.com/mattn/go-sqlite3"
+	"golang.org/x/crypto/bcrypt"
 	"log"
 	"strconv"
 )
@@ -297,4 +298,38 @@ func GetRecordTypes() ([]RecordType, error) {
 	}
 
 	return recordTypes, nil
+}
+
+// Users
+
+func CreateUser(user NewUser) error {
+	query := sq.Insert("user").Columns("firstName", "lastName", "username", "password")
+	password, _ := bcrypt.GenerateFromPassword([]byte(user.Password), 14)
+	query = query.Values(user.FirstName, user.LastName, user.Username, password)
+	_, err := query.RunWith(db).Exec()
+	if err != nil {
+		return fmt.Errorf("CreateUser: %v", err)
+	}
+	return nil
+}
+
+func GetUser(username string) (User, error) {
+	var user User
+
+	query := sq.Select("user.id, firstName, lastName, username, password, user_roles.name")
+	query = query.From("user")
+	query = query.InnerJoin("user_roles on user.role_id = user_roles.id")
+	query = query.Where("username = ?", username)
+
+	row := query.RunWith(db).QueryRow()
+	err := row.Scan(&user.ID, &user.FirstName, &user.LastName, &user.Username, &user.Password, &user.Role)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return user, fmt.Errorf("GetUser: no user with username '%s'", username)
+		}
+		return user, fmt.Errorf("GetUser %s: %v", username, err)
+	}
+
+	return user, nil
 }

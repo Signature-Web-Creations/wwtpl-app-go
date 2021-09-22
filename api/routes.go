@@ -10,6 +10,7 @@ func initRouter() *gin.Engine {
 	router.GET("/records/:id", PublicRecordDetail)
 
 	router.POST("/register", RegisterUser)
+	router.POST("/login", Login)
 	// router.POST("/login", Login)
 	return router
 }

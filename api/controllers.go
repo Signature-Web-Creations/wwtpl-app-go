@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"strconv"
 )
@@ -73,7 +74,7 @@ func PublicRecords(c *gin.Context) {
 	collections, err := GetCollections()
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, nil)
-		return 
+		return
 	} else {
 		results["collections"] = collections
 	}
@@ -81,7 +82,7 @@ func PublicRecords(c *gin.Context) {
 	sourceArchives, err := GetSourceArchives()
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, nil)
-		return 
+		return
 	} else {
 		results["sourceArchives"] = sourceArchives
 	}
@@ -91,7 +92,7 @@ func PublicRecords(c *gin.Context) {
 		c.IndentedJSON(http.StatusOK, nil)
 		return
 	} else {
-		results["recordTypes"] = recordTypes 
+		results["recordTypes"] = recordTypes
 	}
 	c.IndentedJSON(http.StatusOK, results)
 }
@@ -100,9 +101,9 @@ func PublicRecords(c *gin.Context) {
 
 type NewUser struct {
 	FirstName string `json:"firstName" binding:"required"`
-	LastName string `json:"lastName" binding:"required"`
-	Username string `json:"username" binding:"required"`
-	Password string `json:"password" binding:"required"`
+	LastName  string `json:"lastName" binding:"required"`
+	Username  string `json:"username" binding:"required"`
+	Password  string `json:"password" binding:"required"`
 }
 
 func RegisterUser(c *gin.Context) {
@@ -113,10 +114,42 @@ func RegisterUser(c *gin.Context) {
 		return
 	}
 
-	err := CreateUser(json) 
+	err := CreateUser(json)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return 
+		return
 	}
 	c.JSON(http.StatusOK, gin.H{"success": "Successfully created user"})
+}
+
+type UserLogin struct {
+	Username string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
+
+func Login(c *gin.Context) {
+	var json UserLogin
+
+	if err := c.ShouldBindJSON(&json); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	user, err := GetUser(json.Username)
+
+	if err != nil {
+		fmt.Println(err)
+		c.JSON(http.StatusNotFound, gin.H{"error": "invalid username/password"})
+		return
+	}
+
+	err = bcrypt.CompareHashAndPassword(user.Password, []byte(json.Password))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "invalid username/password"})
+		return
+	}
+
+	// TODO set Session and JWT If the code reaches this point
+	// The user is authenticated.
+	c.JSON(http.StatusOK, gin.H{"success": "Successfully logged in user."})
 }
