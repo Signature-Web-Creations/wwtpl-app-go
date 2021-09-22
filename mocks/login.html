@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login Template</title>
+
+    <!-- UIkit CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/uikit@3.7.2/dist/css/uikit.min.css"
+    />
+
+    <!-- UIkit JS -->
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.7.2/dist/js/uikit.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.7.2/dist/js/uikit-icons.min.js"></script>
+  </head>
+  <body>
+    <div class="uk-container uk-container-medium">
+      <form
+        class="uk-form-stacked uk-form-width-large uk-margin-top"
+        method="POST"
+        action="/login"
+        onSubmit="{handleSubmit}"
+      >
+        <div uk-alert class="uk-alert-danger">
+          <a class="uk-alert-close" uk-close></a>
+          <p>{error}</p>
+        </div>
+
+        <div>
+          <label class="uk-form-label">Username</label>
+          <input
+            class="uk-form-width-large uk-input"
+            type="text"
+            name="username"
+            onChange="{changeUsername}"
+            value="{username}"
+          />
+        </div>
+
+        <div class="uk-margin-top">
+          <label class="uk-form-label">Password</label>
+          <input
+            class="uk-form-width-large uk-input"
+            type="text"
+            name="password"
+            onChange="{changePassword}"
+            value="{password}"
+          />
+        </div>
+
+        <input
+          class="uk-button uk-button-primary uk-margin-top"
+          type="submit"
+          value="login"
+        />
+      </form>
+    </div>
+  </body>
+</html>
