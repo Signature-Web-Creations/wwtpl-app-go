@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
+	"github.com/dgrijalva/jwt-go"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 func PublicRecordDetail(c *gin.Context) {
@@ -127,6 +129,8 @@ type UserLogin struct {
 	Password string `json:"password" binding:"required"`
 }
 
+const SecretKey = "secret"
+
 func Login(c *gin.Context) {
 	var json UserLogin
 
@@ -151,5 +155,22 @@ func Login(c *gin.Context) {
 
 	// TODO set Session and JWT If the code reaches this point
 	// The user is authenticated.
+
+	expiresAt := time.Now().Add(time.Hour * 24)
+	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
+		Issuer: strconv.Itoa(int(user.ID)),
+		ExpiresAt: expiresAt.Unix(), 
+	})
+
+
+	token, err := claims.SignedString([]byte(SecretKey)) 
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not login"})
+	}
+
+	seconds_in_day := 86400
+	c.SetCookie("jwt", token, seconds_in_day, "/", "", false, true)
+	
 	c.JSON(http.StatusOK, gin.H{"success": "Successfully logged in user."})
 }
