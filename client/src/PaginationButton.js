@@ -10,9 +10,6 @@ function PrevButton(props) {
 }
 
 function NextButton(props) {
-  console.log('NextButton -> currentPage: ', props.currentPage)
-  console.log('NextButton -> pages: ', props.pages)
-  console.log('NextButton -> should display: ', props.currentPage >= props.pages)
   if (props.currentPage >= props.pages) {
     return null 
   } 
