@@ -153,9 +153,6 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	// TODO set Session and JWT If the code reaches this point
-	// The user is authenticated.
-
 	expiresAt := time.Now().Add(time.Hour * 24)
 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
 		Issuer: strconv.Itoa(int(user.ID)),
@@ -206,4 +203,10 @@ func GetLoggedInUser(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, user)
+}
+
+func Logout(c *gin.Context) {
+
+	c.SetCookie("jwt", "", -1, "/", "", false, true)
+	c.JSON(http.StatusOK, gin.H{"success": "Logged out user"})
 }

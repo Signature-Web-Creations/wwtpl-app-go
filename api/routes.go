@@ -18,6 +18,7 @@ func initRouter() *gin.Engine {
 
 	router.POST("/register", RegisterUser)
 	router.POST("/login", Login)
+	router.POST("/logout", Logout)
 	router.GET("/user", GetLoggedInUser)
 	return router
 }
