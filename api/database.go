@@ -12,10 +12,9 @@ import (
 
 var db *sql.DB
 var historyRecords sq.SelectBuilder
-var recordsPerPage int
+const recordsPerPage = 20
 
 func init() {
-	recordsPerPage = 50
 	historyRecords = sq.Select(`
     history_record.id,
     history_record.date,
