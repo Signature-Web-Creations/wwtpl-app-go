@@ -8,6 +8,8 @@ import RecordTable from './RecordTable';
 import RecordDetail from './RecordDetail';
 import LoginForm from './LoginForm';
 
+import Dashboard from './Dashboard';
+
 import {getListingData} from './api';
 
 function useSearchParams() {
@@ -99,6 +101,11 @@ function App() {
           <Route path="/login">
             <LoginForm />
           </Route>
+
+          <Route path="/dashboard">
+            <Dashboard />
+          </Route>
+
           <Route exact path="/"> 
             <Header>
               <h1 className="uk-text-lead"> History Listing </h1>

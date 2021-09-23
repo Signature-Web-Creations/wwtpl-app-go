@@ -1,22 +1,14 @@
 import {useState} from 'react';
 import {login} from './api';
+import {Redirect} from 'react-router-dom'; 
 
-async function handleLoginResult(response, onError){
-  // can we get the cookie that was set by the header 
-
-  const loginResult = await response.json()
-  if (!loginResult.succeeded) {
-    onError(loginResult.errorMessage)
-  } else {
-    console.log('login result: ', loginResult)
-  }
-}
 
 export default function LoginForm(props) {
 
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("") 
   const [error, setError] = useState(null)
+  const [redirect, setRedirect] = useState(false)
 
   const changeUsername = (event) => {
     setError(null)
@@ -28,29 +20,45 @@ export default function LoginForm(props) {
     setPassword(event.target.value)
   }
 
+  async function handleLoginResult(response){
+    const loginResult = await response.json()
+    if (loginResult.error) {
+      setError(loginResult.error)
+    } 
+
+    if (loginResult.success) {
+      setRedirect(true)
+    }
+  }
+
   const handleSubmit = (event) => {
     event.preventDefault()
     const result = login(username, password)
     result.then(result => {
-      handleLoginResult(result, setError)
+      handleLoginResult(result)
     })
   }
 
+  if (redirect) {
+    console.log("Should be redirecting");
+    return <Redirect to="/dashboard" />
+  }
+  
   return (
-    <form class="uk-form-stacked" method="POST" action="/login" onSubmit={handleSubmit}>
+    <form className="uk-form-stacked" onSubmit={handleSubmit}>
 
       <p>{error}</p>
       <div>
-        <label class="uk-form-label"> Username </label>
-        <input class="uk-form-width-large uk-input" type="text" name="username"
+        <label className="uk-form-label"> Username </label>
+        <input className="uk-form-width-large uk-input" type="text" name="username"
                onChange={changeUsername} value={username} /> 
       </div>
       <div>
-        <label class="uk-form-label"> Password </label>
-        <input class="uk-form-width-large uk-input" type="text" name="password"
+        <label className="uk-form-label"> Password </label>
+        <input className="uk-form-width-large uk-input" type="password" name="password"
                onChange={changePassword} value={password} />
       </div>
-      <input class="uk-button uk-button-primary" type="submit" value="login" /> 
+      <input className="uk-button uk-button-primary" type="submit" value="login" /> 
     </form>
   );
 }
