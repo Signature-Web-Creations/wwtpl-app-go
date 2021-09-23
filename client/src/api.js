@@ -1,7 +1,7 @@
 
 export function getListingData(params) {
   const queryParameters = []
-  const baseUri = '/records'
+  const baseUri = '/api/records'
   if (params.offset && params.offset !== null) {
     queryParameters.push(`offset=${encodeURIComponent(params.offset)}`)
   }
@@ -38,7 +38,7 @@ export function getListingData(params) {
 export function getRecords(params) {
 
   const queryParameters = []
-  const baseUri = '/records'
+  const baseUri = '/api/records'
   if (params.query && params.query !== '') {
     queryParameters.push(`query=${encodeURIComponent(params.query)}`)
   }
@@ -54,23 +54,23 @@ export function getRecords(params) {
 }
 
 export function getRecordByID(id) {
-  return fetch(`/records/${id}`)
+  return fetch(`/api/records/${id}`)
     .then(res => res.json())
 }
 
 export async function login(username, password) {
   const data = {username, password} 
 
-  const response = await fetch('/login', {
+  const response = await fetch('/api/login', {
     method: 'POST',
     mode: 'same-origin', 
     cache: 'no-cache',
+    credentials: "include",
     headers: {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify(data)
   })
 
-  console.log('Headers: ', response.headers)
   return response
 }
