@@ -172,11 +172,16 @@ func Login(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"success": "Successfully logged in user."})
 }
 
-func GetLoggedInUser(c *gin.Context) {
+func getAuthenticatedUser(c *gin.Context) (User, bool) {
+	// Returns the user if they are authenticated, otherwise returns an false
+	// Used to check authentication in controllers where users need to be logged 
+	// in
+
+	var user User
+
 	cookie, err := c.Cookie("jwt") 
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "User is not logged in"})
-		return 
+		return user, false
 	}
 
 	token, err := jwt.ParseWithClaims(cookie, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
@@ -184,21 +189,29 @@ func GetLoggedInUser(c *gin.Context) {
 	})
 
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "User is not logged in"})
-		return 
+		return user, false
 	}
 
 	claims := token.Claims.(*jwt.StandardClaims)
 
 	id, err := strconv.Atoi(claims.Issuer)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Issuer was not an integer"})
-		return
+		return user, false
 	}
 
-	user, err := GetUserByID(id)
+	user, err = GetUserByID(id)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return user, false
+	}
+
+
+	return user, true
+}
+
+func GetLoggedInUser(c *gin.Context) {
+	user, ok := getAuthenticatedUser(c)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User is not logged in"})
 		return
 	}
 
@@ -206,7 +219,6 @@ func GetLoggedInUser(c *gin.Context) {
 }
 
 func Logout(c *gin.Context) {
-
 	c.SetCookie("jwt", "", -1, "/", "", false, true)
 	c.JSON(http.StatusOK, gin.H{"success": "Logged out user"})
 }

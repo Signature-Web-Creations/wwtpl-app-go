@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom'; 
 import { useState, useEffect } from 'react';
-import { getRecordByID } from './api';
+import { getPublicRecordByID } from './api';
 
 const getValueOrDefault = (value, defaultValue) => {
   if (value) {
@@ -200,7 +200,7 @@ function RecordDetail(props) {
   const [record, setRecord] = useState(null)
 
   useEffect(() => {
-    getRecordByID(id).then(setRecord)
+    getPublicRecordByID(id).then(setRecord)
   }, [id])
 
   if (!record) {

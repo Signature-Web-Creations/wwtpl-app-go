@@ -13,8 +13,8 @@ func initRouter() *gin.Engine {
 		AllowCredentials: true,
 	}))
 
-	router.GET("/api/records", PublicRecords)
-	router.GET("/api/records/:id", PublicRecordDetail)
+	router.GET("/api/public/records", PublicRecords)
+	router.GET("/api/public/records/:id", PublicRecordDetail)
 
 	router.POST("/api/register", RegisterUser)
 	router.POST("/api/login", Login)

@@ -1,5 +1,5 @@
 import {useState, useEffect} from 'react';
-import {Link, Route, useLocation} from 'react-router-dom'; 
+import {Link, Route} from 'react-router-dom'; 
 
 import Header from './Header';
 import PaginationButtons from './PaginationButton';
@@ -10,11 +10,8 @@ import LoginForm from './LoginForm';
 
 import Dashboard from './Dashboard';
 
-import {getListingData} from './api';
-
-function useSearchParams() {
-  return new URLSearchParams(useLocation().search);
-}
+import {getPublicListingData} from './api';
+import {useSearchParams} from './hooks';
 
 function getOffset(searchParameters) {
   let offsetParam = searchParameters.get("offset") 
@@ -53,7 +50,8 @@ function App() {
 
   const handleSearch = (e) => {
     e.preventDefault()
-    getListingData({offset, query, searchYear, searchCollection, searchSourceArchive, searchRecordType}).then(({records, pages, years}) => {
+    const params = {offset, query, searchYear, searchCollection, searchSourceArchive, searchRecordType}
+    getPublicListingData(params).then(({records, pages, years}) => {
       setRecords(records)
       setPages(pages)
       setYears(years)
@@ -62,7 +60,7 @@ function App() {
   }
 
   useEffect(() => {
-    getListingData({offset}).then(({records, pages, years, collections, sourceArchives, recordTypes}) => {
+    getPublicListingData({offset}).then(({records, pages, years, collections, sourceArchives, recordTypes}) => {
       setRecords(records)
       setPages(pages)
       setYears(years)
