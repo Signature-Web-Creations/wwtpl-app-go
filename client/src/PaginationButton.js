@@ -6,7 +6,12 @@ function PrevButton(props) {
   } 
 
   const href = `/?offset=${props.currentPage - 1}` 
-  return <a href={href}> Previous </a>
+  return (
+    <a href={href}> 
+      <span class="uk-margin-small-right" uk-pagination-previous></span>
+      Previous
+    </a>
+  )
 }
 
 function NextButton(props) {
@@ -15,7 +20,12 @@ function NextButton(props) {
   } 
 
   const href = `/?offset=${props.currentPage + 1}` 
-  return <a href={href}> Next  </a>
+  return (
+    <a href={href}>
+      Next
+      <span class="uk-margin-small-left" uk-pagination-next></span>
+    </a>
+  )
 }
 
 export default function PaginationButtons(props) {
@@ -23,10 +33,20 @@ export default function PaginationButtons(props) {
     return null
   } else {
     return (
-    <div> 
-      <PrevButton currentPage={props.currentPage} />
-      <NextButton currentPage={props.currentPage} pages={props.pages} />
-    </div> 
+    <ul class="uk-pagination uk-margin-large-top"> 
+      <li>
+        <PrevButton currentPage={props.currentPage} />
+      </li>
+      <li>
+        <hr
+          class="uk-divider-vertical"
+          style={{height: "30px", padding: "4px 0", borderWidth: "2px"}}
+        />
+      </li>
+      <li> 
+        <NextButton currentPage={props.currentPage} pages={props.pages} />
+      </li>
+    </ul> 
     )
   }
 }
