@@ -37,19 +37,12 @@ function App() {
   const [collections, setCollections] = useState([])
   const [sourceArchives, setSourceArchives] = useState([])
 
-  // Search Parameters
-  const [query, setQuery] = useState("")
-  const [searchYear, setSearchYear] = useState("")
-  const [searchCollection, setSearchCollection] = useState("")
-  const [searchSourceArchive, setSearchSourceArchive] = useState("")
-  const [searchRecordType, setSearchRecordType] = useState("")
-
   // stores whether a search was run or not
   // used to show different error messages in record table
   const [searched, setSearched] = useState(false)
 
-  const handleSearch = (e) => {
-    e.preventDefault()
+  const handleSearch = (searchParams) => {
+    const {query, searchYear, searchCollection, searchSourceArchive, searchRecordType} = searchParams
     const params = {offset, query, searchYear, searchCollection, searchSourceArchive, searchRecordType}
     getPublicListingData(params).then(({records, pages, years}) => {
       setRecords(records)
@@ -109,25 +102,9 @@ function App() {
               <h1 className="uk-text-lead"> History Listing </h1>
               <SearchForm
                 years={!years ? [] : years}
-                changeYear={(e) => {
-                  console.log("Selected year ", e.target.value)
-                  setSearchYear(e.target.value)
-                }}
-                changeQuery={(e) => {
-                  setQuery(e.target.value)
-                }}
                 recordTypes={recordTypes}
-                changeRecordType={(e) => {
-                  setSearchRecordType(e.target.value)
-                }}
                 collections={collections}
-                changeCollection={(e) => {
-                  setSearchCollection(e.target.value)
-                }}
                 sourceArchives={sourceArchives}
-                changeSourceArchive={(e) => {
-                  setSearchSourceArchive(e.target.value)
-                }}
                 onSubmit={handleSearch}/>
               <PaginationButtons currentPage={!offset ? 0 : offset} pages={pages} />
             </Header>
