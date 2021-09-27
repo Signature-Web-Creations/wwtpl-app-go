@@ -169,7 +169,7 @@ func Login(c *gin.Context) {
 	seconds_in_day := 86400
 	c.SetCookie("jwt", token, seconds_in_day, "/", "", false, true)
 	
-	c.JSON(http.StatusOK, gin.H{"success": "Successfully logged in user."})
+	c.JSON(http.StatusOK, gin.H{"success": "Successfully logged in user.", "user": user})
 }
 
 func getAuthenticatedUser(c *gin.Context) (User, bool) {

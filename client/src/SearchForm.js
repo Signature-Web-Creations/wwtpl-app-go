@@ -18,7 +18,7 @@ export default function SearchForm(props) {
       const params = {query, searchYear, searchCollection, searchSourceArchive, searchRecordType}
       props.onSubmit(params)
     }}>
-        <div className="searchBar uk-grid-small" uk-grid>
+        <div className="searchBar uk-grid-small" uk-grid="true">
           <div className="uk-width-expand@s">
             <input className="uk-input" type="text" placeholder="Search" onChange={(e) => {
               setQuery(e.target.value)
@@ -32,8 +32,8 @@ export default function SearchForm(props) {
               { props.years.map(year => <option key={year} value={year}> {year} </option>)}
             </select>
           </div>
-          <div className="advancedSearchButton uk-width-auto@s uk-grid-small" uk-grid>
-            <div class="uk-width-auto">
+          <div className="advancedSearchButton uk-width-auto@s uk-grid-small" uk-grid="true">
+            <div className="uk-width-auto">
               <button 
                 className="uk-button uk-button-default"
                 uk-icon="more"
@@ -43,9 +43,9 @@ export default function SearchForm(props) {
                 }}
               ></button>
             </div>
-            <div class="uk-width-auto">
+            <div className="uk-width-auto">
               <button 
-                class="uk-button uk-button-primary searchButton"
+                className="uk-button uk-button-primary searchButton"
                 type="submit"
                 uk-icon="search"
                 uk-tooltip="Search">
@@ -54,7 +54,7 @@ export default function SearchForm(props) {
           </div>
         </div>
         
-      <div className={advancedSearchClassName} uk-grid> 
+      <div className={advancedSearchClassName} uk-grid="true"> 
           <div className="uk-width-1-3@s">
             <select className="uk-select" onChange={(e) => {
               setSearchRecordType(e.target.value)
@@ -71,7 +71,7 @@ export default function SearchForm(props) {
               { props.sourceArchives.map(({id, name}) => <option key={id} value={id}> {name} </option>) }
             </select>
           </div>
-          <div class="uk-width-1-3@s">
+          <div className="uk-width-1-3@s">
             <select className="uk-select" onChange={(e) => {
               setSearchCollection(e.target.value)
             }}>

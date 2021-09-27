@@ -1,5 +1,5 @@
 import {useState, useEffect} from 'react';
-import {Link, Route} from 'react-router-dom'; 
+import {Link, Route, Redirect} from 'react-router-dom'; 
 
 import Header from './Header';
 import PaginationButtons from './PaginationButton';
@@ -7,12 +7,12 @@ import SearchForm from './SearchForm';
 import RecordTable from './RecordTable';
 import RecordDetail from './RecordDetail';
 import LoginForm from './LoginForm';
-import Logout from './Logout';
 
 import Dashboard from './Dashboard';
 
-import {getPublicListingData, getUserData} from './api';
+import {getPublicListingData} from './api';
 import {useSearchParams} from './hooks';
+import {useAuth, PrivateRoute} from './auth.js';  
 
 function getOffset(searchParameters) {
   let offsetParam = searchParameters.get("offset") 
@@ -28,6 +28,8 @@ function getOffset(searchParameters) {
 }
 
 function App() {
+  const auth = useAuth()
+
   const searchParameters = useSearchParams()
   const offset = getOffset(searchParameters)
 
@@ -37,13 +39,6 @@ function App() {
   const [recordTypes, setRecordTypes] = useState([])
   const [collections, setCollections] = useState([])
   const [sourceArchives, setSourceArchives] = useState([])
-
-  const [user, setUser] = useState(null)
-
-  const loggedIn = () => {
-    // Returns true if user is logged in
-    return user !== null
-  }
 
   // stores whether a search was run or not
   // used to show different error messages in record table
@@ -71,20 +66,10 @@ function App() {
     })
   }, [offset])
 
-  useEffect(() => {
-    getUserData().then(data => {
-      if (!data.error) {
-        setUser(data)
-      }
-    })
-  }, []);
-
 
   return (
         <div className="uk-marign-top">
           <header>
-            { loggedIn() ? <p> You are logged in. </p> : <p> You are not logged in </p> }
-            { loggedIn() ? <a href="/logout"> Logout </a> : null }
             <h1> History Database </h1>
             <nav className="uk-navbar">
               <div className="uk-nav-bar-left">
@@ -94,7 +79,10 @@ function App() {
               </div>
               <div className="uk-navbar-right">
                 <ul className="uk-navbar-nav">
-                  <li><Link to="/login"> Login </Link></li>
+                  { auth.user ?
+                    <li><Link to="/logout" onClick={() => {auth.signout()}}> Logout </Link></li> : 
+                    <li><Link to="/login"> Login </Link></li>
+                  }
                 </ul>
               </div>
             </nav>
@@ -111,8 +99,12 @@ function App() {
             <LoginForm />
           </Route>
 
-          <Route path="/dashboard">
+          <PrivateRoute path="/dashboard">
             <Dashboard />
+          </PrivateRoute>
+
+          <Route path="/logout"> 
+            <Redirect to="/" />
           </Route>
 
           <Route exact path="/"> 
@@ -128,11 +120,6 @@ function App() {
             </Header>
             <RecordTable searched={searched} records={records} />
           </Route>
-
-          <Route path="/logout"> 
-            <Logout />
-          </Route>
-
         </div>
   );
 }

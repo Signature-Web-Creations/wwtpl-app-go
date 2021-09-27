@@ -1,14 +1,14 @@
 import {useState} from 'react';
-import {login} from './api';
-import {Redirect} from 'react-router-dom'; 
+import {useAuth} from './auth.js';
+import {Redirect} from 'react-router-dom';
 
 
 export default function LoginForm(props) {
+  const auth = useAuth()
 
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("") 
   const [error, setError] = useState(null)
-  const [redirect, setRedirect] = useState(false)
 
   const changeUsername = (event) => {
     setError(null)
@@ -20,33 +20,18 @@ export default function LoginForm(props) {
     setPassword(event.target.value)
   }
 
-  async function handleLoginResult(response){
-    const loginResult = await response.json()
-    if (loginResult.error) {
-      setError(loginResult.error)
-    } 
-
-    if (loginResult.success) {
-      setRedirect(true)
-    }
-  }
-
   const handleSubmit = (event) => {
     event.preventDefault()
-    const result = login(username, password)
-    result.then(result => {
-      handleLoginResult(result)
-    })
+    auth.signin(username, password, () => setError)
   }
 
-  if (redirect) {
-    console.log("Should be redirecting");
-    return <Redirect to="/dashboard" />
+  console.log(auth.user)
+  if (auth.user) {
+    return <Redirect to="/" />
   }
-  
+
   return (
     <form className="uk-form-stacked" onSubmit={handleSubmit}>
-
       <p>{error}</p>
       <div>
         <label className="uk-form-label"> Username </label>

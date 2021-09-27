@@ -54,11 +54,11 @@ export async function login(username, password) {
     body: JSON.stringify(data)
   })
 
-  return response
+  return response.json()
 }
 
 export async function logout() {
-  await fetch('/api/logout', {
+  return fetch('/api/logout', {
     method: 'POST',
     mode: 'same-origin', 
     cache: 'no-cache',
