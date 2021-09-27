@@ -1,5 +1,5 @@
-import {useState, useContext, createContext} from 'react';
-import {login, logout} from './api'; 
+import {useState, useEffect, useContext, createContext} from 'react';
+import {getUserData, login, logout} from './api'; 
 import {Route, Redirect} from 'react-router-dom';
 
 
@@ -16,6 +16,14 @@ export function useAuth() {
 // Provider hook that creates auth object and handles state
 export function useProvideAuth() {
   const [user, setUser] = useState(false) 
+
+  useEffect(() => {
+    getUserData().then(json => {
+      if (json.username) {
+        setUser(json)
+      }
+    })
+  }, [])
 
   const signin = (username, password, onError) => {
     login(username, password).then(result => {
