@@ -7,10 +7,11 @@ import SearchForm from './SearchForm';
 import RecordTable from './RecordTable';
 import RecordDetail from './RecordDetail';
 import LoginForm from './LoginForm';
+import Logout from './Logout';
 
 import Dashboard from './Dashboard';
 
-import {getPublicListingData} from './api';
+import {getPublicListingData, getUserData} from './api';
 import {useSearchParams} from './hooks';
 
 function getOffset(searchParameters) {
@@ -36,6 +37,13 @@ function App() {
   const [recordTypes, setRecordTypes] = useState([])
   const [collections, setCollections] = useState([])
   const [sourceArchives, setSourceArchives] = useState([])
+
+  const [user, setUser] = useState(null)
+
+  const loggedIn = () => {
+    // Returns true if user is logged in
+    return user !== null
+  }
 
   // stores whether a search was run or not
   // used to show different error messages in record table
@@ -63,10 +71,20 @@ function App() {
     })
   }, [offset])
 
+  useEffect(() => {
+    getUserData().then(data => {
+      if (!data.error) {
+        setUser(data)
+      }
+    })
+  }, []);
+
 
   return (
         <div className="uk-marign-top">
           <header>
+            { loggedIn() ? <p> You are logged in. </p> : <p> You are not logged in </p> }
+            { loggedIn() ? <a href="/logout"> Logout </a> : null }
             <h1> History Database </h1>
             <nav className="uk-navbar">
               <div className="uk-nav-bar-left">
@@ -109,6 +127,10 @@ function App() {
               <PaginationButtons currentPage={!offset ? 0 : offset} pages={pages} />
             </Header>
             <RecordTable searched={searched} records={records} />
+          </Route>
+
+          <Route path="/logout"> 
+            <Logout />
           </Route>
 
         </div>

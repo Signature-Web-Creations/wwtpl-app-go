@@ -56,3 +56,17 @@ export async function login(username, password) {
 
   return response
 }
+
+export async function logout() {
+  await fetch('/api/logout', {
+    method: 'POST',
+    mode: 'same-origin', 
+    cache: 'no-cache',
+    credentials: "include",
+  })
+}
+
+export function getUserData() {
+  return fetch(`/api/user`)
+    .then(res => res.json())
+}
