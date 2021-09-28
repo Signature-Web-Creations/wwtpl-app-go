@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/contrib/static"
 )
 
 func initRouter() *gin.Engine {
@@ -13,6 +14,8 @@ func initRouter() *gin.Engine {
 		AllowCredentials: true,
 	}))
 
+	router.Use(static.Serve("/", static.LocalFile("./public", true)))
+	
 	router.GET("/api/public/records", PublicRecords)
 	router.GET("/api/public/records/:id", PublicRecordDetail)
 
@@ -20,5 +23,6 @@ func initRouter() *gin.Engine {
 	router.POST("/api/login", Login)
 	router.POST("/api/logout", Logout)
 	router.GET("/api/user", GetLoggedInUser)
+
 	return router
 }
