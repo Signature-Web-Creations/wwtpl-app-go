@@ -1,3 +1,5 @@
+import {Link} from 'react-router-dom'
+
 export default function RecordRow(props) {
   let href = `/record/${props.id}`
   return (
@@ -5,7 +7,7 @@ export default function RecordRow(props) {
       <td>{props.date}</td>
       <td>{props.title}</td>
       <td>
-        <a href={href} className="uk-button uk-button-primary"> View </a>
+        <Link to={href} className="uk-button uk-button-primary"> View </Link>
       </td>
     </tr>
   );
