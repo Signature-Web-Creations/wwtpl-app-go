@@ -152,7 +152,7 @@ function CollectionRow(props) {
 
   const collectionLabel = (collection) => {
     return (
-      <span className="uk-label"> {collection} </span>
+      <span key={collection} className="uk-label"> {collection} </span>
     )
   }
   
