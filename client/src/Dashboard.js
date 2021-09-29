@@ -1,4 +1,9 @@
+import {Link} from 'react-router-dom'
 
 export default function Dashboard() {
-  return <h1> Welcome to the Dashboard </h1>
+  return (
+    <ul>
+      <li><Link to="/adduser"> Add User </Link></li>
+    </ul>
+  )
 }
