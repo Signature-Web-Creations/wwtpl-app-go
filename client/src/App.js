@@ -14,6 +14,7 @@ import { getPublicListingData } from './api'
 import { useSearchParams } from './hooks'
 import { useAuth, PrivateRoute } from './auth.js'
 import EditRecord from './admin/EditRecordDetail'
+import EditUser from './admin/EditUser'
 
 function getOffset(searchParameters) {
   let offsetParam = searchParameters.get('offset')
@@ -131,6 +132,10 @@ function App() {
 
       <Route path="/edit">
         <EditRecord />
+      </Route>
+
+      <Route path="/adduser">
+        <EditUser />
       </Route>
 
       <PrivateRoute path="/dashboard">
