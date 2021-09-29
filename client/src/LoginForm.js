@@ -43,7 +43,7 @@ export default function LoginForm(props) {
 
   console.log(auth.user)
   if (auth.user) {
-    return <Redirect to="/" />
+    return <Redirect to="/dashboard" />
   }
 
   return (
