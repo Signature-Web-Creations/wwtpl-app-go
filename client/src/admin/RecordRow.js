@@ -7,14 +7,10 @@ function RecordRow(props) {
 
   const editUrl = `/editrecord/${props.id}`
 
-  let statusClass = ''
-  if (props.status === 'published') {
-    statusClass = 'uk-label-success'
-  } else if (props.status === 'unpublished') {
-    statusClass = 'uk-label-warning'
-  } else if (props.status === 'deleted') {
-    statusClass = 'uk-label-error'
-  }
+  let statusClass = 'uk-label'
+  statusClass = props.status === 'published' && 'uk-label uk-label-success'
+  statusClass = props.status === 'unpublished' && 'uk-label uk-label-warning'
+  statusClass = props.status === 'deleted' && 'uk-label uk-label-error'
 
   return (
     <tr>
@@ -35,7 +31,7 @@ function RecordRow(props) {
       <td>{props.date}</td>
       <td>{props.title}</td>
       <td>
-        <span className="uk-label {statusClass}">{props.status}</span>
+        <span className={statusClass}>{props.status}</span>
       </td>
     </tr>
   )
