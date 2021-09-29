@@ -131,7 +131,11 @@ function App() {
       </Route>
 
       <Route path="/edit">
-        <EditRecord />
+        <EditRecord
+          recordTypes={recordTypes}
+          collections={collections}
+          sourceArchives={sourceArchives}
+        />
       </Route>
 
       <Route path="/adduser">

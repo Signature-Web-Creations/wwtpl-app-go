@@ -1,29 +1,27 @@
-function CollectionRow() {
+function CollectionRow(props) {
+  const handleCheckbox = (event) => {
+    // add each option to the list
+  }
+
   return (
     <tr>
       <td>
         <strong>Collection</strong>
       </td>
       <td>
-        <label>
-          <input class="uk-checkbox" type="checkbox" />
-          &nbsp;&nbsp; Option 01
-        </label>
-        <br />
-        <label>
-          <input class="uk-checkbox" type="checkbox" />
-          &nbsp;&nbsp; Option 02
-        </label>
-        <br />
-        <label>
-          <input class="uk-checkbox" type="checkbox" />
-          &nbsp;&nbsp; Option 03
-        </label>
-        <br />
-        <label>
-          <input class="uk-checkbox" type="checkbox" />
-          &nbsp;&nbsp; Option 04
-        </label>
+        {props.collections.map(({ id, name }) => (
+          <>
+            <label>
+              <input
+                class="uk-checkbox"
+                type="checkbox"
+                onChange={handleCheckbox(id)}
+              />
+              &nbsp;&nbsp; {name}
+            </label>
+            <br />
+          </>
+        ))}
       </td>
     </tr>
   )
