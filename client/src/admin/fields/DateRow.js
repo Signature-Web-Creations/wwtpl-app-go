@@ -5,7 +5,7 @@ function DateRow() {
         <strong>Date</strong>
       </td>
       <td>
-        <input class="uk-input" type="date" placeholder="Input" />
+        <input className="uk-input" type="date" placeholder="Input" />
       </td>
     </tr>
   )

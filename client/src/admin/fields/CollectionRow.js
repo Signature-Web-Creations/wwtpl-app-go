@@ -13,7 +13,7 @@ function CollectionRow(props) {
           <>
             <label>
               <input
-                class="uk-checkbox"
+                className="uk-checkbox"
                 type="checkbox"
                 onChange={handleCheckbox(id)}
               />

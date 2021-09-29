@@ -5,7 +5,7 @@ function AuthorRow() {
         <strong>Author</strong>
       </td>
       <td>
-        <input class="uk-input" type="text" placeholder="Author" />
+        <input className="uk-input" type="text" placeholder="Author" />
       </td>
     </tr>
   )

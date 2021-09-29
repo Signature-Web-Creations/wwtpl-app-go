@@ -5,7 +5,7 @@ function OriginRow() {
         <strong>Origin</strong>
       </td>
       <td>
-        <select class="uk-select">
+        <select className="uk-select">
           <option value="">Select One</option>
           <option>Option 1</option>
           <option>Option 2</option>

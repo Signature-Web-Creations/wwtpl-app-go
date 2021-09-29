@@ -16,13 +16,7 @@ function AdminListings(props) {
       </thead>
       <tbody>
         {props.records.map(({ id, date, title, status }) => (
-          <RecordRow
-            id={id}
-            key={id}
-            date={date}
-            title={title}
-            status={status}
-          />
+          <RecordRow id={id} date={date} title={title} status={status} />
         ))}
       </tbody>
     </table>

@@ -1,11 +1,11 @@
 function TitleRow() {
   return (
     <tr>
-      <td class="uk-width-medium">
+      <td className="uk-width-medium">
         <strong>Title</strong>
       </td>
       <td>
-        <input class="uk-input" type="text" placeholder="Title" />
+        <input className="uk-input" type="text" placeholder="Title" />
       </td>
     </tr>
   )

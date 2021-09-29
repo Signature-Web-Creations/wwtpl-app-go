@@ -6,9 +6,9 @@ function RecordIdRow() {
       </td>
       <td>
         <input
-          class="uk-input"
+          className="uk-input"
           type="text"
-          disabled="true"
+          disabled={true}
           placeholder="Record ID"
         />
       </td>

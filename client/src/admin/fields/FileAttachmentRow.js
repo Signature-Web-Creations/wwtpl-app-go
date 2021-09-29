@@ -8,13 +8,13 @@ function FileAttachmentRow() {
         <div uk-form-custom="target: true">
           <input type="file" />
           <input
-            class="uk-input uk-form-width-medium"
+            className="uk-input uk-form-width-medium"
             type="text"
             placeholder="Select file"
-            disabled="true"
+            disabled={true}
           />
         </div>
-        <button class="uk-button uk-button-default">Submit</button>
+        <button className="uk-button uk-button-default">Submit</button>
       </td>
     </tr>
   )

@@ -6,7 +6,7 @@ function ContentRow() {
       </td>
       <td>
         <textarea
-          class="uk-textarea"
+          className="uk-textarea"
           rows="5"
           placeholder="Description"
         ></textarea>

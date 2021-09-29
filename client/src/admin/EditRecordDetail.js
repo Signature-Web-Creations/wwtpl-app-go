@@ -28,10 +28,10 @@ function EditRecord(props) {
 
   function ErrorBox() {
     return (
-      <div uk-alert="true" className="uk-alert-danger">
+      <div uk-alert={true} className="uk-alert-danger">
         <Link
           className="uk-alert-close"
-          uk-close="true"
+          uk-close={true}
           onClick={handleCloseErrorBox}
         ></Link>
         <p>{error}</p>
@@ -43,7 +43,7 @@ function EditRecord(props) {
     <form className="uk-form-stacked uk-margin-top" onSubmit={handleSubmit}>
       {error && <ErrorBox />}
 
-      <table class="uk-table uk-table-small uk-table-divider uk-margin-medium">
+      <table className="uk-table uk-table-small uk-table-divider uk-margin-medium">
         <tbody>
           <TitleRow />
           <FileAttachmentRow />

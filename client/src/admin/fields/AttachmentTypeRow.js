@@ -5,7 +5,7 @@ function AttachmentTypeRow() {
         <strong>Attachment Type</strong>
       </td>
       <td>
-        <select class="uk-select">
+        <select className="uk-select">
           <option value="">Select One</option>
           <option>Image</option>
           <option>Video</option>

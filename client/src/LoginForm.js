@@ -30,10 +30,10 @@ export default function LoginForm(props) {
 
   function ErrorBox() {
     return (
-      <div uk-alert="true" className="uk-alert-danger">
+      <div uk-alert={true} className="uk-alert-danger">
         <Link
           className="uk-alert-close"
-          uk-close="true"
+          uk-close={true}
           onClick={handleCloseErrorBox}
         ></Link>
         <p>{error}</p>

@@ -46,7 +46,7 @@ export default function SearchForm(props) {
         performSearch()
       }}
     >
-      <div className="searchBar uk-grid-small" uk-grid="true">
+      <div className="searchBar uk-grid-small" uk-grid={true}>
         <div className="uk-width-expand@s">
           <input
             className="uk-input"
@@ -77,7 +77,7 @@ export default function SearchForm(props) {
         </div>
         <div
           className="advancedSearchButton uk-width-auto@s uk-grid-small"
-          uk-grid="true"
+          uk-grid={true}
         >
           <div className="uk-width-auto">
             <button
@@ -111,7 +111,7 @@ export default function SearchForm(props) {
         </div>
       </div>
 
-      <div className={advancedSearchClassName} uk-grid="true">
+      <div className={advancedSearchClassName} uk-grid={true}>
         <div className={advancedSearchOptionsClass}>
           <select
             className="uk-select"

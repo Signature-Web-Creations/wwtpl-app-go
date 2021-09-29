@@ -15,7 +15,7 @@ function EditRecordFieldValues() {
 
   return (
     <>
-      <form class="uk-form-stacked uk-form-width-large uk-margin-top">
+      <form className="uk-form-stacked uk-form-width-large uk-margin-top">
         <label>Select a field to edit</label>
         <select
           className="uk-select"
@@ -29,7 +29,7 @@ function EditRecordFieldValues() {
         </select>
       </form>
 
-      <table class="uk-table uk-table-small uk-table-divider uk-margin-medium">
+      <table className="uk-table uk-table-small uk-table-divider uk-margin-medium">
         <tbody>
           <EditFieldType field={fieldType} />
           {/* { props.records.map(({id, name}) => <EditFieldType id={id} field={fieldType} name={name} />)}  */}
