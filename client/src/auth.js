@@ -58,17 +58,14 @@ export function ProvideAuth({ children }) {
 
 export function PrivateRoute({children, ...rest}) {
   let auth = useAuth()
-  return (
-    <Route
-      {...rest}
-      render={() => 
-        auth.user ? (
-          children
-        ) : (
-          <Redirect 
-            to="/" />
-        )
-      }
-    />
-  )
+
+  if (auth.user) {
+    return (
+      <Route {...rest}>
+        { children }
+      </Route>
+    )
+  } else {
+    return <Redirect to="/" />
+  }
 }
