@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 
 function EditUser() {
   const [firstName, setFirstName] = useState('')
@@ -37,11 +38,11 @@ function EditUser() {
   function ErrorBox() {
     return (
       <div uk-alert="true" className="uk-alert-danger">
-        <span
+        <Link
           className="uk-alert-close"
           uk-close="true"
           onClick={handleCloseErrorBox}
-        ></span>
+        ></Link>
         <p>{error}</p>
       </div>
     )

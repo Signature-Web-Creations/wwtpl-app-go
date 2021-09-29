@@ -7,6 +7,7 @@ export default function SearchForm(props) {
   const [searchCollection, setSearchCollection] = useState('')
   const [searchSourceArchive, setSearchSourceArchive] = useState('')
   const [searchRecordType, setSearchRecordType] = useState('')
+  const [searchStatus, setSearchStatus] = useState('')
 
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false)
   const performSearch = () => {
@@ -16,6 +17,7 @@ export default function SearchForm(props) {
       searchCollection,
       searchSourceArchive,
       searchRecordType,
+      searchStatus,
     }
     props.onSubmit(params)
   }
@@ -25,9 +27,16 @@ export default function SearchForm(props) {
     setSearchCollection('')
     setSearchSourceArchive('')
     setSearchRecordType('')
+    setSearchStatus('')
   }
   const show = showAdvancedSearch ? 'show' : ''
   const advancedSearchClassName = `advancedSearchOptions uk-grid-small ${show}`
+
+  // If logged in
+  const isLoggedIn = false
+  const advancedSearchOptionsClass = !isLoggedIn
+    ? 'uk-width-1-3@s'
+    : 'uk-width-1-4@s'
 
   return (
     <form
@@ -84,7 +93,7 @@ export default function SearchForm(props) {
             <button
               className="uk-button uk-button-default"
               type="submit"
-              uk-icon="search"
+              uk-icon="refresh"
               uk-tooltip="Clear Search"
               onClick={() => {
                 clearSearchFields()
@@ -103,7 +112,7 @@ export default function SearchForm(props) {
       </div>
 
       <div className={advancedSearchClassName} uk-grid="true">
-        <div className="uk-width-1-3@s">
+        <div className={advancedSearchOptionsClass}>
           <select
             className="uk-select"
             value={searchRecordType}
@@ -120,7 +129,7 @@ export default function SearchForm(props) {
             ))}
           </select>
         </div>
-        <div className="uk-width-1-3@s">
+        <div className={advancedSearchOptionsClass}>
           <select
             className="uk-select"
             value={searchSourceArchive}
@@ -137,7 +146,7 @@ export default function SearchForm(props) {
             ))}
           </select>
         </div>
-        <div className="uk-width-1-3@s">
+        <div className={advancedSearchOptionsClass}>
           <select
             className="uk-select"
             value={searchCollection}
@@ -154,6 +163,25 @@ export default function SearchForm(props) {
             ))}
           </select>
         </div>
+        {isLoggedIn && (
+          <div className={advancedSearchOptionsClass}>
+            <select
+              className="uk-select"
+              value={searchStatus}
+              onChange={(e) => {
+                setSearchStatus(e.target.value)
+              }}
+            >
+              <option value="">Status</option>
+              {props.status.map(({ id, name }) => (
+                <option key={id} value={id}>
+                  {' '}
+                  {name}{' '}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
       </div>
     </form>
   )

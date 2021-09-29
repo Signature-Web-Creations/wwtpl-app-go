@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useAuth } from './auth.js'
-import { Redirect } from 'react-router-dom'
+import { Redirect, Link } from 'react-router-dom'
 
 export default function LoginForm(props) {
   const auth = useAuth()
@@ -31,11 +31,11 @@ export default function LoginForm(props) {
   function ErrorBox() {
     return (
       <div uk-alert="true" className="uk-alert-danger">
-        <span
+        <Link
           className="uk-alert-close"
           uk-close="true"
           onClick={handleCloseErrorBox}
-        ></span>
+        ></Link>
         <p>{error}</p>
       </div>
     )
