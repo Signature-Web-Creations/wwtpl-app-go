@@ -1,0 +1,42 @@
+/* https://static.parastorage.com/services/editor-elements/dist/rb_wixui.thunderbolt[SkipToContentButton].3626b1fa.min.css */
+@font-face {
+  font-display: swap;
+  font-family: wixFreemiumFontW01-65Medi;
+  font-weight: 700;
+  src: url(//static.parastorage.com/services/third-party/fonts/Helvetica/Fonts/07fe0fec-b63f-4963-8ee1-535528b67fdb.eot#iefix);
+  src: url(//static.parastorage.com/services/third-party/fonts/Helvetica/Fonts/07fe0fec-b63f-4963-8ee1-535528b67fdb.eot#iefix)
+      format('eot'),
+    url(//static.parastorage.com/services/third-party/fonts/Helvetica/Fonts/60be5c39-863e-40cb-9434-6ebafb62ab2b.woff)
+      format('woff'),
+    url(//static.parastorage.com/services/third-party/fonts/Helvetica/Fonts/4c6503c9-859b-4d3b-a1d5-2d42e1222415.ttf)
+      format('truetype'),
+    url(//static.parastorage.com/services/third-party/fonts/Helvetica/Fonts/36c182c6-ef98-4021-9b0d-d63122c2bbf5.svg#36c182c6-ef98-4021-9b0d-d63122c2bbf5)
+      format('svg');
+}
+._2SeL5 {
+  position: absolute;
+  top: 60px;
+  left: 50%;
+  pointer-events: none;
+  margin-left: -94px;
+  z-index: 9999;
+  background: #fff;
+  color: #116dff;
+  font-family: wixFreemiumFontW01-65Medi, wixFreemiumFontW02-65Medi,
+    wixFreemiumFontW10-65Medi, Helvetica Neue, Helvetica, Arial, メイリオ,
+    meiryo, ヒラギノ角ゴ pro w3, hiragino kaku gothic pro, sans-serif;
+  font-size: 14px;
+  border-radius: 24px;
+  padding: 0 24px 0 24px;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+._2SeL5:focus {
+  border: 2px solid;
+  opacity: 1;
+  width: auto;
+  height: 40px;
+  pointer-events: auto;
+}
