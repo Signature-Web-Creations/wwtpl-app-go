@@ -139,9 +139,9 @@ function App() {
           />
         </Route>
 
-        <Route path="/adduser">
+        <PrivateRoute path="/adduser">
           <EditUser />
-        </Route>
+        </PrivateRoute>
 
         <PrivateRoute path="/dashboard">
           <Dashboard />
