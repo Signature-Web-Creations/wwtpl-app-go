@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Link, Route, Redirect } from 'react-router-dom'
+import { Switch, Link, Route, Redirect } from 'react-router-dom'
 
 import Header from './Header'
 import PaginationButtons from './PaginationButton'
@@ -118,52 +118,54 @@ function App() {
           </div>
         </nav>
       </header>
-      <Route path="/record/:id">
-        <Header>
-          <h1 className="uk-text-lead"> History Record </h1>
-        </Header>
+      <Switch>
+        <Route path="/record/:id">
+          <Header>
+            <h1 className="uk-text-lead"> History Record </h1>
+          </Header>
 
-        <RecordDetail records={records} />
-      </Route>
+          <RecordDetail records={records} />
+        </Route>
 
-      <Route path="/login">
-        <LoginForm />
-      </Route>
+        <Route path="/login">
+          <LoginForm />
+        </Route>
 
-      <Route path="/edit">
-        <EditRecord
-          recordTypes={recordTypes}
-          collections={collections}
-          sourceArchives={sourceArchives}
-        />
-      </Route>
-
-      <Route path="/adduser">
-        <EditUser />
-      </Route>
-
-      <PrivateRoute path="/dashboard">
-        <Dashboard />
-      </PrivateRoute>
-
-      <Route path="/logout">
-        <Redirect to="/" />
-      </Route>
-
-      <Route exact path="/">
-        <Header>
-          <h1 className="uk-text-lead"> History Listing </h1>
-          <SearchForm
-            years={!years ? [] : years}
+        <Route path="/edit">
+          <EditRecord
             recordTypes={recordTypes}
             collections={collections}
             sourceArchives={sourceArchives}
-            onSubmit={handleSearch}
           />
-          <PaginationButtons currentPage={!offset ? 0 : offset} pages={pages} />
-        </Header>
-        <RecordTable searched={searched} records={records} />
-      </Route>
+        </Route>
+
+        <Route path="/adduser">
+          <EditUser />
+        </Route>
+
+        <PrivateRoute path="/dashboard">
+          <Dashboard />
+        </PrivateRoute>
+
+        <Route path="/logout">
+          <Redirect to="/" />
+        </Route>
+
+        <Route exact path="/">
+          <Header>
+            <h1 className="uk-text-lead"> History Listing </h1>
+            <SearchForm
+              years={!years ? [] : years}
+              recordTypes={recordTypes}
+              collections={collections}
+              sourceArchives={sourceArchives}
+              onSubmit={handleSearch}
+            />
+            <PaginationButtons currentPage={!offset ? 0 : offset} pages={pages} />
+          </Header>
+          <RecordTable searched={searched} records={records} />
+        </Route>
+        </Switch>
     </div>
   )
 }
