@@ -19,7 +19,7 @@ func initRouter() *gin.Engine {
 	router.GET("/api/public/records", PublicRecords)
 	router.GET("/api/public/records/:id", PublicRecordDetail)
 
-	router.POST("/api/register", RegisterUser)
+	router.POST("/api/user", RegisterUser)
 	router.POST("/api/login", Login)
 	router.POST("/api/logout", Logout)
 	router.GET("/api/user", GetLoggedInUser)

@@ -81,3 +81,19 @@ export async function logout() {
 export function getUserData() {
   return fetch(`/api/user`).then((res) => res.json())
 }
+
+export async function createUser(userData) {
+  const response = await fetch('/api/user', {
+      method: 'POST',
+      mode: 'same-origin',
+      cache: 'no-cache',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json'
+      }, 
+
+      body: JSON.stringify(userData)
+  })
+
+  return response.json()
+}

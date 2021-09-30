@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { createUser } from '../api.js'
 
 function EditUser() {
   const [firstName, setFirstName] = useState('')
@@ -7,13 +8,18 @@ function EditUser() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState(null)
+  const [message, setMessage] = useState(null)
 
   const handleSubmit = (event) => {
     event.preventDefault()
-  }
-
-  const handleCloseErrorBox = () => {
-    setError(null)
+    const userData = {firstName, lastName, username, password}
+    createUser(userData).then((res) => {
+      if (res.success) {
+        setMessage(res.success)
+      } else {
+        setError(res.error)
+      }
+    })
   }
 
   const changeFirstName = (event) => {
@@ -35,15 +41,32 @@ function EditUser() {
     setPassword(event.target.value)
   }
 
-  function ErrorBox() {
+  function SuccessBox(props) {
+    return (
+      <div uk-alert={true} className="uk-alert-success">
+        <Link
+          className="uk-alert-close"
+          uk-close={true}
+          onClick={() => {
+            setMessage(null)
+          }}
+        ></Link>
+        <p>{props.message}</p>
+      </div>
+    )
+  }
+
+  function ErrorBox(props) {
     return (
       <div uk-alert={true} className="uk-alert-danger">
         <Link
           className="uk-alert-close"
           uk-close={true}
-          onClick={handleCloseErrorBox}
+          onClick={() => {
+            setError(null)
+          }}
         ></Link>
-        <p>{error}</p>
+        <p>{props.message}</p>
       </div>
     )
   }
@@ -53,7 +76,8 @@ function EditUser() {
       className="uk-form-stacked uk-form-width-large uk-margin-top"
       onSubmit={handleSubmit}
     >
-      {error && <ErrorBox />}
+      {message && <SuccessBox message={message}/>}
+      {error && <ErrorBox message={error}/>}
 
       <div>
         <label className="uk-form-label uk-margin-top">First Name</label>
