@@ -33,8 +33,7 @@ export default function SearchForm(props) {
   const advancedSearchClassName = `advancedSearchOptions uk-grid-small ${show}`
 
   // If logged in
-  const isLoggedIn = false
-  const advancedSearchOptionsClass = !isLoggedIn
+  const advancedSearchOptionsClass = !props.isLoggedIn
     ? 'uk-width-1-3@s'
     : 'uk-width-1-4@s'
 
@@ -163,7 +162,7 @@ export default function SearchForm(props) {
             ))}
           </select>
         </div>
-        {isLoggedIn && (
+        {props.isLoggedIn && (
           <div className={advancedSearchOptionsClass}>
             <select
               className="uk-select"
