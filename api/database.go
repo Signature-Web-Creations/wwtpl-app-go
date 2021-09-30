@@ -410,7 +410,7 @@ func GetUserByID(id int) (User, error) {
 func GetUsers() ([]User, error) {
 	var users []User
 
-	query := sq.Select("user.id, firstName, lastName, username, password, user_roles.name")
+	query := sq.Select("user.id, firstName, lastName, username, user_roles.name")
 	query = query.From("user")
 	query = query.InnerJoin("user_roles on user.role_id = user_roles.id")
 

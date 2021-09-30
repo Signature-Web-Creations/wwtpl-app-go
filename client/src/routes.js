@@ -3,6 +3,7 @@ const routes = {
   home: '/',
   login: '/login',
   logout: '/logout',
+  showUsers: '/users',
   addUser: '/adduser',
   editRecord: {
     url: '/editrecord',

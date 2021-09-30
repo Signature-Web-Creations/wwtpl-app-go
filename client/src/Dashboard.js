@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import AdminListings from './admin/RecordTable'
+import {UrlFor} from './routes.js'
 
 export default function Dashboard(props) {
   return (
@@ -15,6 +16,10 @@ export default function Dashboard(props) {
         {' '}
         Update Users{' '}
       </Link>
+      <Link to={UrlFor('showUsers')} className="uk-button uk-button-default">
+        {' '}
+        Manage Users{' '}
+      </Link> 
 
       {/* Search Form for Admins should go here */}
 

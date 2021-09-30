@@ -23,6 +23,7 @@ func initRouter() *gin.Engine {
 	router.POST("/api/login", Login)
 	router.POST("/api/logout", Logout)
 	router.GET("/api/user", GetLoggedInUser)
+	router.GET("/api/users", GetUsersList)
 
 	return router
 }

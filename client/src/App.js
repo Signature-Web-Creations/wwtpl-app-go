@@ -16,6 +16,7 @@ import { useSearchParams } from './hooks'
 import { useAuth, PrivateRoute } from './auth.js'
 import EditRecord from './admin/RecordForm'
 import UserForm from './admin/UserForm'
+import UserListings from './admin/UserListings'
 
 function getOffset(searchParameters) {
   let offsetParam = searchParameters.get('offset')
@@ -157,6 +158,9 @@ function App() {
           <UserForm />
         </PrivateRoute>
 
+        <PrivateRoute path={UrlFor('showUsers')}>
+          <UserListings />
+        </PrivateRoute>
         <Route path={UrlFor('logout')}>
           <Redirect to={UrlFor('home')} />
         </Route>

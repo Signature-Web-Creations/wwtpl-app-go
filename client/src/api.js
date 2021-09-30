@@ -97,3 +97,16 @@ export async function createUser(userData) {
 
   return response.json()
 }
+
+// Returns a json list of users. If the user is not
+// authenticated returns a 401 unauthorized
+export async function getUsers() {
+  const response = await fetch('/api/users', {
+      method: 'GET',
+      mode: 'same-origin',
+      cache: 'no-cache',
+      credentials: 'include'
+  })
+
+  return response.json()
+}
