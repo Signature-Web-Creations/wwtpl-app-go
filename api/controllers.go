@@ -229,6 +229,20 @@ func GetLoggedInUser(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
+func GetUsersList(c *gin.Context) {
+	user, ok := getAuthenticatedUser(c)
+	if !ok || user.Role != "admin" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User is not authorized"})
+	}
+
+	users, err := GetUsers()
+	if err != nil {
+		fmt.Printf("GetUsersList: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "The server encountered an error. Try again later."})
+	}
+	c.JSON(http.StatusOK, gin.H{"users": users})
+}
+
 func Logout(c *gin.Context) {
 	c.SetCookie("jwt", "", -1, "/", "", false, true)
 	c.JSON(http.StatusOK, gin.H{"success": "Logged out user"})

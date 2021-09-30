@@ -406,3 +406,41 @@ func GetUserByID(id int) (User, error) {
 
 	return user, nil
 }
+
+func GetUsers() ([]User, error) {
+	var users []User
+
+	query := sq.Select("user.id, firstName, lastName, username, password, user_roles.name")
+	query = query.From("user")
+	query = query.InnerJoin("user_roles on user.role_id = user_roles.id")
+
+	rows, err := query.RunWith(db).Query()
+
+	if err != nil {
+		return nil, fmt.Errorf("GetUsers: %v", err)
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var user User
+		err := rows.Scan(
+			&user.ID,
+			&user.FirstName,
+			&user.LastName,
+			&user.Username,
+			&user.Role,
+		)
+
+		if err != nil {
+			return nil, fmt.Errorf("GetUsers: %v", err)
+		}
+		users = append(users, user)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("GetUsers: %v", err)
+	}
+
+	return users, nil
+}
