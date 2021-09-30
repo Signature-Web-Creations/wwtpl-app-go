@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom'
 import { UrlFor } from './routes'
 
 export default function RecordRow(props) {
-  // let href = `/record/${props.id}`
   return (
     <tr>
       <td>{props.date}</td>
