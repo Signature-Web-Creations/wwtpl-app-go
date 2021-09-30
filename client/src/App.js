@@ -90,9 +90,15 @@ function App() {
         <nav className="uk-navbar">
           <div className="uk-nav-bar-left">
             <ul className="uk-navbar-nav">
-              <li>
-                <Link to="/"> Home </Link>
-              </li>
+              {auth.user ? (
+                <li>
+                  <Link to="/dashboard"> Dashboard </Link>
+                </li>
+              ) : (
+                <li>
+                  <Link to="/"> Home </Link>
+                </li>
+              )}
             </ul>
           </div>
           <div className="uk-navbar-right">
@@ -118,6 +124,7 @@ function App() {
           </div>
         </nav>
       </header>
+
       <Switch>
         <Route path="/record/:id">
           <Header>
@@ -139,33 +146,42 @@ function App() {
           />
         </Route>
 
-        <PrivateRoute path="/adduser">
-          <EditUser />
+        <PrivateRoute path="/dashboard">
+          <Dashboard records={records} />
         </PrivateRoute>
 
-        <PrivateRoute path="/dashboard">
-          <Dashboard />
+        <PrivateRoute path="/adduser">
+          <EditUser />
         </PrivateRoute>
 
         <Route path="/logout">
           <Redirect to="/" />
         </Route>
 
-        <Route exact path="/">
-          <Header>
-            <h1 className="uk-text-lead"> History Listing </h1>
-            <SearchForm
-              years={!years ? [] : years}
-              recordTypes={recordTypes}
-              collections={collections}
-              sourceArchives={sourceArchives}
-              onSubmit={handleSearch}
-            />
-            <PaginationButtons currentPage={!offset ? 0 : offset} pages={pages} />
-          </Header>
-          <RecordTable searched={searched} records={records} />
-        </Route>
-        </Switch>
+        {auth.user ? (
+          <Route path="/">
+            <Redirect to="/dashboard" />
+          </Route>
+        ) : (
+          <Route exact path="/">
+            <Header>
+              <h1 className="uk-text-lead"> History Listing </h1>
+              <SearchForm
+                years={!years ? [] : years}
+                recordTypes={recordTypes}
+                collections={collections}
+                sourceArchives={sourceArchives}
+                onSubmit={handleSearch}
+              />
+              <PaginationButtons
+                currentPage={!offset ? 0 : offset}
+                pages={pages}
+              />
+            </Header>
+            <RecordTable searched={searched} records={records} />
+          </Route>
+        )}
+      </Switch>
     </div>
   )
 }

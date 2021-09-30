@@ -1,9 +1,28 @@
-import {Link} from 'react-router-dom'
+import { Link } from 'react-router-dom'
+import AdminListings from './admin/RecordTable'
 
-export default function Dashboard() {
+export default function Dashboard(props) {
   return (
-    <ul>
-      <li><Link to="/adduser"> Add User </Link></li>
-    </ul>
+    <>
+      <Link
+        to="/adduser"
+        className="uk-button uk-button-primary uk-margin-right"
+      >
+        {' '}
+        Add New User{' '}
+      </Link>
+      <Link to="/adduser" className="uk-button uk-button-default">
+        {' '}
+        Update Users{' '}
+      </Link>
+
+      {/* Search Form for Admins should go here */}
+
+      {/*
+       * List of pending records by default
+       * Needs to include a records status in the records
+       */}
+      <AdminListings records={props.records} />
+    </>
   )
 }
