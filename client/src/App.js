@@ -15,7 +15,7 @@ import { getPublicListingData } from './api'
 import { useSearchParams } from './hooks'
 import { useAuth, PrivateRoute } from './auth.js'
 import EditRecord from './admin/RecordForm'
-import EditUser from './admin/EditUser'
+import UserForm from './admin/UserForm'
 
 function getOffset(searchParameters) {
   let offsetParam = searchParameters.get('offset')
@@ -154,7 +154,7 @@ function App() {
         </PrivateRoute>
 
         <PrivateRoute path={UrlFor('addUser')}>
-          <EditUser />
+          <UserForm />
         </PrivateRoute>
 
         <Route path={UrlFor('logout')}>
