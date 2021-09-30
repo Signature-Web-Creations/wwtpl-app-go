@@ -4,12 +4,32 @@ const routes = {
   login: '/login',
   logout: '/logout',
   addUser: '/adduser',
-  editRecord: '/editrecord/:id',
-  viewRecord: '/record/:id',
+  editRecord: {
+    url: '/editrecord',
+    params: {
+      id: ':id',
+    },
+  },
+  viewRecord: {
+    url: '/record',
+    params: {
+      id: ':id',
+    },
+  },
 }
 
-export function UrlFor(name) {
-  const route = routes[name]
+export function UrlFor(name, params) {
+  let route = ''
+
+  if (typeof routes[name] === 'string') {
+    route = routes[name]
+  } else {
+    if (params !== undefined) {
+      route = routes[name].url + '/' + params.id
+    } else {
+      route = routes[name].url + '/' + routes[name].params.id
+    }
+  }
 
   if (route === undefined) {
     throw new Error(`Route doesn't exist: ${name}`)
