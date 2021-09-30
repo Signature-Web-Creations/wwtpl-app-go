@@ -5,12 +5,17 @@ function RecordRow(props) {
     // intiate delete record
   }
 
-  const editUrl = `/editrecord/${props.id}`
+  const handleStatusColor = (status) => {
+    if (status === 'unpublished') {
+      return 'uk-label uk-label-warning'
+    } else if (status === 'deleted') {
+      return 'uk-label uk-label-error'
+    } else {
+      return 'uk-label uk-label-success'
+    }
+  }
 
-  let statusClass = 'uk-label'
-  statusClass = props.status === 'published' && 'uk-label uk-label-success'
-  statusClass = props.status === 'unpublished' && 'uk-label uk-label-warning'
-  statusClass = props.status === 'deleted' && 'uk-label uk-label-error'
+  const editUrl = `/editrecord/${props.id}`
 
   return (
     <tr>
@@ -31,7 +36,7 @@ function RecordRow(props) {
       <td>{props.date}</td>
       <td>{props.title}</td>
       <td>
-        <span className={statusClass}>{props.status}</span>
+        <span className={handleStatusColor(props.status)}>{props.status}</span>
       </td>
     </tr>
   )

@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"golang.org/x/crypto/bcrypt"
-	"github.com/dgrijalva/jwt-go"
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/dgrijalva/jwt-go"
+	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func PublicRecordDetail(c *gin.Context) {
@@ -35,6 +36,7 @@ func getQueryParams(c *gin.Context) map[string]string {
 	params["recordType"] = c.Query("recordType")
 	params["collection"] = c.Query("collection")
 	params["sourceArchive"] = c.Query("sourceArchive")
+	params["recordStatus"] = c.Query("recordStatus")
 	return params
 }
 
@@ -96,6 +98,14 @@ func PublicRecords(c *gin.Context) {
 	} else {
 		results["recordTypes"] = recordTypes
 	}
+
+	recordStatus, err := GetRecordStatuses()
+	if err != nil {
+		c.IndentedJSON(http.StatusOK, nil)
+		return
+	} else {
+		results["recordStatus"] = recordStatus
+	}
 	c.IndentedJSON(http.StatusOK, results)
 }
 
@@ -156,11 +166,11 @@ func Login(c *gin.Context) {
 	expiresAt := time.Now().Add(time.Hour * 24)
 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
 		Issuer: strconv.Itoa(int(user.ID)),
-		ExpiresAt: expiresAt.Unix(), 
+		ExpiresAt: expiresAt.Unix(),
 	})
 
 
-	token, err := claims.SignedString([]byte(SecretKey)) 
+	token, err := claims.SignedString([]byte(SecretKey))
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not login"})
@@ -168,18 +178,18 @@ func Login(c *gin.Context) {
 
 	seconds_in_day := 86400
 	c.SetCookie("jwt", token, seconds_in_day, "/", "", false, true)
-	
+
 	c.JSON(http.StatusOK, gin.H{"success": "Successfully logged in user.", "user": user})
 }
 
 func getAuthenticatedUser(c *gin.Context) (User, bool) {
 	// Returns the user if they are authenticated, otherwise returns an false
-	// Used to check authentication in controllers where users need to be logged 
+	// Used to check authentication in controllers where users need to be logged
 	// in
 
 	var user User
 
-	cookie, err := c.Cookie("jwt") 
+	cookie, err := c.Cookie("jwt")
 	if err != nil {
 		return user, false
 	}

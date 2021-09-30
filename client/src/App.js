@@ -41,6 +41,7 @@ function App() {
   const [recordTypes, setRecordTypes] = useState([])
   const [collections, setCollections] = useState([])
   const [sourceArchives, setSourceArchives] = useState([])
+  const [recordStatus, setRecordStatus] = useState([])
 
   // stores whether a search was run or not
   // used to show different error messages in record table
@@ -138,13 +139,14 @@ function App() {
           <LoginForm />
         </Route>
 
-        <Route path="/edit">
+        <PrivateRoute path="/edit">
           <EditRecord
             recordTypes={recordTypes}
             collections={collections}
             sourceArchives={sourceArchives}
+            recordStatus={recordStatus}
           />
-        </Route>
+        </PrivateRoute>
 
         <PrivateRoute path="/dashboard">
           <Dashboard records={records} />

@@ -3,11 +3,12 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"log"
+	"strconv"
+
 	sq "github.com/Masterminds/squirrel"
 	_ "github.com/mattn/go-sqlite3"
 	"golang.org/x/crypto/bcrypt"
-	"log"
-	"strconv"
 )
 
 var db *sql.DB
@@ -26,11 +27,12 @@ func init() {
     attachment_type_name,
     file_name,
     record_type.name,
+		record_status.name,
     (SELECT GROUP_CONCAT(collection.name, ';')
      FROM history_record hr
      LEFT OUTER JOIN record_collections ON hr.id = record_collections.record_id
      LEFT OUTER JOIN collection ON record_collections.collection_id = collection.id
-     WHERE history_record.id = hr.id) AS collections  
+     WHERE history_record.id = hr.id) AS collections
   `).From(`history_record`)
 
 	historyRecords = historyRecords.LeftJoin(`(
@@ -42,6 +44,7 @@ func init() {
 
 	historyRecords = historyRecords.LeftJoin(`record_type ON history_record.record_type_id = record_type.id`)
 	historyRecords = historyRecords.LeftJoin(`source_archive ON history_record.source_archive_id = source_archive.id`)
+	historyRecords = historyRecords.LeftJoin(`record_status ON history_record.record_status_id = record_status.id`)
 }
 
 func Connect() {
@@ -93,6 +96,12 @@ func addFilters(query sq.SelectBuilder, params map[string]string) sq.SelectBuild
 		query = query.Where(`? IN (SELECT collection_id FROM record_collections WHERE record_id = history_record.id)`, params["collection"])
 	}
 
+	if params["recordStatus"] != "" {
+		if recordStatus, err := strconv.Atoi(params["recordStatus"]); err == nil {
+			query = query.Where(`history_record.record_status_id = ?`, recordStatus)
+		}
+	}
+
 	return query
 }
 
@@ -127,7 +136,9 @@ func PublishedHistoryRecords(offset int, params map[string]string) ([]HistoryRec
 			&record.AttachmentType,
 			&record.FileName,
 			&record.RecordType,
-			&record.Collections)
+			&record.RecordStatus,
+			&record.Collections,
+		)
 		if err != nil {
 			return nil, fmt.Errorf("publishedHistoryRecords: %v", err)
 		}
@@ -146,9 +157,20 @@ func HistoryRecordByID(id int64) (HistoryRecord, error) {
 
 	row := PublishedRecords().Where(sq.Eq{`history_record.id`: id}).RunWith(db).QueryRow()
 
-	err := row.Scan(&record.ID, &record.Date, &record.Title, &record.Content, &record.Origin,
-		&record.Author, &record.SourceArchive, &record.AttachmentType, &record.FileName, &record.RecordType,
-		&record.Collections)
+	err := row.Scan(
+		&record.ID,
+		&record.Date,
+		&record.Title,
+		&record.Content,
+		&record.Origin,
+		&record.Author,
+		&record.SourceArchive,
+		&record.AttachmentType,
+		&record.FileName,
+		&record.RecordType,
+		&record.RecordStatus,
+		&record.Collections,
+	)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -297,6 +319,37 @@ func GetRecordTypes() ([]RecordType, error) {
 	}
 
 	return recordTypes, nil
+}
+
+func GetRecordStatuses() ([]RecordStatus, error) {
+	var recordStatuses []RecordStatus
+
+	query := sq.Select("id, name").From("record_status")
+	rows, err := query.RunWith(db).Query()
+
+	if err != nil {
+		return nil, fmt.Errorf("GetRecordStatuses: %v", err)
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var recordStatus RecordStatus
+		err := rows.Scan(
+			&recordStatus.ID,
+			&recordStatus.Name)
+
+		if err != nil {
+			return nil, fmt.Errorf("GetRecordStatuses: %v", err)
+		}
+		recordStatuses = append(recordStatuses, recordStatus)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("GetRecordStatuses: %v", err)
+	}
+
+	return recordStatuses, nil
 }
 
 // Users

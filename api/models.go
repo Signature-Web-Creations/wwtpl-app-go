@@ -12,9 +12,15 @@ type HistoryRecord struct {
 	FileName       *string `json:"fileName"`
 	RecordType     *string `json:"recordType"`
 	Collections    *string `json:"collections"`
+	RecordStatus   *string `json:"recordStatus"`
 }
 
 type RecordType struct {
+	ID   int64  `json:"id"`
+	Name string `json:"name"`
+}
+
+type RecordStatus struct {
 	ID   int64  `json:"id"`
 	Name string `json:"name"`
 }
