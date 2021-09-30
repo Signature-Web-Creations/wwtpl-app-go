@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Switch, Link, Route, Redirect } from 'react-router-dom'
+import { UrlFor } from './routes'
 
 import Header from './Header'
 import PaginationButtons from './PaginationButton'
@@ -13,7 +14,7 @@ import Dashboard from './Dashboard'
 import { getPublicListingData } from './api'
 import { useSearchParams } from './hooks'
 import { useAuth, PrivateRoute } from './auth.js'
-import EditRecord from './admin/EditRecordDetail'
+import EditRecord from './admin/RecordForm'
 import EditUser from './admin/EditUser'
 
 function getOffset(searchParameters) {
@@ -93,11 +94,11 @@ function App() {
             <ul className="uk-navbar-nav">
               {auth.user ? (
                 <li>
-                  <Link to="/dashboard"> Dashboard </Link>
+                  <Link to={UrlFor('adminHome')}> Dashboard </Link>
                 </li>
               ) : (
                 <li>
-                  <Link to="/"> Home </Link>
+                  <Link to={UrlFor('home')}> Home </Link>
                 </li>
               )}
             </ul>
@@ -107,7 +108,7 @@ function App() {
               {auth.user ? (
                 <li>
                   <Link
-                    to="/logout"
+                    to={UrlFor('logout')}
                     onClick={() => {
                       auth.signout()
                     }}
@@ -118,7 +119,7 @@ function App() {
                 </li>
               ) : (
                 <li>
-                  <Link to="/login"> Login </Link>
+                  <Link to={UrlFor('login')}> Login </Link>
                 </li>
               )}
             </ul>
@@ -127,7 +128,7 @@ function App() {
       </header>
 
       <Switch>
-        <Route path="/record/:id">
+        <Route path={UrlFor('viewRecord')}>
           <Header>
             <h1 className="uk-text-lead"> History Record </h1>
           </Header>
@@ -135,11 +136,11 @@ function App() {
           <RecordDetail records={records} />
         </Route>
 
-        <Route path="/login">
+        <Route path={UrlFor('login')}>
           <LoginForm />
         </Route>
 
-        <PrivateRoute path="/edit">
+        <PrivateRoute path={UrlFor('editRecord')}>
           <EditRecord
             recordTypes={recordTypes}
             collections={collections}
@@ -148,24 +149,24 @@ function App() {
           />
         </PrivateRoute>
 
-        <PrivateRoute path="/dashboard">
+        <PrivateRoute path={UrlFor('adminHome')}>
           <Dashboard records={records} />
         </PrivateRoute>
 
-        <PrivateRoute path="/adduser">
+        <PrivateRoute path={UrlFor('addUser')}>
           <EditUser />
         </PrivateRoute>
 
-        <Route path="/logout">
-          <Redirect to="/" />
+        <Route path={UrlFor('logout')}>
+          <Redirect to={UrlFor('home')} />
         </Route>
 
         {auth.user ? (
-          <Route path="/">
-            <Redirect to="/dashboard" />
+          <Route path={UrlFor('home')}>
+            <Redirect to={UrlFor('adminHome')} />
           </Route>
         ) : (
-          <Route exact path="/">
+          <Route exact path={UrlFor('home')}>
             <Header>
               <h1 className="uk-text-lead"> History Listing </h1>
               <SearchForm
