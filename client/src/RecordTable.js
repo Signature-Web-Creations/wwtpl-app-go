@@ -1,7 +1,7 @@
-import RecordRow from './RecordRow'; 
+import RecordRow from './RecordRow'
 
 function NoResultsPage() {
-  return (<h1> Your search did not return any results. </h1>) 
+  return <h1> Your search did not return any results. </h1>
 }
 
 function PublicListings(props) {
@@ -11,11 +11,20 @@ function PublicListings(props) {
         <tr>
           <th className="uk-width-small">Date</th>
           <th>Title</th>
+          <th>Type</th>
           <th className="uk-table-shrink"></th>
         </tr>
       </thead>
       <tbody>
-        { props.records.map(({id, date, title}) => <RecordRow id={id} key={id} date={date} title={title} />)} 
+        {props.records.map(({ id, date, title, recordType }) => (
+          <RecordRow
+            id={id}
+            key={id}
+            date={date}
+            title={title}
+            type={recordType}
+          />
+        ))}
       </tbody>
     </table>
   )
@@ -24,11 +33,11 @@ function PublicListings(props) {
 export default function RecordTable(props) {
   if (props.records === null) {
     if (props.searched) {
-      return <NoResultsPage /> 
+      return <NoResultsPage />
     } else {
-      return null;
+      return null
     }
   } else {
-    return <PublicListings records={props.records} /> 
+    return <PublicListings records={props.records} />
   }
 }
