@@ -1,0 +1,82 @@
+/* https://static.parastorage.com/services/editor-elements/dist/rb_wixui.thunderbolt[SliderGallery_SliderGalleryNoArrow].3107aee2.min.css */
+._2-T_u .CxsuI {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 100%;
+  overflow: hidden;
+}
+._2-T_u .CxsuI .i4XNY {
+  position: absolute;
+  height: 100%;
+  display: flex;
+}
+._2-T_u .CxsuI .i4XNY ._2UHIp {
+  position: relative;
+  height: 100%;
+  margin-right: var(--spacing);
+}
+._2-T_u .al0_P {
+  display: none;
+}
+._2-T_u {
+  z-index: 0;
+}
+._2-T_u .VpZMp,
+._2-T_u .Yl6LQ {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50px;
+  cursor: pointer;
+  z-index: 10;
+}
+._2-T_u .Yl6LQ {
+  left: 0;
+}
+._2-T_u .VpZMp {
+  right: 0;
+}
+._28r-1 ._1E-FJ {
+  display: block;
+}
+._28r-1 ._1E-FJ,
+._28r-1 ._1pZJd {
+  position: relative;
+  height: 100%;
+}
+._28r-1 ._3HZCq,
+._28r-1 ._3lG4F,
+._28r-1 .DMiEl,
+._28r-1 .Yapir {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+._28r-1 ._3WVKv {
+  cursor: pointer;
+}
+._28r-1 .DMiEl {
+  border: solid var(--brw, 0)
+    rgba(var(--brd, var(--color_15)), var(--alpha-brd, 1));
+  background: rgba(var(--brd, var(--color_15)), var(--alpha-brd, 1));
+}
+._28r-1 ._3lG4F {
+  overflow: hidden;
+}
+._28r-1 ._3HZCq,
+._28r-1 ._3lG4F,
+._28r-1 ._3WVKv,
+._28r-1 .DMiEl {
+  border-radius: var(--rd, 5px);
+}
+._28r-1 .Yapir {
+  transition: var(--trans, opacity 0.4s ease 0s);
+  background: rgba(var(--bg, var(--color_11)), var(--alpha-bg, 1));
+  opacity: 0;
+}
+._28r-1 .Yapir:hover {
+  opacity: 1;
+}
