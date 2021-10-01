@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { createUser } from '../api.js'
+import { createUser, getUserRoles } from '../api.js'
 
-function EditUser() {
+function UserForm() {
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [username, setUsername] = useState('')
@@ -128,4 +128,4 @@ function EditUser() {
   )
 }
 
-export default EditUser
+export default UserForm
