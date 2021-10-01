@@ -116,6 +116,7 @@ type NewUser struct {
 	LastName  string `json:"lastName" binding:"required"`
 	Username  string `json:"username" binding:"required"`
 	Password  string `json:"password" binding:"required"`
+	RoleId		int64  `json:"roleId" binding:"required"`
 }
 
 // Creates an new user if valid

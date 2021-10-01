@@ -356,9 +356,9 @@ func GetRecordStatuses() ([]RecordStatus, error) {
 // Users
 
 func CreateUser(user NewUser) error {
-	query := sq.Insert("user").Columns("firstName", "lastName", "username", "password")
+	query := sq.Insert("user").Columns("firstName", "lastName", "username", "password", "role_id")
 	password, _ := bcrypt.GenerateFromPassword([]byte(user.Password), 14)
-	query = query.Values(user.FirstName, user.LastName, user.Username, password)
+	query = query.Values(user.FirstName, user.LastName, user.Username, password, user.RoleId)
 	_, err := query.RunWith(db).Exec()
 	if err != nil {
 		return fmt.Errorf("CreateUser: %v", err)
