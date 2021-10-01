@@ -35,6 +35,11 @@ type Collection struct {
 	Name string `json:"name"`
 }
 
+type UserRole struct {
+	ID   int64  `json:"id"`
+	Name string `json:"name"`
+}
+
 type User struct {
 	ID        int64  `json:"id"`
 	FirstName string `json:"firstName"`

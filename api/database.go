@@ -13,6 +13,7 @@ import (
 
 var db *sql.DB
 var historyRecords sq.SelectBuilder
+
 const recordsPerPage = 20
 
 func init() {
@@ -443,4 +444,38 @@ func GetUsers() ([]User, error) {
 	}
 
 	return users, nil
+}
+
+func GetRoles() ([]UserRole, error) {
+	var roles []UserRole
+
+	query := sq.Select("id, name")
+	query = query.From("user_roles")
+
+	rows, err := query.RunWith(db).Query()
+
+	if err != nil {
+		return nil, fmt.Errorf("GetUsers: %v", err)
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var role UserRole
+		err := rows.Scan(
+			&role.ID,
+			&role.Name,
+		)
+
+		if err != nil {
+			return nil, fmt.Errorf("GetRoles: %v", err)
+		}
+		roles = append(roles, role)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("GetRoles: %v", err)
+	}
+
+	return roles, nil
 }

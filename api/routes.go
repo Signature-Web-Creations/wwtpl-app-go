@@ -1,21 +1,21 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/contrib/static"
+	"github.com/gin-gonic/gin"
 )
 
 func initRouter() *gin.Engine {
 	router := gin.Default()
 
 	router.Use(cors.New(cors.Config{
-		AllowOrigins: []string{"*"},
+		AllowOrigins:     []string{"*"},
 		AllowCredentials: true,
 	}))
 
 	router.Use(static.Serve("/", static.LocalFile("./public", true)))
-	
+
 	router.GET("/api/public/records", PublicRecords)
 	router.GET("/api/public/records/:id", PublicRecordDetail)
 
@@ -24,6 +24,7 @@ func initRouter() *gin.Engine {
 	router.POST("/api/logout", Logout)
 	router.GET("/api/user", GetLoggedInUser)
 	router.GET("/api/users", GetUsersList)
+	router.GET("/api/user_roles", GetUserRoles)
 
 	return router
 }
