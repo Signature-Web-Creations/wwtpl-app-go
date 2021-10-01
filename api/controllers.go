@@ -116,13 +116,21 @@ type NewUser struct {
 	LastName  string `json:"lastName" binding:"required"`
 	Username  string `json:"username" binding:"required"`
 	Password  string `json:"password" binding:"required"`
+	RoleId		int64  `json:"roleId" binding:"required"`
 }
 
+// Creates an new user if valid
 func RegisterUser(c *gin.Context) {
 	var json NewUser
 
 	if err := c.ShouldBindJSON(&json); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	user, ok := getAuthenticatedUser(c)
+	if !ok || user.Role != "admin" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User is not authorized."})
 		return
 	}
 
@@ -135,13 +143,16 @@ func RegisterUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"success": "Successfully created user"})
 }
 
+// TODO: replace secret key with a randomly generated file loaded from confifuration file
+const SecretKey = "secret"
+
+// Login Credentials
 type UserLogin struct {
 	Username string `json:"username" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
 
-const SecretKey = "secret"
-
+// Login a user based on username and password
 func Login(c *gin.Context) {
 	var json UserLogin
 
@@ -158,6 +169,12 @@ func Login(c *gin.Context) {
 		return
 	}
 
+	if !user.Active {
+		fmt.Println("Disabled users cannot login") 
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "disabled user cannot login. See administrator"})
+		return 
+	}
+
 	err = bcrypt.CompareHashAndPassword(user.Password, []byte(json.Password))
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "invalid username/password"})
@@ -166,10 +183,9 @@ func Login(c *gin.Context) {
 
 	expiresAt := time.Now().Add(time.Hour * 24)
 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
-		Issuer: strconv.Itoa(int(user.ID)),
+		Issuer:    strconv.Itoa(int(user.ID)),
 		ExpiresAt: expiresAt.Unix(),
 	})
-
 
 	token, err := claims.SignedString([]byte(SecretKey))
 
@@ -183,10 +199,10 @@ func Login(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"success": "Successfully logged in user.", "user": user})
 }
 
+// Returns the user if they are authenticated, otherwise returns an false
+// Used to check authentication in controllers where users need to be logged
+// in
 func getAuthenticatedUser(c *gin.Context) (User, bool) {
-	// Returns the user if they are authenticated, otherwise returns an false
-	// Used to check authentication in controllers where users need to be logged
-	// in
 
 	var user User
 
@@ -214,7 +230,6 @@ func getAuthenticatedUser(c *gin.Context) (User, bool) {
 	if err != nil {
 		return user, false
 	}
-
 
 	return user, true
 }
@@ -246,4 +261,49 @@ func GetUsersList(c *gin.Context) {
 func Logout(c *gin.Context) {
 	c.SetCookie("jwt", "", -1, "/", "", false, true)
 	c.JSON(http.StatusOK, gin.H{"success": "Logged out user"})
+}
+
+func GetUserRoles(c *gin.Context) {
+	roles, err := GetRoles()
+	if err != nil {
+		fmt.Printf("GetUserRoles: %v\n", err)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve user roles."})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, gin.H{"roles": roles})
+}
+
+// JSON that represents a specific user
+// used to select a user when editing/disabling 
+// users
+type UserID struct {
+	ID int64 `json:"userId" binding:"required"`
+}
+
+func DisableUser(c *gin.Context) {
+	var json UserID 
+	data := map[string]interface{}{
+		"active": 0,
+	}
+
+	user, ok := getAuthenticatedUser(c) 
+	if !ok || user.Role != "admin" {
+		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "User is not authorized"})
+		return 
+	}
+
+	if err := c.ShouldBindJSON(&json); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	err := UpdateUser(json.ID, data)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Couldn't process request. Try again later"})
+		fmt.Printf("DisableUser: %v\n", err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"success": "Successfully disabled user"}) 
 }

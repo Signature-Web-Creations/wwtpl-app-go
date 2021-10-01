@@ -78,10 +78,14 @@ export async function logout() {
   })
 }
 
+// Returns user data for the logged in user. 
+// If user is not logged in returns an error message
 export function getUserData() {
   return fetch(`/api/user`).then((res) => res.json())
 }
 
+// Creates a new user. User must be authenticated
+// and an admin to succeed
 export async function createUser(userData) {
   const response = await fetch('/api/user', {
       method: 'POST',
@@ -109,4 +113,30 @@ export async function getUsers() {
   })
 
   return response.json()
+}
+
+// Returns a list of user roles. 
+export async function getUserRoles() {
+  const response = await fetch('/api/user_roles', {
+    method: 'GET', 
+    mode: 'same-origin', 
+    cache: 'no-cache', 
+  })
+
+  return response.json()
+}
+
+// Disables a user 
+export async function disableUser(userId) {
+  const response = await fetch('/api/user/disable', {
+    method: 'POST', 
+    mode: 'same-origin', 
+    cache: 'no-cache', 
+    credentials: 'include', 
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({userId}) 
+  })
+  return response.json() 
 }

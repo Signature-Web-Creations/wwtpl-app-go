@@ -13,6 +13,7 @@ import (
 
 var db *sql.DB
 var historyRecords sq.SelectBuilder
+
 const recordsPerPage = 20
 
 func init() {
@@ -355,9 +356,9 @@ func GetRecordStatuses() ([]RecordStatus, error) {
 // Users
 
 func CreateUser(user NewUser) error {
-	query := sq.Insert("user").Columns("firstName", "lastName", "username", "password")
+	query := sq.Insert("user").Columns("firstName", "lastName", "username", "password", "role_id")
 	password, _ := bcrypt.GenerateFromPassword([]byte(user.Password), 14)
-	query = query.Values(user.FirstName, user.LastName, user.Username, password)
+	query = query.Values(user.FirstName, user.LastName, user.Username, password, user.RoleId)
 	_, err := query.RunWith(db).Exec()
 	if err != nil {
 		return fmt.Errorf("CreateUser: %v", err)
@@ -368,13 +369,13 @@ func CreateUser(user NewUser) error {
 func GetUserByUsername(username string) (User, error) {
 	var user User
 
-	query := sq.Select("user.id, firstName, lastName, username, password, user_roles.name")
+	query := sq.Select("user.id, firstName, lastName, username, password, active, user_roles.name")
 	query = query.From("user")
 	query = query.InnerJoin("user_roles on user.role_id = user_roles.id")
 	query = query.Where("username = ?", username)
 
 	row := query.RunWith(db).QueryRow()
-	err := row.Scan(&user.ID, &user.FirstName, &user.LastName, &user.Username, &user.Password, &user.Role)
+	err := row.Scan(&user.ID, &user.FirstName, &user.LastName, &user.Username, &user.Password, &user.Active, &user.Role)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -443,4 +444,53 @@ func GetUsers() ([]User, error) {
 	}
 
 	return users, nil
+}
+
+func GetRoles() ([]UserRole, error) {
+	var roles []UserRole
+
+	query := sq.Select("id, name")
+	query = query.From("user_roles")
+
+	rows, err := query.RunWith(db).Query()
+
+	if err != nil {
+		return nil, fmt.Errorf("GetUsers: %v", err)
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var role UserRole
+		err := rows.Scan(
+			&role.ID,
+			&role.Name,
+		)
+
+		if err != nil {
+			return nil, fmt.Errorf("GetRoles: %v", err)
+		}
+		roles = append(roles, role)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("GetRoles: %v", err)
+	}
+
+	return roles, nil
+}
+
+// Updates a user with given userId
+func UpdateUser(userId int64, fields map[string]interface{}) error {
+	query := sq.Update("user")
+	for field, value := range fields {
+		query = query.Set(field, value)
+	}
+	query = query.Where("id = ?", userId)
+	_, err := query.RunWith(db).Exec()
+
+	if err != nil {
+		return fmt.Errorf("UpdateUser: %v", err)
+	}
+	return nil
 }
