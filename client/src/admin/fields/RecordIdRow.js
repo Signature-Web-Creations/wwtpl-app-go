@@ -1,4 +1,4 @@
-function RecordIdRow() {
+function RecordIdRow(props) {
   return (
     <tr>
       <td>
@@ -10,6 +10,7 @@ function RecordIdRow() {
           type="text"
           disabled={true}
           placeholder="Record ID"
+          value={props.id}
         />
       </td>
     </tr>

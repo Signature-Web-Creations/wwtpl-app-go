@@ -3,6 +3,14 @@ function RecordTypeRow(props) {
     // add each option to the list
   }
 
+  const isSelected = (name) => {
+    if (props.type === name) {
+      return true
+    } else {
+      return false
+    }
+  }
+
   return (
     <tr>
       <td>
@@ -12,7 +20,7 @@ function RecordTypeRow(props) {
         <select className="uk-select" onChange={handleSelect}>
           <option value=""> Select One </option>
           {props.recordTypes.map(({ id, name }) => (
-            <option key={id} value={id}>
+            <option key={id} value={id} selected={isSelected(name)}>
               {name}
             </option>
           ))}

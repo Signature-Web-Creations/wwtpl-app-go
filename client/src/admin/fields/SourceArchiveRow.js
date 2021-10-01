@@ -3,6 +3,14 @@ function SourceArchiveRow(props) {
     // add each option to the list
   }
 
+  const isSelected = (name) => {
+    if (props.source === name) {
+      return true
+    } else {
+      return false
+    }
+  }
+
   return (
     <tr>
       <td>
@@ -12,7 +20,7 @@ function SourceArchiveRow(props) {
         <select className="uk-select" onChange={handleSelect}>
           <option value=""> Select One </option>
           {props.sourceArchives.map(({ id, name }) => (
-            <option key={id} value={id}>
+            <option key={id} value={id} selected={isSelected(name)}>
               {name}
             </option>
           ))}

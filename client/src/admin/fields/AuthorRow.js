@@ -1,11 +1,16 @@
-function AuthorRow() {
+function AuthorRow(props) {
   return (
     <tr>
       <td>
         <strong>Author</strong>
       </td>
       <td>
-        <input className="uk-input" type="text" placeholder="Author" />
+        <input
+          className="uk-input"
+          type="text"
+          placeholder="Author"
+          value={props.author}
+        />
       </td>
     </tr>
   )

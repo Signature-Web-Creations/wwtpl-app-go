@@ -1,5 +1,6 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { useParams } from 'react-router-dom'
+import { getPublicRecordByID } from '../api'
 
 import TitleRow from './fields/TitleRow'
 import FileAttachmentRow from './fields/FileAttachmentRow'
@@ -13,60 +14,77 @@ import RecordTypeRow from './fields/RecordTypeRow'
 import SourceArchiveRow from './fields/SourceArchiveRow'
 import DateEnteredRow from './fields/DateEnteredRow'
 import CollectionRow from './fields/CollectionRow'
+import MessageBox from '../MessageBox'
 
 function EditRecord(props) {
-  const [error, setError] = useState(null)
+  let { id } = useParams()
 
-  const handleSubmit = (event) => {
-    event.preventDefault()
-    // submit form
+  const [record, setRecord] = useState(null)
+  const [message, setMessage] = useState(null)
+
+  function Loading() {
+    return <h1> Loading </h1>
   }
 
-  const handleCloseErrorBox = () => {
-    setError(null)
-  }
+  useEffect(() => {
+    getPublicRecordByID(id).then(setRecord)
+  }, [id])
 
-  function ErrorBox() {
+  if (!record) {
+    return <Loading />
+  } else {
+    const handleSubmit = (event) => {
+      event.preventDefault()
+      // submit form
+    }
+
+    const handleCloseBox = (message) => {
+      setMessage(message)
+    }
+    // const handleMessageType = () => {}
+    // const han
+
     return (
-      <div uk-alert={true} className="uk-alert-danger">
-        <Link
-          className="uk-alert-close"
-          uk-close={true}
-          onClick={handleCloseErrorBox}
-        ></Link>
-        <p>{error}</p>
-      </div>
+      <form className="uk-form-stacked uk-margin-top" onSubmit={handleSubmit}>
+        {message && (
+          <MessageBox
+            onChange={handleCloseBox}
+            message={message}
+            type="error"
+          />
+        )}
+
+        <table className="uk-table uk-table-small uk-table-divider uk-margin-medium">
+          <tbody>
+            <TitleRow title={record.title} />
+            <FileAttachmentRow />
+            <AttachmentTypeRow />
+            <ContentRow content={record.content} />
+            <DateRow date={record.date} />
+            <OriginRow origin={record.origin} />
+            <AuthorRow author={record.author} />
+            <RecordIdRow id={record.id} />
+            <RecordTypeRow
+              recordTypes={props.recordTypes}
+              type={record.recordType}
+            />
+            <SourceArchiveRow
+              sourceArchives={props.sourceArchives}
+              source={record.sourceArchive}
+            />
+            <DateEnteredRow />
+            <CollectionRow collections={props.collections} />
+          </tbody>
+        </table>
+
+        <input
+          className="uk-button uk-button-primary uk-margin-top"
+          type="submit"
+          value="Add Record"
+        />
+      </form>
     )
   }
-
-  return (
-    <form className="uk-form-stacked uk-margin-top" onSubmit={handleSubmit}>
-      {error && <ErrorBox />}
-
-      <table className="uk-table uk-table-small uk-table-divider uk-margin-medium">
-        <tbody>
-          <TitleRow />
-          <FileAttachmentRow />
-          <AttachmentTypeRow />
-          <ContentRow />
-          <DateRow />
-          <OriginRow />
-          <AuthorRow />
-          <RecordIdRow />
-          <RecordTypeRow recordTypes={props.recordTypes} />
-          <SourceArchiveRow sourceArchives={props.sourceArchives} />
-          <DateEnteredRow />
-          <CollectionRow collections={props.collections} />
-        </tbody>
-      </table>
-
-      <input
-        className="uk-button uk-button-primary uk-margin-top"
-        type="submit"
-        value="Add Record"
-      />
-    </form>
-  )
 }
 
 export default EditRecord
