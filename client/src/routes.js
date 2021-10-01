@@ -5,14 +5,15 @@ const routes = {
   logout: '/logout',
   showUsers: '/users',
   addUser: '/adduser',
+  newRecord: '/record/new',
   editRecord: {
-    url: '/editrecord',
+    url: '/record/edit',
     params: {
       id: ':id',
     },
   },
   viewRecord: {
-    url: '/record',
+    url: '/record/view',
     params: {
       id: ':id',
     },
