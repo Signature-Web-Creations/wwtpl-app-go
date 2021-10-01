@@ -369,13 +369,13 @@ func CreateUser(user NewUser) error {
 func GetUserByUsername(username string) (User, error) {
 	var user User
 
-	query := sq.Select("user.id, firstName, lastName, username, password, user_roles.name")
+	query := sq.Select("user.id, firstName, lastName, username, password, active, user_roles.name")
 	query = query.From("user")
 	query = query.InnerJoin("user_roles on user.role_id = user_roles.id")
 	query = query.Where("username = ?", username)
 
 	row := query.RunWith(db).QueryRow()
-	err := row.Scan(&user.ID, &user.FirstName, &user.LastName, &user.Username, &user.Password, &user.Role)
+	err := row.Scan(&user.ID, &user.FirstName, &user.LastName, &user.Username, &user.Password, &user.Active, &user.Role)
 
 	if err != nil {
 		if err == sql.ErrNoRows {

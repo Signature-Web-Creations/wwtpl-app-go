@@ -169,6 +169,12 @@ func Login(c *gin.Context) {
 		return
 	}
 
+	if !user.Active {
+		fmt.Println("Disabled users cannot login") 
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "disabled user cannot login. See administrator"})
+		return 
+	}
+
 	err = bcrypt.CompareHashAndPassword(user.Password, []byte(json.Password))
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "invalid username/password"})
