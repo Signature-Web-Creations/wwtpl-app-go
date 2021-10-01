@@ -102,6 +102,10 @@ export default function Dashboard() {
         Manage Users{' '}
       </Link>
 
+      <Link to={UrlFor('newRecord')} className="uk-button uk-button-default">
+        {' '}
+        New Record{' '}
+      </Link>
       <SearchForm
         years={!years ? [] : years}
         recordTypes={recordTypes}

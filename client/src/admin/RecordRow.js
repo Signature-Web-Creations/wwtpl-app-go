@@ -27,11 +27,11 @@ function RecordRow(props) {
         ></Link>
       </td>
       <td>
-        <Link
+        <button
           onClick={handleDeleteRecord}
           className="uk-icon-link uk-margin-small-right"
           uk-icon="trash"
-        ></Link>
+        ></button>
       </td>
       <td>{props.date}</td>
       <td>{props.title}</td>

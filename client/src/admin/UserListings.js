@@ -3,6 +3,7 @@ import {getUsers, disableUser} from '../api'
 import {useState, useEffect} from 'react'
 
 function UserRow(props) {
+
   const {id, firstName, lastName, username, role} = props
 
   const deleteUser = function (e){
@@ -48,7 +49,7 @@ export default function UserListings(props) {
   const [users, setUsers] = useState([]) 
 
   useEffect(() => {
-    const users = getUsers().then((data) => {
+    getUsers().then((data) => {
       if (data.users) {
         setUsers(data.users)
       }

@@ -14,7 +14,8 @@ import Dashboard from './Dashboard'
 import { getPublicListingData } from './api'
 import { useSearchParams } from './hooks'
 import { useAuth, PrivateRoute } from './auth.js'
-import EditRecord from './admin/RecordForm'
+
+import RecordForm from './admin/RecordForm'
 import UserForm from './admin/UserForm'
 import UserListings from './admin/UserListings'
 
@@ -141,8 +142,8 @@ function App() {
           <LoginForm />
         </Route>
 
-        <PrivateRoute path={UrlFor('editRecord')}>
-          <EditRecord
+        <PrivateRoute path={UrlFor('newRecord')}>
+          <RecordForm
             recordTypes={recordTypes}
             collections={collections}
             sourceArchives={sourceArchives}

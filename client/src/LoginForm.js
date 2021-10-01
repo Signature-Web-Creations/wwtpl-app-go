@@ -25,7 +25,6 @@ export default function LoginForm(props) {
   }
 
   const handleCloseErrorBox = () => {
-    setError(null)
   }
 
   function ErrorBox() {
@@ -41,7 +40,6 @@ export default function LoginForm(props) {
     )
   }
 
-  console.log(auth.user)
   if (auth.user) {
     return <Redirect to="/dashboard" />
   }
