@@ -267,3 +267,37 @@ func GetUserRoles(c *gin.Context) {
 
 	c.IndentedJSON(http.StatusOK, gin.H{"roles": roles})
 }
+
+// JSON that represents a specific user
+// used to select a user when editing/disabling 
+// users
+type UserID struct {
+	ID int64 `json:"userId" binding:"required"`
+}
+
+func DisableUser(c *gin.Context) {
+	var json UserID 
+	data := map[string]interface{}{
+		"active": 0,
+	}
+
+	user, ok := getAuthenticatedUser(c) 
+	if !ok || user.Role != "admin" {
+		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "User is not authorized"})
+		return 
+	}
+
+	if err := c.ShouldBindJSON(&json); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	err := UpdateUser(json.ID, data)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Couldn't process request. Try again later"})
+		fmt.Printf("DisableUser: %v\n", err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"success": "Successfully disabled user"}) 
+}

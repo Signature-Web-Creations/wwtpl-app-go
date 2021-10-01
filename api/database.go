@@ -479,3 +479,18 @@ func GetRoles() ([]UserRole, error) {
 
 	return roles, nil
 }
+
+// Updates a user with given userId
+func UpdateUser(userId int64, fields map[string]interface{}) error {
+	query := sq.Update("user")
+	for field, value := range fields {
+		query = query.Set(field, value)
+	}
+	query = query.Where("id = ?", userId)
+	_, err := query.RunWith(db).Exec()
+
+	if err != nil {
+		return fmt.Errorf("UpdateUser: %v", err)
+	}
+	return nil
+}

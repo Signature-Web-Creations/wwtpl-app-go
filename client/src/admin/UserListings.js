@@ -1,11 +1,23 @@
 import {Link} from 'react-router-dom'
-import {getUsers} from '../api'
+import {getUsers, disableUser} from '../api'
 import {useState, useEffect} from 'react'
 
 function UserRow(props) {
   const {id, firstName, lastName, username, role} = props
 
-  const deleteUser = function (){
+  const deleteUser = function (e){
+    e.preventDefault();
+    const userId = parseInt(id) 
+    if (isNaN(userId)) {
+      console.log('Id was not a number') 
+    }
+    disableUser(id).then(response => {
+      if (response.error) {
+        console.log(response.error)
+      } else {
+        console.log(response.success)
+      }
+    })
   }
 
   return (
@@ -19,7 +31,7 @@ function UserRow(props) {
       </td>
       <td>
         <Link
-          onClick={() => deleteUser(id)}
+          onClick={deleteUser}
           className="uk-icon-link uk-margin-small-right"
           uk-icon="trash"
         ></Link>
