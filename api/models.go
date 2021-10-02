@@ -46,6 +46,6 @@ type User struct {
 	LastName  string `json:"lastName"`
 	Username  string `json:"username"`
 	Password  []byte `json:"-"`
-	Active 		bool  `json:"active"`
+	Active    bool   `json:"active"`
 	Role      string `json:"role"`
 }

@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
-// import { getPublicRecordByID } from '../api'
+import { getRecordByID } from '../api'
 
 
 import MessageBox from '../MessageBox'
 
 function RecordForm(props) {
   let { id } = useParams()
+
 
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
@@ -26,12 +27,32 @@ function RecordForm(props) {
   useEffect(() => {
     if (!newRecord) {
       // Populate form fields with record
+      getRecordByID(id).then(data => {
+        if (data.record) {
+          const r = data.record
+          setTitle(r.title)
+          setContent(r.content)
+          setDate(r.date)
+          setOrigin(r.origin)
+          setAuthor(r.author)
+          setRecordType(r.recordType)
+          setSourceArchive(r.sourceArchive)
+
+          let c = []
+          r.collections.split(';').forEach(col => {
+            if (props.collectionToId[col]) {
+              c.push(props.collectionToId[col])
+            }
+          })
+          setCollections(c)
+        }
+      })
     }
   }, [newRecord, id])
 
   const handleCollection = (id) => {
     if (collections.includes(id)) {
-      setCollections(collections.filter(i => i != id))
+      setCollections(collections.filter(i => i !== id))
     } else {
       setCollections(collections.concat(id))
     }

@@ -27,5 +27,7 @@ func initRouter() *gin.Engine {
 	router.GET("/api/user_roles", GetUserRoles)
 	router.POST("/api/user/disable", DisableUser)
 
+	router.GET("/api/records/:id", RecordDetail)
+
 	return router
 }

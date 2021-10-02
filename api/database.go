@@ -153,6 +153,38 @@ func PublishedHistoryRecords(offset int, params map[string]string) ([]HistoryRec
 	return records, nil
 }
 
+// Returns a HistoryRecord detail 
+// Used in the admin interface 
+func GetRecordDetail(id int64) (HistoryRecord, error) {
+	var record HistoryRecord
+	row := historyRecords.Where("history_record.id = ?", id).RunWith(db).QueryRow()
+
+	err := row.Scan(
+		&record.ID,
+		&record.Date,
+		&record.Title,
+		&record.Content,
+		&record.Origin,
+		&record.Author,
+		&record.SourceArchive,
+		&record.AttachmentType,
+		&record.FileName,
+		&record.RecordType,
+		&record.RecordStatus,
+		&record.Collections,
+	)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return record, fmt.Errorf("historyRecordById %d: no such record", id)
+		}
+		return record, fmt.Errorf("historyRecordById %d: %v", id, err)
+	}
+	return record, nil
+}
+
+// Returns HistoryRecord detail 
+// History Record must be published and not deleted
 func HistoryRecordByID(id int64) (HistoryRecord, error) {
 	var record HistoryRecord
 
@@ -229,14 +261,20 @@ func CountPages(params map[string]string) (int, error) {
 	return pages / recordsPerPage, nil
 }
 
-func GetCollections() ([]Collection, error) {
-	var collections []Collection
+type CollectionInfo struct {
+	Collections []Collection `json:"collections"`
+	CollectionToID map[string]int64 `json:"collectionToId"`
+}
+
+func GetCollections() (CollectionInfo, error) {
+	var collectionInfo CollectionInfo
+	collectionInfo.CollectionToID = make(map[string]int64)
 
 	query := sq.Select("id, name").From("collection")
 	rows, err := query.RunWith(db).Query()
 
 	if err != nil {
-		return nil, fmt.Errorf("GetCollections: %v", err)
+		return collectionInfo, fmt.Errorf("GetCollections: %v", err)
 	}
 
 	defer rows.Close()
@@ -248,16 +286,17 @@ func GetCollections() ([]Collection, error) {
 			&collection.Name)
 
 		if err != nil {
-			return nil, fmt.Errorf("GetCollections: %v", err)
+			return collectionInfo, fmt.Errorf("GetCollections: %v", err)
 		}
-		collections = append(collections, collection)
+		collectionInfo.Collections = append(collectionInfo.Collections, collection)
+		collectionInfo.CollectionToID[collection.Name] = collection.ID
 	}
 
 	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("GetCollections: %v", err)
+		return collectionInfo, fmt.Errorf("GetCollections: %v", err)
 	}
 
-	return collections, nil
+	return collectionInfo, nil
 }
 
 func GetSourceArchives() ([]SourceArchive, error) {

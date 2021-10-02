@@ -52,6 +52,19 @@ export function getPublicRecordByID(id) {
   return fetch(`/api/public/records/${id}`).then((res) => res.json())
 }
 
+// Retrieves a record by its id regardless of status. 
+// User must be logged in
+export async function getRecordByID(id) {
+  const response = await fetch(`/api/records/${id}`, {
+    method: 'GET', 
+    mode: 'same-origin', 
+    cache: 'no-cache',
+    credentials: 'include'
+  })
+
+  return await response.json() 
+}
+
 export async function login(username, password) {
   const data = { username, password }
 

@@ -43,6 +43,7 @@ function App() {
   const [pages, setPages] = useState(null)
   const [recordTypes, setRecordTypes] = useState([])
   const [collections, setCollections] = useState([])
+  const [collectionToId, setCollectionToId] = useState({})
   const [sourceArchives, setSourceArchives] = useState([])
   const [recordStatus, setRecordStatus] = useState([])
 
@@ -80,7 +81,8 @@ function App() {
         setRecords(records)
         setPages(pages)
         setYears(years)
-        setCollections(collections)
+        setCollections(collections.collections)
+        setCollectionToId(collections.collectionToId)
         setSourceArchives(sourceArchives)
         setRecordTypes(recordTypes)
       },
@@ -148,6 +150,16 @@ function App() {
             collections={collections}
             sourceArchives={sourceArchives}
             recordStatus={recordStatus}
+          />
+        </PrivateRoute>
+        
+        <PrivateRoute path={UrlFor('editRecord')}>
+          <RecordForm
+            recordTypes={recordTypes}
+            collections={collections}
+            sourceArchives={sourceArchives}
+            recordStatus={recordStatus}
+            collectionToId={collectionToId}
           />
         </PrivateRoute>
 

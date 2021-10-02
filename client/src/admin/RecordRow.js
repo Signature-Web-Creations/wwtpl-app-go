@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { UrlFor } from '../routes.js'
 
 function RecordRow(props) {
   const handleDeleteRecord = () => {
@@ -15,7 +16,7 @@ function RecordRow(props) {
     }
   }
 
-  const editUrl = `/editrecord/${props.id}`
+  const editUrl = UrlFor('editRecord', {id: props.id}) 
 
   return (
     <tr>

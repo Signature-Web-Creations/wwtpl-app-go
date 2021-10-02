@@ -11,6 +11,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// Returns JSON response containing a public record detail
 func PublicRecordDetail(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
@@ -25,6 +26,44 @@ func PublicRecordDetail(c *gin.Context) {
 	} else {
 		c.IndentedJSON(http.StatusOK, record)
 	}
+}
+
+// Options that determine whether to
+// return a HistoryRecord
+type HistoryRecordOptions struct {
+	KeepDeleted  bool  `json:"keepDeleted"`
+	AdminOnly    bool  `json:"adminOnly`
+	RecordStatus int64 `json:"recordStatus"`
+}
+
+// Returns a HistoryRecord by it's id
+// User must be authenticated
+// It decides whether to return a HistoryRecord by options
+// Sent in the request
+func RecordDetail(c *gin.Context) {
+	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		fmt.Printf("Error: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error. Bad request"})
+		return
+	}
+
+	_, ok := getAuthenticatedUser(c)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User is not authorized."})
+		return
+	}
+
+	record, err := GetRecordDetail(id)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internval server error"})
+		fmt.Printf("Error: %v", err) 
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"record": record})
+
 }
 
 func getQueryParams(c *gin.Context) map[string]string {
@@ -116,7 +155,7 @@ type NewUser struct {
 	LastName  string `json:"lastName" binding:"required"`
 	Username  string `json:"username" binding:"required"`
 	Password  string `json:"password" binding:"required"`
-	RoleId		int64  `json:"roleId" binding:"required"`
+	RoleId    int64  `json:"roleId" binding:"required"`
 }
 
 // Creates an new user if valid
@@ -170,9 +209,9 @@ func Login(c *gin.Context) {
 	}
 
 	if !user.Active {
-		fmt.Println("Disabled users cannot login") 
+		fmt.Println("Disabled users cannot login")
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "disabled user cannot login. See administrator"})
-		return 
+		return
 	}
 
 	err = bcrypt.CompareHashAndPassword(user.Password, []byte(json.Password))
@@ -275,22 +314,22 @@ func GetUserRoles(c *gin.Context) {
 }
 
 // JSON that represents a specific user
-// used to select a user when editing/disabling 
+// used to select a user when editing/disabling
 // users
 type UserID struct {
 	ID int64 `json:"userId" binding:"required"`
 }
 
 func DisableUser(c *gin.Context) {
-	var json UserID 
+	var json UserID
 	data := map[string]interface{}{
 		"active": 0,
 	}
 
-	user, ok := getAuthenticatedUser(c) 
+	user, ok := getAuthenticatedUser(c)
 	if !ok || user.Role != "admin" {
 		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "User is not authorized"})
-		return 
+		return
 	}
 
 	if err := c.ShouldBindJSON(&json); err != nil {
@@ -305,5 +344,5 @@ func DisableUser(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"success": "Successfully disabled user"}) 
+	c.JSON(http.StatusOK, gin.H{"success": "Successfully disabled user"})
 }

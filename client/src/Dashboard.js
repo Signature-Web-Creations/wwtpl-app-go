@@ -80,7 +80,7 @@ export default function Dashboard() {
         setPages(pages)
         setYears(years)
         setStatus(status)
-        setCollections(collections)
+        setCollections(collections.collections)
         setSourceArchives(sourceArchives)
         setRecordTypes(recordTypes)
         setRecordStatus(recordStatus)
