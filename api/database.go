@@ -4,7 +4,9 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"regexp"
 	"strconv"
+	"strings"
 
 	sq "github.com/Masterminds/squirrel"
 	_ "github.com/mattn/go-sqlite3"
@@ -153,8 +155,8 @@ func PublishedHistoryRecords(offset int, params map[string]string) ([]HistoryRec
 	return records, nil
 }
 
-// Returns a HistoryRecord detail 
-// Used in the admin interface 
+// Returns a HistoryRecord detail
+// Used in the admin interface
 func GetRecordDetail(id int64) (HistoryRecord, error) {
 	var record HistoryRecord
 	row := historyRecords.Where("history_record.id = ?", id).RunWith(db).QueryRow()
@@ -183,7 +185,7 @@ func GetRecordDetail(id int64) (HistoryRecord, error) {
 	return record, nil
 }
 
-// Returns HistoryRecord detail 
+// Returns HistoryRecord detail
 // History Record must be published and not deleted
 func HistoryRecordByID(id int64) (HistoryRecord, error) {
 	var record HistoryRecord
@@ -262,7 +264,7 @@ func CountPages(params map[string]string) (int, error) {
 }
 
 type CollectionInfo struct {
-	Collections []Collection `json:"collections"`
+	Collections    []Collection     `json:"collections"`
 	CollectionToID map[string]int64 `json:"collectionToId"`
 }
 
@@ -531,5 +533,83 @@ func UpdateUser(userId int64, fields map[string]interface{}) error {
 	if err != nil {
 		return fmt.Errorf("UpdateUser: %v", err)
 	}
+	return nil
+}
+
+type HistoryRecordJSON struct {
+	ID              int64   `json:"id"`
+	Date            string  `json:"date"`
+	Title           string  `json:"title"`
+	Content         string  `json:"content"`
+	Origin          string  `json:"origin"`
+	Author          string  `json:"author"`
+	AttachmentType  *string `json:"attachmentType"`
+	FileName        *string `json:"fileName"`
+	RecordTypeId    int64   `json:"recordType"`
+	SourceArchiveId int64   `json:"sourceArchive"`
+	Collections     []int64 `json:"collections"`
+}
+
+// Formats a date either in the format yyyy or mm/dd/yyyy
+// to yyyy-mm-dd. If only year is given month and day
+// defaults to 01/01. If it couldn't not format the date
+// returns error
+func formatDate(dateStr string) (string, error) {
+	date := regexp.MustCompile(`^\d{2}/\d{2}/\d{4}$`)
+	yearOnly := regexp.MustCompile(`^\d{4}$`)
+
+	if date.Match([]byte(dateStr)) {
+		segments := strings.Split(dateStr, "/")
+		month := segments[0]
+		day := segments[1]
+		year := segments[2]
+		return (year + "-" + month + "-" + day), nil
+	} else if yearOnly.Match([]byte(dateStr)) {
+		return (dateStr + "-" + "01" + "01"), nil
+	} else {
+		return dateStr, fmt.Errorf("Cannot format date: %s", dateStr)
+	}
+}
+
+// Inserts a history record
+func InsertRecord(user User, record HistoryRecordJSON) error {
+	date, err := formatDate(record.Date)
+	if err != nil {
+		return fmt.Errorf("InsertRecord: %v", err)
+	}
+
+	tx, err := db.Begin()
+
+	result, err := tx.Exec(`
+	 INSERT INTO history_record
+	 (title, content, date, origin, author, record_type_id, source_archive_id, entered_by)
+	 VALUES
+	 (?, ?, ?, ?, ?, ?, ?, ?)
+	 `, record.Title, record.Content, date, record.Origin, record.Author, record.RecordTypeId,
+		record.SourceArchiveId, user.FirstName+" "+user.LastName,
+	)
+
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("Error inserting record: %v", err)
+	}
+
+	recordId, err := result.LastInsertId()
+
+	query := sq.Insert("record_collections")
+	query = query.Columns("record_id", "collection_id")
+	for _, collectionId := range record.Collections {
+		query = query.Values(recordId, collectionId)
+	}
+	queryStr, arguments, err := query.ToSql()
+	_, err = tx.Exec(queryStr, arguments, err)
+
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("Error inserting collection id: %v", err)
+	}
+	
+
+	tx.Commit()
 	return nil
 }

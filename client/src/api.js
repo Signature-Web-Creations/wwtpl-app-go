@@ -153,3 +153,17 @@ export async function disableUser(userId) {
   })
   return response.json() 
 }
+
+export async function saveRecord(record) {
+  const response = await fetch('/api/records', {
+    method: 'POST', 
+    mode: 'same-origin', 
+    cache: 'no-cache',
+    credentials: 'include', 
+    headers: {
+      'Content-Type': 'application/json'
+    }, 
+    body: JSON.stringify(record) 
+  })
+  return response.json()
+}

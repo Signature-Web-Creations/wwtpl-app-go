@@ -58,7 +58,7 @@ func RecordDetail(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internval server error"})
-		fmt.Printf("Error: %v", err) 
+		fmt.Printf("Error: %v", err)
 		return
 	}
 
@@ -345,4 +345,32 @@ func DisableUser(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"success": "Successfully disabled user"})
+}
+
+func SaveRecord(c *gin.Context) {
+	var json HistoryRecordJSON
+	var err error
+
+	user, ok := getAuthenticatedUser(c)
+	if !ok {
+		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "User is not authorized"})
+		return
+	}
+
+	if err = c.ShouldBindJSON(&json); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if json.ID == 0 {
+		err = InsertRecord(user, json)
+	}
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Couldn't process request. Try again later"})
+		fmt.Printf("InsertRecord: %v\n", err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"success": "Successfully created record"})
 }

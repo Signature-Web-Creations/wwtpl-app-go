@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
-import { getRecordByID } from '../api'
+import { getRecordByID, saveRecord } from '../api'
 import moment from 'moment'
 
 import MessageBox from '../MessageBox'
@@ -68,8 +68,7 @@ function RecordForm(props) {
   // i.e yyyy or mm/dd/yyyy 
   const validDateFormat = (date) => {
     let m = moment(date, "MM/DD/YYYY", true)
-    console.log(m)
-    return false
+    return true
   }
 
   // Returns true if date represents a valid 
@@ -83,6 +82,7 @@ function RecordForm(props) {
   const validateForm = () => {
     let valid = true
     let errors = {}
+
     if (blank(title)) {
       errors.title = 'Title is required'
       valid = false
@@ -93,6 +93,9 @@ function RecordForm(props) {
       valid = false
     } else if (!validDateFormat(date)) {
       errors.date = 'Date either needs to be a year (yyyy) or month day and year (mm/dd/yyyy)'
+      valid = false
+    } else if (!validDate(date)) {
+      errors.date = 'Date is invalid'
       valid = false
     }
 
@@ -113,6 +116,7 @@ function RecordForm(props) {
     setValidationErrors(Object.assign(validationErrors, errors))
     return valid
   }
+
   const newRecord = id === undefined
 
   const [message, setMessage] = useState(null)
@@ -142,7 +146,7 @@ function RecordForm(props) {
         }
       })
     }
-  }, [newRecord, id])
+  }, [newRecord, id, props.collectionToId])
 
   const handleCollection = (id) => {
     if (collections.includes(id)) {
@@ -152,20 +156,46 @@ function RecordForm(props) {
     }
   }
 
+  const parseIntOrError = (str) => {
+    const n = parseInt(str)
+    if (isNaN(n)) {
+      throw new Error(`Couldn't parse int on string: ${str}`)
+    }
+    return n
+  }
+
   const handleSubmit = (event) => {
     event.preventDefault()
-    const recordData = {
-      title,
-      content, 
-      date, 
-      origin,
-      author,
-      recordType, 
-      sourceArchive,
-      collections 
-    }
 
-    console.log('Valid Form: ', validateForm())
+    if (validateForm()) {
+      const record = {
+        title,
+        content, 
+        date, 
+        origin,
+        author,
+        recordType: parseIntOrError(recordType), 
+        recordType: parseIntOrError(sourceArchive),
+        collections: collections.map(parseIntOrError)
+      }
+
+      let request;
+
+      if (newRecord) {
+        request = saveRecord(record)
+      } else {
+        request = saveRecord(Object.assign(record, {id}))
+      }
+
+      request.then(data => {
+        if (data.error) {
+          console.log('Error: ', data.error) 
+        } else {
+          console.log(data.success)
+        }
+      })
+    }
+    
   }
 
   const handleCloseBox = (message) => {
