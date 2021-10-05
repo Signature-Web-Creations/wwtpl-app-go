@@ -565,7 +565,7 @@ func formatDate(dateStr string) (string, error) {
 		year := segments[2]
 		return (year + "-" + month + "-" + day), nil
 	} else if yearOnly.Match([]byte(dateStr)) {
-		return (dateStr + "-" + "01" + "01"), nil
+		return fmt.Sprintf("%s-01-01", dateStr), nil
 	} else {
 		return dateStr, fmt.Errorf("Cannot format date: %s", dateStr)
 	}
@@ -595,20 +595,7 @@ func InsertRecord(user User, record HistoryRecordJSON) error {
 	}
 
 	recordId, err := result.LastInsertId()
-
-	query := sq.Insert("record_collections")
-	query = query.Columns("record_id", "collection_id")
-	for _, collectionId := range record.Collections {
-		query = query.Values(recordId, collectionId)
-	}
-	queryStr, arguments, err := query.ToSql()
-	_, err = tx.Exec(queryStr, arguments, err)
-
-	if err != nil {
-		tx.Rollback()
-		return fmt.Errorf("Error inserting collection id: %v", err)
-	}
-	
+	fmt.Printf("RecordId: %d\n", recordId)
 
 	tx.Commit()
 	return nil
