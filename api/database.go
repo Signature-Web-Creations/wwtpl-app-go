@@ -597,6 +597,24 @@ func InsertRecord(user User, record HistoryRecordJSON) error {
 	recordId, err := result.LastInsertId()
 	fmt.Printf("RecordId: %d\n", recordId)
 
+	query := sq.Insert("record_collections")
+	query = query.Columns("record_id", "collection_id") 
+	for _, collectionId := range record.Collections {
+		query = query.Values(recordId, collectionId)
+	}
+
+	sql, arguments, err := query.ToSql()
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("Error creating query for collections: %v", err)
+	}
+
+	_, err = tx.Exec(sql, arguments...) 
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("Error inserting collections: %v", err)
+	}
+
 	tx.Commit()
 	return nil
 }
