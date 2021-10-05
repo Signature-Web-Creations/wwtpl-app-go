@@ -31,6 +31,17 @@ function RecordForm(props) {
   const [sourceArchive, setSourceArchive] = useState(''); 
   const [collections, setCollections] = useState([])
 
+  const clearForm = () => {
+    setTitle('')
+    setContent('')
+    setDate('')
+    setOrigin('')
+    setAuthor('')
+    setRecordType('')
+    setSourceArchive('')
+    setCollections([])
+  }
+
   // Form Validation
   const [validationErrors, setValidationErrors] = useState({
     title: false, 
@@ -121,6 +132,14 @@ function RecordForm(props) {
 
   const [message, setMessage] = useState(null)
 
+  const createSuccessMessage = (message) => {
+    setMessage({message, type:"success"})
+  }
+
+  const createErrorMessage = (message) => {
+    setMessage({message, type:"error"}) 
+  }
+
 
   useEffect(() => {
     if (!newRecord) {
@@ -189,9 +208,10 @@ function RecordForm(props) {
 
       request.then(data => {
         if (data.error) {
-          console.log('Error: ', data.error) 
+          createErrorMessage(data.error)
         } else {
-          console.log(data.success)
+          clearForm()
+          createSuccessMessage(data.success)
         }
       })
     }
@@ -209,8 +229,8 @@ function RecordForm(props) {
       {message && (
         <MessageBox
           onChange={handleCloseBox}
-          message={message}
-          type="error"
+          message={message.message}
+          type={message.type}
         />
       )}
       <h1> {header} </h1> 

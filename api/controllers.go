@@ -94,57 +94,59 @@ func PublicRecords(c *gin.Context) {
 		fmt.Printf("Error: %v", err)
 		c.IndentedJSON(http.StatusOK, nil)
 		return
-	} else {
-		results["records"] = records
-	}
+	} 
+
+	results["records"] = records
 
 	pages, err := CountPages(params)
 	if err != nil {
+		fmt.Printf("Error: %v", err)
 		c.IndentedJSON(http.StatusOK, nil)
 		return
-	} else {
-		results["pages"] = pages
-	}
+	} 
+	results["pages"] = pages
 
 	years, err := GetYears()
 	if err != nil {
+		fmt.Printf("Error: %v", err)
 		c.IndentedJSON(http.StatusOK, nil)
 		return
-	} else {
-		results["years"] = years
 	}
+	results["years"] = years
 
 	collections, err := GetCollections()
 	if err != nil {
+		fmt.Printf("Error: %v", err)
 		c.IndentedJSON(http.StatusOK, nil)
 		return
-	} else {
-		results["collections"] = collections
-	}
+	} 
+	results["collections"] = collections
 
 	sourceArchives, err := GetSourceArchives()
 	if err != nil {
+		fmt.Printf("Error: %v", err)
+		c.IndentedJSON(http.StatusOK, nil)
 		c.IndentedJSON(http.StatusOK, nil)
 		return
-	} else {
-		results["sourceArchives"] = sourceArchives
 	}
+	results["sourceArchives"] = sourceArchives
 
 	recordTypes, err := GetRecordTypes()
 	if err != nil {
+		fmt.Printf("Error: %v", err)
 		c.IndentedJSON(http.StatusOK, nil)
 		return
-	} else {
-		results["recordTypes"] = recordTypes
 	}
+	results["recordTypes"] = recordTypes
 
 	recordStatus, err := GetRecordStatuses()
 	if err != nil {
+		fmt.Printf("Error: %v", err)
 		c.IndentedJSON(http.StatusOK, nil)
 		return
-	} else {
-		results["recordStatus"] = recordStatus
-	}
+	} 
+	results["recordStatus"] = recordStatus
+
 	c.IndentedJSON(http.StatusOK, results)
 }
 
