@@ -75,17 +75,33 @@ function RecordForm(props) {
   const clearSourceArchiveError = clearValidationError("sourceArchive")
   const clearCollectionsError = clearValidationError("collections")
 
-  // Returns [moment, true] if date format is valid
-  // i.e yyyy or mm/dd/yyyy 
-  const validDateFormat = (date) => {
-    let m = moment(date, "MM/DD/YYYY", true)
-    return true
-  }
 
-  // Returns true if date represents a valid 
-  // date
-  const validDate = (date) => {
-    return true
+
+  // Returns an error message if date field has an error
+  // or returns false if it is valid
+  const validateDate = () => {
+    if (blank(date)) {
+      return 'Date is required.'
+    } 
+
+    if (date.trim().match(/^\d{4}$/)) {
+      let year = parseInt(date)
+      let currentYear = new Date().getFullYear() 
+      if ((year < 1800) || (year > currentYear)) {
+        return `Year has to be between 1800 and ${currentYear}`
+      }
+      return false
+    }
+
+    if (date.trim().match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+      const m = moment(date.trim(), "MM/DD/YYYY")
+      if (m.isValid()) {
+        return "Date is not valid"
+      }
+      return false
+    }
+
+    return "Date format is either YYYY or MM/DD/YYYY"
   }
 
   // Validates all of the fields on the form. 
@@ -99,16 +115,8 @@ function RecordForm(props) {
       valid = false
     }
 
-    if (blank(date)) {
-      errors.date = 'Date is required.'
-      valid = false
-    } else if (!validDateFormat(date)) {
-      errors.date = 'Date either needs to be a year (yyyy) or month day and year (mm/dd/yyyy)'
-      valid = false
-    } else if (!validDate(date)) {
-      errors.date = 'Date is invalid'
-      valid = false
-    }
+    errors.date = validateDate()
+    valid = valid && errors.date === false
 
     if (blank(recordType)) {
       errors.recordType = 'You need to select a record type'
@@ -124,6 +132,7 @@ function RecordForm(props) {
       errors.collections = 'You need to select at least one collection'
     }
 
+    console.log("Validation errors: ", errors)
     setValidationErrors(Object.assign(validationErrors, errors))
     return valid
   }
