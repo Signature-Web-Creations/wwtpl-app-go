@@ -253,15 +253,9 @@ func GetYears() ([]string, error) {
 	return years, nil
 }
 
-// Counts records that are published not deleted and 
-// are not filtered by given params
-func CountPublishedPages(params map[string]interface{}) (int, error) {
+func runCountQuery(query sq.SelectBuilder) (int, error) {
 	var pages int
 
-	query := sq.Select("COUNT(*)").From("history_record")
-	query = query.Where(sq.Eq{"deleted_at": nil})
-	query = query.Where(sq.Eq{"record_status_id": 3})
-	query = addFilters(query, params)
 	row := query.RunWith(db).QueryRow()
 	err := row.Scan(&pages)
 
@@ -270,6 +264,23 @@ func CountPublishedPages(params map[string]interface{}) (int, error) {
 	}
 
 	return pages / recordsPerPage, nil
+}
+// Counts pages
+func CountPages(params map[string]interface{}) (int, error) {
+	query := sq.Select("COUNT(*)").From("history_record")
+	query = addFilters(query, params)
+
+	return runCountQuery(query)
+}
+
+// Counts records that are published not deleted and 
+// are not filtered by given params
+func CountPublishedPages(params map[string]interface{}) (int, error) {
+	query := sq.Select("COUNT(*)").From("history_record")
+	query = query.Where(sq.Eq{"deleted_at": nil})
+	query = query.Where(sq.Eq{"record_status_id": 3})
+	query = addFilters(query, params)
+	return runCountQuery(query)
 }
 
 type CollectionInfo struct {
