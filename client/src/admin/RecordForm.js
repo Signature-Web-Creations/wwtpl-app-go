@@ -5,7 +5,6 @@ import moment from 'moment'
 
 import MessageBox from '../MessageBox'
 
-
 // Returns true if string is blank
 function blank(s) {
   return s.trim().length === 0
@@ -15,7 +14,7 @@ function ValidationError(props) {
   if (!props.error) {
     return null
   }
-  return (<p> {props.error} </p>)
+  return <p> {props.error} </p>
 }
 
 function RecordForm(props) {
@@ -27,8 +26,8 @@ function RecordForm(props) {
   const [origin, setOrigin] = useState('')
   const [author, setAuthor] = useState('')
 
-  const [recordType, setRecordType] = useState('');
-  const [sourceArchive, setSourceArchive] = useState(''); 
+  const [recordType, setRecordType] = useState('')
+  const [sourceArchive, setSourceArchive] = useState('')
   const [collections, setCollections] = useState([])
 
   const clearForm = () => {
@@ -44,21 +43,22 @@ function RecordForm(props) {
 
   // Form Validation
   const [validationErrors, setValidationErrors] = useState({
-    title: false, 
-    date: false, 
+    title: false,
+    date: false,
     recordType: false,
     sourceArchive: false,
     collections: false,
   })
 
-
   // Creates a helper function to clear validation errors
   // I am using a closure here because if I mispelled a field
-  // name I want it to throw an error right away. Using 
+  // name I want it to throw an error right away. Using
   // something lke
   const clearValidationError = (fieldName) => {
     if (validationErrors[fieldName] === undefined) {
-      throw new Error(`Cannot create helper function for unknown field: ${fieldName}`)
+      throw new Error(
+        `Cannot create helper function for unknown field: ${fieldName}`,
+      )
     }
     return () => {
       if (validationErrors[fieldName]) {
@@ -69,43 +69,41 @@ function RecordForm(props) {
     }
   }
 
-  const clearTitleError = clearValidationError("title")
-  const clearDateError = clearValidationError("date")
-  const clearRecordTypeError = clearValidationError("recordType")
-  const clearSourceArchiveError = clearValidationError("sourceArchive")
-  const clearCollectionsError = clearValidationError("collections")
-
-
+  const clearTitleError = clearValidationError('title')
+  const clearDateError = clearValidationError('date')
+  const clearRecordTypeError = clearValidationError('recordType')
+  const clearSourceArchiveError = clearValidationError('sourceArchive')
+  const clearCollectionsError = clearValidationError('collections')
 
   // Returns an error message if date field has an error
   // or returns false if it is valid
   const validateDate = () => {
     if (blank(date)) {
       return 'Date is required.'
-    } 
+    }
 
     if (date.trim().match(/^\d{4}$/)) {
       let year = parseInt(date)
-      let currentYear = new Date().getFullYear() 
-      if ((year < 1800) || (year > currentYear)) {
+      let currentYear = new Date().getFullYear()
+      if (year < 1800 || year > currentYear) {
         return `Year has to be between 1800 and ${currentYear}`
       }
       return false
     }
 
     if (date.trim().match(/^\d{2}\/\d{2}\/\d{4}$/)) {
-      const m = moment(date.trim(), "MM/DD/YYYY")
+      const m = moment(date.trim(), 'MM/DD/YYYY')
       if (m.isValid()) {
-        return "Date is not valid"
+        return 'Date is not valid'
       }
       return false
     }
 
-    return "Date format is either YYYY or MM/DD/YYYY"
+    return 'Date format is either YYYY or MM/DD/YYYY'
   }
 
-  // Validates all of the fields on the form. 
-  // Returns true if there are no errors and it is ok to submit 
+  // Validates all of the fields on the form.
+  // Returns true if there are no errors and it is ok to submit
   const validateForm = () => {
     let valid = true
     let errors = {}
@@ -132,7 +130,7 @@ function RecordForm(props) {
       errors.collections = 'You need to select at least one collection'
     }
 
-    console.log("Validation errors: ", errors)
+    console.log('Validation errors: ', errors)
     setValidationErrors(Object.assign(validationErrors, errors))
     return valid
   }
@@ -142,18 +140,17 @@ function RecordForm(props) {
   const [message, setMessage] = useState(null)
 
   const createSuccessMessage = (message) => {
-    setMessage({message, type:"success"})
+    setMessage({ message, type: 'success' })
   }
 
   const createErrorMessage = (message) => {
-    setMessage({message, type:"error"}) 
+    setMessage({ message, type: 'error' })
   }
-
 
   useEffect(() => {
     if (!newRecord) {
       // Populate form fields with record
-      getRecordByID(id).then(data => {
+      getRecordByID(id).then((data) => {
         if (data.record) {
           const r = data.record
           setTitle(r.title)
@@ -165,7 +162,7 @@ function RecordForm(props) {
           setSourceArchive(r.sourceArchive)
 
           let c = []
-          r.collections.split(';').forEach(col => {
+          r.collections.split(';').forEach((col) => {
             if (props.collectionToId[col]) {
               c.push(props.collectionToId[col])
             }
@@ -178,7 +175,7 @@ function RecordForm(props) {
 
   const handleCollection = (id) => {
     if (collections.includes(id)) {
-      setCollections(collections.filter(i => i !== id))
+      setCollections(collections.filter((i) => i !== id))
     } else {
       setCollections(collections.concat(id))
     }
@@ -198,24 +195,24 @@ function RecordForm(props) {
     if (validateForm()) {
       const record = {
         title,
-        content, 
-        date, 
+        content,
+        date,
         origin,
         author,
-        recordType: parseIntOrError(recordType), 
-        recordType: parseIntOrError(sourceArchive),
-        collections: collections.map(parseIntOrError)
+        recordType: parseIntOrError(recordType),
+        sourceArchive: parseIntOrError(sourceArchive),
+        collections: collections.map(parseIntOrError),
       }
 
-      let request;
+      let request
 
       if (newRecord) {
         request = saveRecord(record)
       } else {
-        request = saveRecord(Object.assign(record, {id}))
+        request = saveRecord(Object.assign(record, { id }))
       }
 
-      request.then(data => {
+      request.then((data) => {
         if (data.error) {
           createErrorMessage(data.error)
         } else {
@@ -224,95 +221,108 @@ function RecordForm(props) {
         }
       })
     }
-    
   }
 
-  const handleCloseBox = (message) => {
-    setMessage(message)
-  }
-
-  const header = newRecord ? "New Record" : "Edit Record"
+  const header = newRecord ? 'New Record' : 'Edit Record'
 
   return (
     <form className="uk-form-stacked uk-margin-top" onSubmit={handleSubmit}>
       {message && (
         <MessageBox
-          onChange={handleCloseBox}
+          onChange={() => {
+            setMessage(null)
+          }}
           message={message.message}
           type={message.type}
         />
       )}
-      <h1> {header} </h1> 
+      <h1> {header} </h1>
 
-      <div> 
+      <div>
         <ValidationError error={validationErrors.title} />
         <label className="uk-form-label"> Title </label>
         <input
           className="uk-form-width-large uk-input"
           type="text"
           value={title}
-          onChange={(e) => { 
+          onChange={(e) => {
             clearTitleError()
             setTitle(e.target.value)
-          }} />
-      </div> 
+          }}
+        />
+      </div>
 
-      <div> 
+      <div>
         <label className="uk-form-label"> Content </label>
-        <textarea 
+        <textarea
           className="uk-form-width-large uk-textarea"
           value={content}
-          onChange={(e) => { setContent(e.target.value) } } />
-      </div> 
+          onChange={(e) => {
+            setContent(e.target.value)
+          }}
+        />
+      </div>
 
-      <div> 
+      <div>
         <ValidationError error={validationErrors.date} />
         <label className="uk-form-label"> Date </label>
-        <input 
+        <input
           className="uk-form-width-large uk-input"
           type="text"
           value={date}
-          onChange={(e) => { 
+          onChange={(e) => {
             clearDateError()
             setDate(e.target.value)
-          }} />
-      </div> 
+          }}
+        />
+      </div>
 
-
-      <div> 
+      <div>
         <label className="uk-form-label"> Origin </label>
-        <input 
+        <input
           className="uk-form-width-large uk-input"
-          type="text" 
+          type="text"
           value={origin}
-          onChange={(e) => { setOrigin(e.target.value) } } />
-      </div> 
+          onChange={(e) => {
+            setOrigin(e.target.value)
+          }}
+        />
+      </div>
 
-      <div> 
+      <div>
         <label className="uk-form-label"> Author </label>
         <input
           className="uk-form-width-large uk-input"
           type="text"
-          value={author} 
-          onChange={(e) => { setAuthor(e.target.value) } } />
-      </div> 
+          value={author}
+          onChange={(e) => {
+            setAuthor(e.target.value)
+          }}
+        />
+      </div>
 
-      <div> 
+      <div>
         <ValidationError error={validationErrors.recordType} />
         <label className="uk-form-label"> Record Type </label>
-        <select 
-          className="uk-select uk-form-width-large" 
+        <select
+          className="uk-select uk-form-width-large"
           value={recordType}
           onChange={(e) => {
             clearRecordTypeError()
             setRecordType(e.target.value)
-          }}>
-          <option value=''> No Record Type </option> 
-          { props.recordTypes.map(({id, name}) => <option key={id} value={id}> {name} </option>) }
+          }}
+        >
+          <option value=""> No Record Type </option>
+          {props.recordTypes.map(({ id, name }) => (
+            <option key={id} value={id}>
+              {' '}
+              {name}{' '}
+            </option>
+          ))}
         </select>
-      </div> 
+      </div>
 
-      <div> 
+      <div>
         <ValidationError error={validationErrors.sourceArchive} />
         <label className="uk-form-label"> Source Archive </label>
         <select
@@ -320,20 +330,26 @@ function RecordForm(props) {
           value={sourceArchive}
           onChange={(e) => {
             clearSourceArchiveError()
-            setSourceArchive(e.target.value)}
-          }>
-          <option value=''> No Source Archive </option> 
-          { props.sourceArchives.map(({id, name}) => <option key={id} value={id}> {name} </option>) }
+            setSourceArchive(e.target.value)
+          }}
+        >
+          <option value=""> No Source Archive </option>
+          {props.sourceArchives.map(({ id, name }) => (
+            <option key={id} value={id}>
+              {' '}
+              {name}{' '}
+            </option>
+          ))}
         </select>
-      </div> 
+      </div>
 
-      <div> 
+      <div>
         <ValidationError error={validationErrors.collections} />
         <label className="uk-form-label"> Collections </label>
-        {props.collections.map(({id, name}) => {
+        {props.collections.map(({ id, name }) => {
           return (
-            <label className="uk-form-label" key={id} >
-              <input 
+            <label className="uk-form-label" key={id}>
+              <input
                 className="uk-checkbox"
                 type="checkbox"
                 key={id}
@@ -342,15 +358,14 @@ function RecordForm(props) {
                 checked={collections.includes(id)}
                 onChange={() => {
                   clearCollectionsError()
-                  handleCollection(id)}
-                } />
-            &nbsp;&nbsp;  { name } 
+                  handleCollection(id)
+                }}
+              />
+              &nbsp;&nbsp; {name}
             </label>
           )
         })}
       </div>
-
-      
 
       <input
         className="uk-button uk-button-primary uk-margin-top"
@@ -358,6 +373,7 @@ function RecordForm(props) {
         value="Add Record"
       />
     </form>
-    ) } 
+  )
+}
 
-export default RecordForm;
+export default RecordForm
