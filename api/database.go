@@ -211,7 +211,42 @@ func EditorListings(user User, params map[string]interface{}) ([]HistoryRecord, 
 
 // Returns listings for a publisher 
 func PublisherListings(user User, params map[string]interface{}) ([]HistoryRecord, int, error) {
-	return nil, 0, nil
+	query := historyRecords
+	query = addFilters(query, params)
+	query = query.Where(sq.Eq{"deleted_at": nil})
+	query = query.Where(
+		sq.Or{
+			sq.Eq{"record_status_id": 1, "created_by": user.ID}, // Saved and created by the publisher
+			sq.Eq{"record_status_id": 2}, // Created and pending approval
+		},
+	)
+
+	query = query.OrderBy("date(history_record.date)").OrderBy("history_record.title")
+	query = query.Limit(uint64(recordsPerPage))
+	query = query.Offset(uint64(params["offset"].(int)) * recordsPerPage)
+
+	records, err := queryRecords("PublisherListings", query)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	
+	query = sq.Select("COUNT(*)").From("history_record")
+	query = addFilters(query, params)
+	query = query.Where(sq.Eq{"deleted_at": nil})
+	query = query.Where(
+		sq.Or{
+			sq.Eq{"record_status_id": 1, "created_by": user.ID}, // Saved and created by the publisher
+			sq.Eq{"record_status_id": 2}, // Created and pending approval
+		},
+	)
+	pages, err := runCountQuery(query)
+
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return records, pages, nil
 }
 
 // Returns listings for an admin

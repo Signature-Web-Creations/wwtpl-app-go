@@ -39,11 +39,9 @@ const getQueryParameters = (params) => {
   return queryParameters 
 }
 
-const buildURLWithQueryParameters = (base_uri, params) => {
+const buildURLWithQueryParameters = (baseUri, params) => {
   const queryParameters = getQueryParameters(params)
-  const baseUri = '/api/records'
 
-  let uri
   if (queryParameters.length !== 0) {
     return baseUri + `?${queryParameters.join('&')}`
   } else {
