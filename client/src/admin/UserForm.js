@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
 import { createUser, getUserRoles } from '../api.js'
 
-import MessageBox from './MessageBox.js'
+import MessageBox from '../MessageBox.js'
 
 // capitalize a string
 function capitalize(s) {
