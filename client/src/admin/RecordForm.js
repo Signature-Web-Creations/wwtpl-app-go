@@ -11,10 +11,7 @@ function blank(s) {
 }
 
 function ValidationError(props) {
-  if (!props.error) {
-    return null
-  }
-  return <p> {props.error} </p>
+  return <label> *{props.error} </label>
 }
 
 function RecordForm(props) {
@@ -30,6 +27,13 @@ function RecordForm(props) {
   const [sourceArchive, setSourceArchive] = useState('')
   const [collections, setCollections] = useState([])
 
+  const newRecord = id === undefined
+
+  const [message, setMessage] = useState({
+    message: null,
+    type: null,
+  })
+
   const clearForm = () => {
     setTitle('')
     setContent('')
@@ -43,11 +47,11 @@ function RecordForm(props) {
 
   // Form Validation
   const [validationErrors, setValidationErrors] = useState({
-    title: false,
-    date: false,
-    recordType: false,
-    sourceArchive: false,
-    collections: false,
+    title: null,
+    date: null,
+    recordType: null,
+    sourceArchive: null,
+    collections: null,
   })
 
   // Creates a helper function to clear validation errors
@@ -63,7 +67,7 @@ function RecordForm(props) {
     return () => {
       if (validationErrors[fieldName]) {
         let errors = {}
-        errors[fieldName] = false
+        errors[fieldName] = null
         setValidationErrors(Object.assign(validationErrors, errors))
       }
     }
@@ -132,19 +136,8 @@ function RecordForm(props) {
 
     console.log('Validation errors: ', errors)
     setValidationErrors(Object.assign(validationErrors, errors))
+    console.log(validationErrors)
     return valid
-  }
-
-  const newRecord = id === undefined
-
-  const [message, setMessage] = useState(null)
-
-  const createSuccessMessage = (message) => {
-    setMessage({ message, type: 'success' })
-  }
-
-  const createErrorMessage = (message) => {
-    setMessage({ message, type: 'error' })
   }
 
   useEffect(() => {
@@ -194,11 +187,11 @@ function RecordForm(props) {
 
     if (validateForm()) {
       const record = {
-        title,
-        content,
-        date,
-        origin,
-        author,
+        title: title.trim(),
+        content: content.trim(),
+        date: date.trim(),
+        origin: origin.trim(),
+        author: author.trim(),
         recordType: parseIntOrError(recordType),
         sourceArchive: parseIntOrError(sourceArchive),
         collections: collections.map(parseIntOrError),
@@ -214,11 +207,16 @@ function RecordForm(props) {
 
       request.then((data) => {
         if (data.error) {
-          createErrorMessage(data.error)
+          setMessage({ message: data.error, type: 'error' })
         } else {
           clearForm()
-          createSuccessMessage(data.success)
+          setMessage({ message: data.success, type: 'success' })
         }
+      })
+    } else {
+      setMessage({
+        message: 'Please fill out required fields correctly',
+        type: 'error',
       })
     }
   }
@@ -227,10 +225,13 @@ function RecordForm(props) {
 
   return (
     <form className="uk-form-stacked uk-margin-top" onSubmit={handleSubmit}>
-      {message && (
+      {message.message && (
         <MessageBox
           onChange={() => {
-            setMessage(null)
+            setMessage({
+              message: null,
+              type: null,
+            })
           }}
           message={message.message}
           type={message.type}
@@ -239,7 +240,9 @@ function RecordForm(props) {
       <h1> {header} </h1>
 
       <div>
-        <ValidationError error={validationErrors.title} />
+        {validationErrors.title && (
+          <ValidationError error={validationErrors.title} />
+        )}
         <label className="uk-form-label"> Title </label>
         <input
           className="uk-form-width-large uk-input"
@@ -264,7 +267,9 @@ function RecordForm(props) {
       </div>
 
       <div>
-        <ValidationError error={validationErrors.date} />
+        {validationErrors.date && (
+          <ValidationError error={validationErrors.date} />
+        )}
         <label className="uk-form-label"> Date </label>
         <input
           className="uk-form-width-large uk-input"
@@ -302,7 +307,9 @@ function RecordForm(props) {
       </div>
 
       <div>
-        <ValidationError error={validationErrors.recordType} />
+        {validationErrors.recordType && (
+          <ValidationError error={validationErrors.recordType} />
+        )}
         <label className="uk-form-label"> Record Type </label>
         <select
           className="uk-select uk-form-width-large"
@@ -323,7 +330,9 @@ function RecordForm(props) {
       </div>
 
       <div>
-        <ValidationError error={validationErrors.sourceArchive} />
+        {validationErrors.sourceArchive && (
+          <ValidationError error={validationErrors.sourceArchive} />
+        )}
         <label className="uk-form-label"> Source Archive </label>
         <select
           className="uk-select uk-form-width-large"
@@ -344,7 +353,9 @@ function RecordForm(props) {
       </div>
 
       <div>
-        <ValidationError error={validationErrors.collections} />
+        {validationErrors.collections && (
+          <ValidationError error={validationErrors.collections} />
+        )}
         <label className="uk-form-label"> Collections </label>
         {props.collections.map(({ id, name }) => {
           return (
