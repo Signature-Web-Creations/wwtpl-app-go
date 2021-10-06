@@ -71,7 +71,7 @@ func PublishedRecords() sq.SelectBuilder {
 		sq.Eq{`deleted_at`: nil})
 }
 
-func addFilters(query sq.SelectBuilder, params map[string]string) sq.SelectBuilder {
+func addFilters(query sq.SelectBuilder, params map[string]interface{}) sq.SelectBuilder {
 	if params["query"] != "" {
 		queryParam := fmt.Sprintf("%%%s%%", params["query"])
 		query = query.Where(sq.Or{
@@ -84,13 +84,13 @@ func addFilters(query sq.SelectBuilder, params map[string]string) sq.SelectBuild
 	}
 
 	if params["recordType"] != "" {
-		if recordType, err := strconv.Atoi(params["recordType"]); err == nil {
+		if recordType, err := strconv.Atoi(params["recordType"].(string)); err == nil {
 			query = query.Where(`history_record.record_type_id = ?`, recordType)
 		}
 	}
 
 	if params["sourceArchive"] != "" {
-		if sourceArchive, err := strconv.Atoi(params["sourceArchive"]); err == nil {
+		if sourceArchive, err := strconv.Atoi(params["sourceArchive"].(string)); err == nil {
 			query = query.Where(`history_record.source_archive_id = ?`, sourceArchive)
 		}
 	}
@@ -100,7 +100,7 @@ func addFilters(query sq.SelectBuilder, params map[string]string) sq.SelectBuild
 	}
 
 	if params["recordStatus"] != "" {
-		if recordStatus, err := strconv.Atoi(params["recordStatus"]); err == nil {
+		if recordStatus, err := strconv.Atoi(params["recordStatus"].(string)); err == nil {
 			query = query.Where(`history_record.record_status_id = ?`, recordStatus)
 		}
 	}
@@ -108,20 +108,44 @@ func addFilters(query sq.SelectBuilder, params map[string]string) sq.SelectBuild
 	return query
 }
 
-func PublishedHistoryRecords(offset int, params map[string]string) ([]HistoryRecord, error) {
+// Executes query either returning a single HistoryRecord or an error
+// functionName is given for error reporting
+func queryRecord(functionName string, query sq.SelectBuilder) (HistoryRecord, error) {
+	var record HistoryRecord
+	row := query.RunWith(db).QueryRow()
 
+	err := row.Scan(
+		&record.ID,
+		&record.Date,
+		&record.Title,
+		&record.Content,
+		&record.Origin,
+		&record.Author,
+		&record.SourceArchive,
+		&record.AttachmentType,
+		&record.FileName,
+		&record.RecordType,
+		&record.RecordStatus,
+		&record.Collections,
+	)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return record, fmt.Errorf("%s: no such record", functionName)
+		}
+		return record, fmt.Errorf("%s: %v", functionName, err)
+	}
+	return record, nil
+}
+
+// Executes query either returning a slice of HistoryRecords or an error
+// functionName is given for error reporting
+func queryRecords(functionName string, query sq.SelectBuilder) ([]HistoryRecord, error) {
 	var records []HistoryRecord
-
-	query := addFilters(PublishedRecords(), params)
-
-	query = query.OrderBy("date(history_record.date)").OrderBy("history_record.title")
-	query = query.Limit(uint64(recordsPerPage))
-	query = query.Offset(uint64(offset * recordsPerPage))
-
 	rows, err := query.RunWith(db).Query()
 
 	if err != nil {
-		return nil, fmt.Errorf("publishedHistoryRecords: %v", err)
+		return nil, fmt.Errorf("%s: %v", functionName, err)
 	}
 
 	defer rows.Close()
@@ -143,77 +167,60 @@ func PublishedHistoryRecords(offset int, params map[string]string) ([]HistoryRec
 			&record.Collections,
 		)
 		if err != nil {
-			return nil, fmt.Errorf("publishedHistoryRecords: %v", err)
+			return nil, fmt.Errorf("%s: %v", functionName, err)
 		}
 		records = append(records, record)
 	}
 
 	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("publishedHistoryRecords: %v", err)
+		return nil, fmt.Errorf("%s: %v", functionName, err)
 	}
 
 	return records, nil
 }
 
+// Returns listings for an editor 
+func EditorListings(user User, params map[string]interface{}) ([]HistoryRecord, int, error) {
+	query := historyRecords.Where(sq.Eq{"record_status_id": 1})
+	query = addFilters(query, params) 
+	query = query.Limit(uint64(recordsPerPage))
+	query = query.Offset(uint64(params["offset"].(int)) * recordsPerPage)
+	return nil , 0, nil
+}
+
+// Returns listings for a publisher 
+func PublisherListings(user User, params map[string]interface{}) ([]HistoryRecord, int, error) {
+	return nil, 0, nil
+}
+
+// Returns listings for an admin
+func AdminListings(params map[string]interface{}) ([]HistoryRecord, int, error) {
+	return nil, 0, nil
+}
+
+
+// Returns published history records that are not deleted. 
+// filters the result based on given parameters
+func PublishedHistoryRecords(params map[string]interface{}) ([]HistoryRecord, error) {
+	query := addFilters(PublishedRecords(), params)
+	query = query.OrderBy("date(history_record.date)").OrderBy("history_record.title")
+	query = query.Limit(uint64(recordsPerPage))
+	query = query.Offset(uint64(params["offset"].(int)) * recordsPerPage)
+	return queryRecords("PublishedHistoryRecords", query)
+}
+
 // Returns a HistoryRecord detail
 // Used in the admin interface
 func GetRecordDetail(id int64) (HistoryRecord, error) {
-	var record HistoryRecord
-	row := historyRecords.Where("history_record.id = ?", id).RunWith(db).QueryRow()
-
-	err := row.Scan(
-		&record.ID,
-		&record.Date,
-		&record.Title,
-		&record.Content,
-		&record.Origin,
-		&record.Author,
-		&record.SourceArchive,
-		&record.AttachmentType,
-		&record.FileName,
-		&record.RecordType,
-		&record.RecordStatus,
-		&record.Collections,
-	)
-
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return record, fmt.Errorf("historyRecordById %d: no such record", id)
-		}
-		return record, fmt.Errorf("historyRecordById %d: %v", id, err)
-	}
-	return record, nil
+	query := historyRecords.Where("history_record.id = ?", id)
+	return queryRecord("GetRecordDetail", query)
 }
 
 // Returns HistoryRecord detail
 // History Record must be published and not deleted
 func HistoryRecordByID(id int64) (HistoryRecord, error) {
-	var record HistoryRecord
-
-	row := PublishedRecords().Where(sq.Eq{`history_record.id`: id}).RunWith(db).QueryRow()
-
-	err := row.Scan(
-		&record.ID,
-		&record.Date,
-		&record.Title,
-		&record.Content,
-		&record.Origin,
-		&record.Author,
-		&record.SourceArchive,
-		&record.AttachmentType,
-		&record.FileName,
-		&record.RecordType,
-		&record.RecordStatus,
-		&record.Collections,
-	)
-
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return record, fmt.Errorf("historyRecordById %d: no such record", id)
-		}
-		return record, fmt.Errorf("historyRecordById %d: %v", id, err)
-	}
-	return record, nil
+	query := PublishedRecords().Where(sq.Eq{`history_record.id`: id})
+	return queryRecord(fmt.Sprintf("HistoryRecordByID: %d", id), query)
 }
 
 func GetYears() ([]string, error) {
@@ -246,7 +253,9 @@ func GetYears() ([]string, error) {
 	return years, nil
 }
 
-func CountPages(params map[string]string) (int, error) {
+// Counts records that are published not deleted and 
+// are not filtered by given params
+func CountPublishedPages(params map[string]interface{}) (int, error) {
 	var pages int
 
 	query := sq.Select("COUNT(*)").From("history_record")

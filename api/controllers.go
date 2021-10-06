@@ -66,10 +66,18 @@ func RecordDetail(c *gin.Context) {
 
 }
 
-func getQueryParams(c *gin.Context) map[string]string {
+func getQueryParams(c *gin.Context) map[string]interface{} {
 	// Get query parameters from url
 	// if query parameters is absent return an empty string
-	params := make(map[string]string)
+	params := make(map[string]interface{})
+
+	offset, err := strconv.Atoi(c.Query("offset"))
+	if err != nil {
+		params["offset"] = 0
+	} else {
+		params["offset"] = offset
+	}
+
 	params["query"] = c.Query("query")
 	params["year"] = c.Query("year")
 	params["recordType"] = c.Query("recordType")
@@ -79,15 +87,98 @@ func getQueryParams(c *gin.Context) map[string]string {
 	return params
 }
 
-func PublicRecords(c *gin.Context) {
-	params := getQueryParams(c)
-
-	offset, err := strconv.Atoi(c.Query("offset"))
-	if err != nil {
-		offset = 0
+// Gets Listing information for editors, admins, and publishers
+// and returns it as in JSON body. The only difference between 
+// editors, publishers and admins is the corresponding database
+// function that is used to retrieve records. Users that are not
+// logged in receive a 401. 
+func GetListingInformation(c *gin.Context) {
+	var err error
+	user, ok := getAuthenticatedUser(c)
+	if !ok {
+		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "User is not authorized"})
+		return
 	}
 
-	records, err := PublishedHistoryRecords(offset, params)
+	results := make(map[string]interface{})
+	params := getQueryParams(c)
+
+	var records []HistoryRecord
+	var pages int 
+	switch user.Role {
+		case "editor": 
+			records, pages, err = EditorListings(user, params)
+		case "publisher": 
+			records, pages, err = PublisherListings(user, params)
+		case "admin": 
+			records, pages, err = AdminListings(params)
+		default:
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "An internal service error has occured."})
+			fmt.Printf("GetListingInformation: unknown user role: '%s'\n", user.Role)
+			return
+	}
+
+	if err != nil {
+		fmt.Printf("Error: %v", err)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "An internal service error has occured."})
+		return
+	} 
+
+	results["records"] = records
+	results["pages"] = pages
+
+	years, err := GetYears()
+	if err != nil {
+		fmt.Printf("Error: %v", err)
+		c.IndentedJSON(http.StatusOK, nil)
+		return
+	}
+	results["years"] = years
+
+	collections, err := GetCollections()
+	if err != nil {
+		fmt.Printf("Error: %v", err)
+		c.IndentedJSON(http.StatusOK, nil)
+		return
+	} 
+	results["collections"] = collections
+
+	sourceArchives, err := GetSourceArchives()
+	if err != nil {
+		fmt.Printf("Error: %v", err)
+		c.IndentedJSON(http.StatusOK, nil)
+		c.IndentedJSON(http.StatusOK, nil)
+		return
+	}
+	results["sourceArchives"] = sourceArchives
+
+	recordTypes, err := GetRecordTypes()
+	if err != nil {
+		fmt.Printf("Error: %v", err)
+		c.IndentedJSON(http.StatusOK, nil)
+		return
+	}
+	results["recordTypes"] = recordTypes
+
+	recordStatus, err := GetRecordStatuses()
+	if err != nil {
+		fmt.Printf("Error: %v", err)
+		c.IndentedJSON(http.StatusOK, nil)
+		return
+	} 
+	results["recordStatus"] = recordStatus
+
+	c.IndentedJSON(http.StatusOK, results)
+
+}
+// Sends JSON information for public listings. 
+// Includes records, number of pages, 
+// record_statuses, source archives, collections
+// and years.  
+func GetPublicListings(c *gin.Context) {
+	params := getQueryParams(c)
+
+	records, err := PublishedHistoryRecords(params)
 	results := make(map[string]interface{})
 
 	if err != nil {
@@ -98,7 +189,7 @@ func PublicRecords(c *gin.Context) {
 
 	results["records"] = records
 
-	pages, err := CountPages(params)
+	pages, err := CountPublishedPages(params)
 	if err != nil {
 		fmt.Printf("Error: %v", err)
 		c.IndentedJSON(http.StatusOK, nil)

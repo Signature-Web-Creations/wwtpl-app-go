@@ -16,7 +16,7 @@ func initRouter() *gin.Engine {
 
 	router.Use(static.Serve("/", static.LocalFile("./public", true)))
 
-	router.GET("/api/public/records", PublicRecords)
+	router.GET("/api/public/records", GetPublicListings)
 	router.GET("/api/public/records/:id", PublicRecordDetail)
 
 	router.POST("/api/user", RegisterUser)

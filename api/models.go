@@ -35,6 +35,16 @@ type Collection struct {
 	Name string `json:"name"`
 }
 
+// Represents user roles
+// Editors are the most restricted
+// Admins have every permission
+const (
+	Anon = iota
+	Editor
+	Publisher
+	Admin
+)
+
 type UserRole struct {
 	ID   int64  `json:"id"`
 	Name string `json:"name"`
@@ -48,4 +58,10 @@ type User struct {
 	Password  []byte `json:"-"`
 	Active    bool   `json:"active"`
 	Role      string `json:"role"`
+}
+
+func (u User) Authorized(userLevel int) bool {
+	return (u.Role == "editor" && userLevel == 1) ||
+				 (u.Role == "publisher" && userLevel <= 2) ||
+				 (u.Role == "admin")
 }
