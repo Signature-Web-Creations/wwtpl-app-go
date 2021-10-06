@@ -39,32 +39,29 @@ const getQueryParameters = (params) => {
   return queryParameters 
 }
 
-export function getListingData(params) {
+const buildURLWithQueryParameters = (base_uri, params) => {
   const queryParameters = getQueryParameters(params)
   const baseUri = '/api/records'
 
   let uri
   if (queryParameters.length !== 0) {
-    uri = baseUri + `?${queryParameters.join('&')}`
+    return baseUri + `?${queryParameters.join('&')}`
   } else {
-    uri = baseUri
+    return baseUri
   }
+}
 
+// Returns listing data for dashboard. 
+// Records are returned based on if the user is an editor, publisher
+// or admin
+export function getListingData(params) {
+  const uri = buildURLWithQueryParameters('/api/records', params)
   return fetch(uri).then((res) => res.json())
 }
 
+// Returns listing data for public users
 export function getPublicListingData(params) {
-  const queryParameters = getQueryParameters(params)
-  const baseUri = '/api/public/records'
-
-
-  let uri
-  if (queryParameters.length !== 0) {
-    uri = baseUri + `?${queryParameters.join('&')}`
-  } else {
-    uri = baseUri
-  }
-
+  const uri = buildURLWithQueryParameters('/api/public/records', params)
   return fetch(uri).then((res) => res.json())
 }
 
