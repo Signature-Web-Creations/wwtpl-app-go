@@ -1,10 +1,4 @@
-import { Link } from 'react-router-dom'
-
 function MessageBox(props) {
-  const handleClose = () => {
-    props.handleCloseBox(null)
-  }
-
   let messageClass = ''
   if (props.type === 'error') {
     messageClass = 'uk-alert-danger'
@@ -14,11 +8,11 @@ function MessageBox(props) {
 
   return (
     <div uk-alert="true" className={messageClass}>
-      <Link
+      <button
         className="uk-alert-close"
         uk-close="true"
-        onClick={handleClose}
-      ></Link>
+        onClick={props.onClick}
+      ></button>
       <p>{props.message}</p>
     </div>
   )

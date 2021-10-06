@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { useAuth } from './auth.js'
-import { Redirect, Link } from 'react-router-dom'
+import { Redirect } from 'react-router-dom'
+
+import MessageBox from './MessageBox.js'
 
 export default function LoginForm(props) {
   const auth = useAuth()
@@ -21,23 +23,11 @@ export default function LoginForm(props) {
 
   const handleSubmit = (event) => {
     event.preventDefault()
-    auth.signin(username, password, () => setError)
+    auth.signin(username, password, (value) => setError(value))
   }
 
-  const handleCloseErrorBox = () => {
-  }
-
-  function ErrorBox() {
-    return (
-      <div uk-alert={true} className="uk-alert-danger">
-        <Link
-          className="uk-alert-close"
-          uk-close={true}
-          onClick={handleCloseErrorBox}
-        ></Link>
-        <p>{error}</p>
-      </div>
-    )
+  const handleCloseBox = () => {
+    setError(null)
   }
 
   if (auth.user) {
@@ -49,7 +39,9 @@ export default function LoginForm(props) {
       className="uk-form-stacked uk-form-width-large uk-margin-top"
       onSubmit={handleSubmit}
     >
-      {error && <ErrorBox />}
+      {error && (
+        <MessageBox onClick={handleCloseBox} message={error} type="error" />
+      )}
 
       <div>
         <label className="uk-form-label"> Username </label>
