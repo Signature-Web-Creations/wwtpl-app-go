@@ -180,12 +180,26 @@ func queryRecords(functionName string, query sq.SelectBuilder) ([]HistoryRecord,
 }
 
 // Returns listings for an editor 
+// It should only include records that were created by the editor
+// and have a record status of 1 (saved but not submitted)
 func EditorListings(user User, params map[string]interface{}) ([]HistoryRecord, int, error) {
 	query := historyRecords.Where(sq.Eq{"record_status_id": 1})
+	query = historyRecords.Where(sq.Eq{"created_by": user.ID})
 	query = addFilters(query, params) 
 	query = query.Limit(uint64(recordsPerPage))
 	query = query.Offset(uint64(params["offset"].(int)) * recordsPerPage)
-	return nil , 0, nil
+
+	records, err := queryRecords("EditorListings", query)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	pages, err := CountPages(params)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return records, pages, nil
 }
 
 // Returns listings for a publisher 
@@ -617,11 +631,11 @@ func InsertRecord(user User, record HistoryRecordJSON) error {
 
 	result, err := tx.Exec(`
 	 INSERT INTO history_record
-	 (title, content, date, origin, author, record_type_id, source_archive_id, entered_by)
+	 (title, content, date, origin, author, record_type_id, source_archive_id, entered_by, created_by)
 	 VALUES
-	 (?, ?, ?, ?, ?, ?, ?, ?)
+	 (?, ?, ?, ?, ?, ?, ?, ?, ?)
 	 `, record.Title, record.Content, date, record.Origin, record.Author, record.RecordTypeId,
-		record.SourceArchiveId, user.FirstName+" "+user.LastName,
+		record.SourceArchiveId, user.FirstName+" "+user.LastName, user.ID,
 	)
 
 	if err != nil {
