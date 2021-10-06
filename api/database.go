@@ -183,18 +183,25 @@ func queryRecords(functionName string, query sq.SelectBuilder) ([]HistoryRecord,
 // It should only include records that were created by the editor
 // and have a record status of 1 (saved but not submitted)
 func EditorListings(user User, params map[string]interface{}) ([]HistoryRecord, int, error) {
-	query := historyRecords.Where(sq.Eq{"record_status_id": 1})
-	query = historyRecords.Where(sq.Eq{"created_by": user.ID})
+	query := historyRecords
+	query = query.Where(sq.Eq{"created_by": user.ID})
+	query = query.Where(sq.Eq{"record_status_id": 1})
+	query = query.Where(sq.Eq{"deleted_at": nil})
+	query = query.OrderBy("date(history_record.date)").OrderBy("history_record.title")
 	query = addFilters(query, params) 
 	query = query.Limit(uint64(recordsPerPage))
 	query = query.Offset(uint64(params["offset"].(int)) * recordsPerPage)
 
 	records, err := queryRecords("EditorListings", query)
-	if err != nil {
-		return nil, 0, err
-	}
 
-	pages, err := CountPages(params)
+	query = sq.Select("COUNT(*)").From("history_record")
+	query = query.Where(sq.Eq{"created_by": user.ID})
+	query = query.Where(sq.Eq{"record_status_id": 1})
+	query = query.Where(sq.Eq{"deleted_at": nil})
+	query = addFilters(query, params)
+
+	pages, err := runCountQuery(query)
+
 	if err != nil {
 		return nil, 0, err
 	}
@@ -211,6 +218,7 @@ func PublisherListings(user User, params map[string]interface{}) ([]HistoryRecor
 func AdminListings(params map[string]interface{}) ([]HistoryRecord, int, error) {
 	query := historyRecords
 	query = addFilters(query, params)
+	query = query.OrderBy("date(history_record.date)").OrderBy("history_record.title")
 	query = query.Limit(uint64(recordsPerPage))
 	query = query.Offset(uint64(params["offset"].(int)) * recordsPerPage)
 
@@ -301,6 +309,7 @@ func CountPages(params map[string]interface{}) (int, error) {
 
 	return runCountQuery(query)
 }
+
 
 // Counts records that are published not deleted and 
 // are not filtered by given params
