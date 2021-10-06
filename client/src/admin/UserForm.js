@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { createUser, getUserRoles } from '../api.js'
 
+import MessageBox from './MessageBox.js'
+
 // capitalize a string
 function capitalize(s) {
   if (s.length > 0) {
@@ -15,11 +17,11 @@ function UserForm() {
   const [lastName, setLastName] = useState('')
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  
-  // Every role defaults to being an editor. 1 means editor
-  const [roleId, setRoleId] = useState(1) 
 
-  const [roles, setRoles] = useState([]) 
+  // Every role defaults to being an editor. 1 means editor
+  const [roleId, setRoleId] = useState(1)
+
+  const [roles, setRoles] = useState([])
 
   const [error, setError] = useState(null)
   const [message, setMessage] = useState(null)
@@ -27,13 +29,13 @@ function UserForm() {
   const clearForm = () => {
     setFirstName('')
     setLastName('')
-    setUsername('') 
+    setUsername('')
     setPassword('')
     setRoleId(1)
   }
 
   useEffect(() => {
-    getUserRoles().then(data => {
+    getUserRoles().then((data) => {
       if (data.roles) {
         setRoles(data.roles)
       }
@@ -42,7 +44,7 @@ function UserForm() {
 
   const handleSubmit = (event) => {
     event.preventDefault()
-    const userData = {firstName, lastName, username, password, roleId}
+    const userData = { firstName, lastName, username, password, roleId }
     createUser(userData).then((res) => {
       if (res.success) {
         setMessage(res.success)
@@ -71,7 +73,7 @@ function UserForm() {
   const changePassword = (event) => {
     setPassword(event.target.value)
   }
-  
+
   const changeRole = (event) => {
     const roleId = parseInt(event.target.value)
     if (isNaN(roleId)) {
@@ -81,43 +83,29 @@ function UserForm() {
     }
   }
 
-  function SuccessBox(props) {
-    return (
-      <div uk-alert={true} className="uk-alert-success">
-        <Link
-          className="uk-alert-close"
-          uk-close={true}
-          onClick={() => {
-            setMessage(null)
-          }}
-        ></Link>
-        <p>{props.message}</p>
-      </div>
-    )
-  }
-
-  function ErrorBox(props) {
-    return (
-      <div uk-alert={true} className="uk-alert-danger">
-        <Link
-          className="uk-alert-close"
-          uk-close={true}
-          onClick={() => {
-            setError(null)
-          }}
-        ></Link>
-        <p>{props.message}</p>
-      </div>
-    )
-  }
-
   return (
     <form
       className="uk-form-stacked uk-form-width-large uk-margin-top"
       onSubmit={handleSubmit}
     >
-      {message && <SuccessBox message={message}/>}
-      {error && <ErrorBox message={error}/>}
+      {message && (
+        <MessageBox
+          onClick={() => {
+            setMessage(null)
+          }}
+          message={message}
+          type="success"
+        />
+      )}
+      {error && (
+        <MessageBox
+          onClick={() => {
+            setError(null)
+          }}
+          message={error}
+          type="error"
+        />
+      )}
 
       <div>
         <label className="uk-form-label uk-margin-top">First Name</label>
@@ -161,8 +149,14 @@ function UserForm() {
       </div>
       <div>
         <label className="uk-form-label uk-margin-top">Role</label>
-        <select value={roleId} onChange={changeRole}> 
-          { roles.length !== 0 && roles.map(({id, name}) => <option value={id} key={id}> {capitalize(name)} </option>) }
+        <select value={roleId} onChange={changeRole}>
+          {roles.length !== 0 &&
+            roles.map(({ id, name }) => (
+              <option value={id} key={id}>
+                {' '}
+                {capitalize(name)}{' '}
+              </option>
+            ))}
         </select>
       </div>
       <input
