@@ -38,7 +38,7 @@ export default function Dashboard() {
   const [searched, setSearched] = useState(false)
 
   const handleSearch = (searchParams) => {
-    if (!auth.user) return;
+    if (!auth.user) return
     const {
       query,
       searchYear,
@@ -66,11 +66,11 @@ export default function Dashboard() {
   }
 
   useEffect(() => {
-    // Ran into an issue where it was attempting to get listing 
-    // data even when the user was not logged in. It would 
-    // subsequently crash when the promise failed to resolve. 
+    // Ran into an issue where it was attempting to get listing
+    // data even when the user was not logged in. It would
+    // subsequently crash when the promise failed to resolve.
     // Added the line below so that it doesn't even try it.
-    if (!auth.user) return;
+    if (!auth.user) return
     getListingData({ offset }).then(
       ({
         records,
@@ -93,7 +93,7 @@ export default function Dashboard() {
         setRecordStatus(recordStatus)
       },
     )
-  }, [offset])
+  }, [offset, auth.user])
 
   return (
     <>
