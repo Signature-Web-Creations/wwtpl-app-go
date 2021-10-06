@@ -26,10 +26,6 @@ export default function LoginForm(props) {
     auth.signin(username, password, (value) => setError(value))
   }
 
-  const handleCloseBox = () => {
-    setError(null)
-  }
-
   if (auth.user) {
     return <Redirect to="/dashboard" />
   }
@@ -40,7 +36,13 @@ export default function LoginForm(props) {
       onSubmit={handleSubmit}
     >
       {error && (
-        <MessageBox onClick={handleCloseBox} message={error} type="error" />
+        <MessageBox
+          onClick={() => {
+            setError(null)
+          }}
+          message={error}
+          type="error"
+        />
       )}
 
       <div>
