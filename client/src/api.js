@@ -1,7 +1,6 @@
-export function getPublicListingData(params) {
-  const queryParameters = []
-  const baseUri = '/api/public/records'
 
+const getQueryParameters = (params) => {
+  const queryParameters = []
   if (params.offset && params.offset !== null) {
     queryParameters.push(`offset=${encodeURIComponent(params.offset)}`)
   }
@@ -37,6 +36,27 @@ export function getPublicListingData(params) {
       `recordStatus=${encodeURIComponent(params.searchRecordStatus)}`,
     )
   }
+  return queryParameters 
+}
+
+export function getListingData(params) {
+  const queryParameters = getQueryParameters(params)
+  const baseUri = '/api/records'
+
+  let uri
+  if (queryParameters.length !== 0) {
+    uri = baseUri + `?${queryParameters.join('&')}`
+  } else {
+    uri = baseUri
+  }
+
+  return fetch(uri).then((res) => res.json())
+}
+
+export function getPublicListingData(params) {
+  const queryParameters = getQueryParameters(params)
+  const baseUri = '/api/public/records'
+
 
   let uri
   if (queryParameters.length !== 0) {

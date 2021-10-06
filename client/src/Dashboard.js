@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { UrlFor } from './routes'
-import { getPublicListingData } from './api'
+import { getListingData } from './api'
 import { useSearchParams } from './hooks'
 import { useAuth } from './auth.js'
 import AdminListings from './admin/RecordTable'
@@ -55,7 +55,7 @@ export default function Dashboard() {
       searchRecordType,
       searchStatus,
     }
-    getPublicListingData(params).then(({ records, pages, years, status }) => {
+    getListingData(params).then(({ records, pages, years, status }) => {
       setRecords(records)
       setPages(pages)
       setYears(years)
@@ -65,7 +65,7 @@ export default function Dashboard() {
   }
 
   useEffect(() => {
-    getPublicListingData({ offset }).then(
+    getListingData({ offset }).then(
       ({
         records,
         pages,

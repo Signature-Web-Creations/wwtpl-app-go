@@ -195,7 +195,22 @@ func PublisherListings(user User, params map[string]interface{}) ([]HistoryRecor
 
 // Returns listings for an admin
 func AdminListings(params map[string]interface{}) ([]HistoryRecord, int, error) {
-	return nil, 0, nil
+	query := historyRecords
+	query = addFilters(query, params)
+	query = query.Limit(uint64(recordsPerPage))
+	query = query.Offset(uint64(params["offset"].(int)) * recordsPerPage)
+
+	records, err := queryRecords("AdminListings", query)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	pages, err := CountPages(params)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return records, pages, nil
 }
 
 

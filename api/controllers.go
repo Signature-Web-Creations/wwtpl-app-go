@@ -169,8 +169,8 @@ func GetListingInformation(c *gin.Context) {
 	results["recordStatus"] = recordStatus
 
 	c.IndentedJSON(http.StatusOK, results)
-
 }
+
 // Sends JSON information for public listings. 
 // Includes records, number of pages, 
 // record_statuses, source archives, collections
