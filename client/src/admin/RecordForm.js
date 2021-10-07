@@ -416,10 +416,12 @@ function RecordForm(props) {
           type="button"
           value="Save"
         />
-        {(recordStatus === 2 || recordStatus === 4) && (
+        {recordStatus !== 1 && (
           <input
             className="uk-button uk-button-primary uk-margin-top"
-            onClick={handleSubmit(3)}
+            onClick={() => {
+              handleSubmit(3)
+            }}
             type="button"
             value="Save &amp; Publish"
           />
@@ -427,7 +429,9 @@ function RecordForm(props) {
         {recordStatus === 1 && (
           <input
             className="uk-button uk-button-primary uk-margin-top"
-            onClick={handleSubmit(2)}
+            onClick={() => {
+              handleSubmit(2)
+            }}
             type="button"
             value="Submit for Approval"
           />
