@@ -166,6 +166,7 @@ func queryRecords(functionName string, query sq.SelectBuilder) ([]HistoryRecord,
 			&record.FileName,
 			&record.RecordType,
 			&record.RecordStatus,
+			&record.RecordStatusID,
 			&record.Collections,
 		)
 		if err != nil {
@@ -716,7 +717,7 @@ func InsertRecord(user User, record HistoryRecordJSON) error {
 
 	tx.Commit()
 	return nil
-} 
+}
 
 func ChangeStatus(recordID int64, recordStatusID int64) error {
 	query := sq.Update("history_record").Set("record_status", recordStatusID)
