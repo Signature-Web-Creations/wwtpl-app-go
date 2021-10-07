@@ -148,7 +148,7 @@ function UserForm() {
       </div>
       <div>
         <label className="uk-form-label uk-margin-top">Role</label>
-        <select value={roleId} onChange={changeRole}>
+        <select className="uk-select" value={roleId} onChange={changeRole}>
           {roles.length !== 0 &&
             roles.map(({ id, name }) => (
               <option value={id} key={id}>
