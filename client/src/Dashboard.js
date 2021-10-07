@@ -104,7 +104,11 @@ export default function Dashboard() {
         {' '}
         Add New User{' '}
       </Link>
-      <Link to={UrlFor('showUsers')} className="uk-button uk-button-default">
+
+      <Link
+        to={UrlFor('showUsers')}
+        className="uk-button uk-button-default uk-margin-right"
+      >
         {' '}
         Manage Users{' '}
       </Link>
@@ -113,6 +117,7 @@ export default function Dashboard() {
         {' '}
         New Record{' '}
       </Link>
+
       <SearchForm
         years={!years ? [] : years}
         recordTypes={recordTypes}
