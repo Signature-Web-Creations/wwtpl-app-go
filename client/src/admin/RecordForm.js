@@ -11,7 +11,7 @@ function blank(s) {
 }
 
 function ValidationError(props) {
-  return <label> *{props.error} </label>
+  return <label className="uk-form-danger"> *{props.error} </label>
 }
 
 function RecordForm(props) {
@@ -224,7 +224,10 @@ function RecordForm(props) {
   const header = newRecord ? 'New Record' : 'Edit Record'
 
   return (
-    <form className="uk-form-stacked uk-margin-top" onSubmit={handleSubmit}>
+    <form
+      className="uk-form-horizontal uk-margin-large uk-margin-top"
+      onSubmit={handleSubmit}
+    >
       {message.message && (
         <MessageBox
           onChange={() => {
@@ -239,150 +242,173 @@ function RecordForm(props) {
       )}
       <h1> {header} </h1>
 
-      <div>
-        {validationErrors.title && (
-          <ValidationError error={validationErrors.title} />
-        )}
+      <div class="uk-margin">
         <label className="uk-form-label"> Title </label>
-        <input
-          className="uk-form-width-large uk-input"
-          type="text"
-          value={title}
-          onChange={(e) => {
-            clearTitleError()
-            setTitle(e.target.value)
-          }}
-        />
+        <div class="uk-form-controls">
+          <input
+            className={
+              'uk-form-width-large uk-input ' +
+              (validationErrors.title && 'uk-form-danger')
+            }
+            type="text"
+            value={title}
+            onChange={(e) => {
+              clearTitleError()
+              setTitle(e.target.value)
+            }}
+          />
+        </div>
       </div>
 
-      <div>
+      <div class="uk-margin">
         <label className="uk-form-label"> Content </label>
-        <textarea
-          className="uk-form-width-large uk-textarea"
-          value={content}
-          onChange={(e) => {
-            setContent(e.target.value)
-          }}
-        />
+        <div class="uk-form-controls">
+          <textarea
+            className="uk-form-width-large uk-textarea"
+            value={content}
+            onChange={(e) => {
+              setContent(e.target.value)
+            }}
+          />
+        </div>
       </div>
 
-      <div>
-        {validationErrors.date && (
-          <ValidationError error={validationErrors.date} />
-        )}
+      <div class="uk-margin">
         <label className="uk-form-label"> Date </label>
-        <input
-          className="uk-form-width-large uk-input"
-          type="text"
-          value={date}
-          onChange={(e) => {
-            clearDateError()
-            setDate(e.target.value)
-          }}
-        />
+        <div class="uk-form-controls">
+          <input
+            className={
+              'uk-form-width-large uk-input ' +
+              (validationErrors.date && 'uk-form-danger')
+            }
+            type="date"
+            value={date}
+            onChange={(e) => {
+              clearDateError()
+              setDate(e.target.value)
+            }}
+          />
+        </div>
       </div>
 
-      <div>
+      <div class="uk-margin">
         <label className="uk-form-label"> Origin </label>
-        <input
-          className="uk-form-width-large uk-input"
-          type="text"
-          value={origin}
-          onChange={(e) => {
-            setOrigin(e.target.value)
-          }}
-        />
+        <div class="uk-form-controls">
+          <input
+            className="uk-form-width-large uk-input"
+            type="text"
+            value={origin}
+            onChange={(e) => {
+              setOrigin(e.target.value)
+            }}
+          />
+        </div>
       </div>
 
-      <div>
+      <div class="uk-margin">
         <label className="uk-form-label"> Author </label>
+        <div class="uk-form-controls">
+          <input
+            className="uk-form-width-large uk-input"
+            type="text"
+            value={author}
+            onChange={(e) => {
+              setAuthor(e.target.value)
+            }}
+          />
+        </div>
+      </div>
+
+      <div class="uk-margin">
+        <label className="uk-form-label"> Record Type </label>
+        <div class="uk-form-controls">
+          <select
+            className={
+              'uk-form-width-large uk-select ' +
+              (validationErrors.recordType && 'uk-form-danger')
+            }
+            value={recordType}
+            onChange={(e) => {
+              clearRecordTypeError()
+              setRecordType(e.target.value)
+            }}
+          >
+            <option value=""> No Record Type </option>
+            {props.recordTypes.map(({ id, name }) => (
+              <option key={id} value={id}>
+                {' '}
+                {name}{' '}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <div class="uk-margin">
+        <label className="uk-form-label"> Source Archive </label>
+        <div class="uk-form-controls">
+          <select
+            className={
+              'uk-form-width-large uk-select ' +
+              (validationErrors.sourceArchive && 'uk-form-danger')
+            }
+            value={sourceArchive}
+            onChange={(e) => {
+              clearSourceArchiveError()
+              setSourceArchive(e.target.value)
+            }}
+          >
+            <option value=""> No Source Archive </option>
+            {props.sourceArchives.map(({ id, name }) => (
+              <option key={id} value={id}>
+                {' '}
+                {name}{' '}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <div class="uk-margin">
+        <label className="uk-form-label"> Collections </label>
+        <div className="uk-form-controls uk-form-controls-text">
+          <div>
+            {validationErrors.collections && (
+              <ValidationError error={validationErrors.collections} />
+            )}
+          </div>
+
+          <div className="uk-grid-small uk-child-width-1-2 uk-grid">
+            {props.collections.map(({ id, name }, index) => {
+              return (
+                <label key={id}>
+                  <input
+                    className="uk-checkbox"
+                    type="checkbox"
+                    key={id}
+                    name="collections"
+                    value={id}
+                    checked={collections.includes(id)}
+                    onChange={() => {
+                      clearCollectionsError()
+                      handleCollection(id)
+                    }}
+                  />
+                  &nbsp;&nbsp; {name}
+                </label>
+              )
+            })}
+          </div>
+        </div>
+      </div>
+
+      <div className="uk-form-width-large">
         <input
-          className="uk-form-width-large uk-input"
-          type="text"
-          value={author}
-          onChange={(e) => {
-            setAuthor(e.target.value)
-          }}
+          className="uk-button uk-button-primary uk-margin-top"
+          type="submit"
+          value="Add Record"
         />
       </div>
-
-      <div>
-        {validationErrors.recordType && (
-          <ValidationError error={validationErrors.recordType} />
-        )}
-        <label className="uk-form-label"> Record Type </label>
-        <select
-          className="uk-select uk-form-width-large"
-          value={recordType}
-          onChange={(e) => {
-            clearRecordTypeError()
-            setRecordType(e.target.value)
-          }}
-        >
-          <option value=""> No Record Type </option>
-          {props.recordTypes.map(({ id, name }) => (
-            <option key={id} value={id}>
-              {' '}
-              {name}{' '}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div>
-        {validationErrors.sourceArchive && (
-          <ValidationError error={validationErrors.sourceArchive} />
-        )}
-        <label className="uk-form-label"> Source Archive </label>
-        <select
-          className="uk-select uk-form-width-large"
-          value={sourceArchive}
-          onChange={(e) => {
-            clearSourceArchiveError()
-            setSourceArchive(e.target.value)
-          }}
-        >
-          <option value=""> No Source Archive </option>
-          {props.sourceArchives.map(({ id, name }) => (
-            <option key={id} value={id}>
-              {' '}
-              {name}{' '}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div>
-        {validationErrors.collections && (
-          <ValidationError error={validationErrors.collections} />
-        )}
-        <label className="uk-form-label"> Collections </label>
-        {props.collections.map(({ id, name }) => {
-          return (
-            <label className="uk-form-label" key={id}>
-              <input
-                className="uk-checkbox"
-                type="checkbox"
-                key={id}
-                name="collections"
-                value={id}
-                checked={collections.includes(id)}
-                onChange={() => {
-                  clearCollectionsError()
-                  handleCollection(id)
-                }}
-              />
-              &nbsp;&nbsp; {name}
-            </label>
-          )
-        })}
-      </div>
-
-      <input
-        className="uk-button uk-button-primary uk-margin-top"
-        type="submit"
-        value="Add Record"
-      />
     </form>
   )
 }
