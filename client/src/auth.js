@@ -36,9 +36,8 @@ export function useProvideAuth() {
   }
 
   const signout = () => {
-    logout().then(() => {
-      setUser(false)
-    })
+    setUser(false)
+    logout()
   }
 
   return {

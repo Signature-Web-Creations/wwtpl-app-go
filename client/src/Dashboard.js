@@ -70,7 +70,6 @@ export default function Dashboard() {
     // data even when the user was not logged in. It would
     // subsequently crash when the promise failed to resolve.
     // Added the line below so that it doesn't even try it.
-    if (!auth.user) return
     getListingData({ offset }).then(
       ({
         records,
