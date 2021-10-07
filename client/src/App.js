@@ -67,7 +67,7 @@ function App() {
       searchSourceArchive,
       searchRecordType,
     }
-    getPublicListingData(params).then(({ records, pages, years }) => {
+    getPublicListingData(params).then(({ records, pages, years, status }) => {
       setRecords(records)
       setPages(pages)
       setYears(years)
@@ -77,7 +77,15 @@ function App() {
 
   useEffect(() => {
     getPublicListingData({ offset }).then(
-      ({ records, pages, years, collections, sourceArchives, recordTypes }) => {
+      ({
+        records,
+        pages,
+        years,
+        collections,
+        sourceArchives,
+        recordTypes,
+        recordStatus,
+      }) => {
         setRecords(records)
         setPages(pages)
         setYears(years)
@@ -85,6 +93,7 @@ function App() {
         setCollectionToId(collections.collectionToId)
         setSourceArchives(sourceArchives)
         setRecordTypes(recordTypes)
+        setRecordStatus(recordStatus)
       },
     )
   }, [offset])
@@ -150,9 +159,10 @@ function App() {
             collections={collections}
             sourceArchives={sourceArchives}
             recordStatus={recordStatus}
+            buttonText="Add"
           />
         </PrivateRoute>
-        
+
         <PrivateRoute path={UrlFor('editRecord')}>
           <RecordForm
             recordTypes={recordTypes}
@@ -160,6 +170,7 @@ function App() {
             sourceArchives={sourceArchives}
             recordStatus={recordStatus}
             collectionToId={collectionToId}
+            buttonText="Update"
           />
         </PrivateRoute>
 
