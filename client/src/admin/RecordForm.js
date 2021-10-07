@@ -44,7 +44,6 @@ function RecordForm(props) {
     setRecordType('')
     setSourceArchive('')
     setCollections([])
-    setRecordStatus('')
   }
 
   // Form Validation
@@ -54,7 +53,6 @@ function RecordForm(props) {
     recordType: null,
     sourceArchive: null,
     collections: null,
-    recordStatus: null,
   })
 
   // Creates a helper function to clear validation errors
@@ -186,9 +184,7 @@ function RecordForm(props) {
     return n
   }
 
-  const handleSubmit = (event) => {
-    event.preventDefault()
-
+  const handleSubmit = (str) => {
     if (validateForm()) {
       const record = {
         title: title.trim(),
@@ -199,7 +195,7 @@ function RecordForm(props) {
         recordType: parseIntOrError(recordType),
         sourceArchive: parseIntOrError(sourceArchive),
         collections: collections.map(parseIntOrError),
-        recordStatus,
+        recordStatus: str && str === 'publish' ? 'publish' : recordStatus,
       }
 
       let request
@@ -243,6 +239,12 @@ function RecordForm(props) {
           }}
           message={message.message}
           type={message.type}
+        />
+      )}
+      {recordStatus === 'unpublished' && (
+        <MessageBox
+          message="The record has been unpublished while in edit mode!"
+          type="warning"
         />
       )}
       <h1> {header} </h1>
@@ -407,50 +409,19 @@ function RecordForm(props) {
         </div>
       </div>
 
-      {!newRecord && (
-        <div className="uk-margin">
-          <label className="uk-form-label"> Record Status </label>
-          <div className="uk-form-controls">
-            <select
-              className="uk-form-width-large uk-select"
-              value={recordStatus}
-              onChange={(e) => {
-                setRecordStatus(e.target.value)
-              }}
-            >
-              {props.recordStatus.map(({ id, name }) => (
-                <option key={id} value={name}>
-                  {' '}
-                  {name}{' '}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-      )}
-
       <div className="uk-form-width-large">
-        {newRecord && (
-          <div>
-            <input
-              className="uk-button uk-button-default uk-margin-top uk-margin-right"
-              type="button"
-              value="Save"
-            />
-            <input
-              className="uk-button uk-button-primary uk-margin-top"
-              type="submit"
-              value="Submit For Approval"
-            />
-          </div>
-        )}
-        {!newRecord && (
-          <input
-            className="uk-button uk-button-primary uk-margin-top"
-            type="submit"
-            value="Update Record"
-          />
-        )}
+        <input
+          className="uk-button uk-button-default uk-margin-top uk-margin-right"
+          onClick={handleSubmit}
+          type="button"
+          value="Save"
+        />
+        <input
+          className="uk-button uk-button-primary uk-margin-top"
+          onClick={handleSubmit('publish')}
+          type="button"
+          value="Save &amp; Publish"
+        />
       </div>
     </form>
   )
