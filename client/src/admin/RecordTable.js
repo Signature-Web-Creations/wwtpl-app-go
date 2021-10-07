@@ -10,7 +10,9 @@ function AdminListings(props) {
       <thead>
         <tr>
           <th className="uk-table-small"></th>
-          <th className="uk-table-small"></th>
+          {props.user !== undefined && props.user.role === 'admin' && (
+            <th className="uk-table-small"></th>
+          )}
           <th className="uk-width-small">Date</th>
           <th>Title</th>
           <th>Status</th>
@@ -18,7 +20,13 @@ function AdminListings(props) {
       </thead>
       <tbody>
         {props.records.map(({ id, date, title, recordStatus }) => (
-          <RecordRow id={id} key={id} date={date} title={title} status={recordStatus} />
+          <RecordRow
+            id={id}
+            key={id}
+            date={date}
+            title={title}
+            status={recordStatus}
+          />
         ))}
       </tbody>
     </table>

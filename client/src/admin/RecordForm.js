@@ -26,6 +26,7 @@ function RecordForm(props) {
   const [recordType, setRecordType] = useState('')
   const [sourceArchive, setSourceArchive] = useState('')
   const [collections, setCollections] = useState([])
+  const [recordStatus, setRecordStatus] = useState('')
 
   const newRecord = id === undefined
 
@@ -43,6 +44,7 @@ function RecordForm(props) {
     setRecordType('')
     setSourceArchive('')
     setCollections([])
+    setRecordStatus('')
   }
 
   // Form Validation
@@ -52,6 +54,7 @@ function RecordForm(props) {
     recordType: null,
     sourceArchive: null,
     collections: null,
+    recordStatus: null,
   })
 
   // Creates a helper function to clear validation errors
@@ -153,6 +156,7 @@ function RecordForm(props) {
           setAuthor(r.author)
           setRecordType(r.recordType)
           setSourceArchive(r.sourceArchive)
+          setRecordStatus(r.recordStatus)
 
           let c = []
           r.collections.split(';').forEach((col) => {
@@ -195,6 +199,7 @@ function RecordForm(props) {
         recordType: parseIntOrError(recordType),
         sourceArchive: parseIntOrError(sourceArchive),
         collections: collections.map(parseIntOrError),
+        recordStatus,
       }
 
       let request
@@ -242,9 +247,9 @@ function RecordForm(props) {
       )}
       <h1> {header} </h1>
 
-      <div class="uk-margin">
+      <div className="uk-margin">
         <label className="uk-form-label"> Title </label>
-        <div class="uk-form-controls">
+        <div className="uk-form-controls">
           <input
             className={
               'uk-form-width-large uk-input ' +
@@ -260,9 +265,9 @@ function RecordForm(props) {
         </div>
       </div>
 
-      <div class="uk-margin">
+      <div className="uk-margin">
         <label className="uk-form-label"> Content </label>
-        <div class="uk-form-controls">
+        <div className="uk-form-controls">
           <textarea
             className="uk-form-width-large uk-textarea"
             value={content}
@@ -273,9 +278,9 @@ function RecordForm(props) {
         </div>
       </div>
 
-      <div class="uk-margin">
+      <div className="uk-margin">
         <label className="uk-form-label"> Date </label>
-        <div class="uk-form-controls">
+        <div className="uk-form-controls">
           <input
             className={
               'uk-form-width-large uk-input ' +
@@ -291,9 +296,9 @@ function RecordForm(props) {
         </div>
       </div>
 
-      <div class="uk-margin">
+      <div className="uk-margin">
         <label className="uk-form-label"> Origin </label>
-        <div class="uk-form-controls">
+        <div className="uk-form-controls">
           <input
             className="uk-form-width-large uk-input"
             type="text"
@@ -305,9 +310,9 @@ function RecordForm(props) {
         </div>
       </div>
 
-      <div class="uk-margin">
+      <div className="uk-margin">
         <label className="uk-form-label"> Author </label>
-        <div class="uk-form-controls">
+        <div className="uk-form-controls">
           <input
             className="uk-form-width-large uk-input"
             type="text"
@@ -319,9 +324,9 @@ function RecordForm(props) {
         </div>
       </div>
 
-      <div class="uk-margin">
+      <div className="uk-margin">
         <label className="uk-form-label"> Record Type </label>
-        <div class="uk-form-controls">
+        <div className="uk-form-controls">
           <select
             className={
               'uk-form-width-large uk-select ' +
@@ -335,7 +340,7 @@ function RecordForm(props) {
           >
             <option value=""> No Record Type </option>
             {props.recordTypes.map(({ id, name }) => (
-              <option key={id} value={id}>
+              <option key={id} value={name}>
                 {' '}
                 {name}{' '}
               </option>
@@ -344,9 +349,9 @@ function RecordForm(props) {
         </div>
       </div>
 
-      <div class="uk-margin">
+      <div className="uk-margin">
         <label className="uk-form-label"> Source Archive </label>
-        <div class="uk-form-controls">
+        <div className="uk-form-controls">
           <select
             className={
               'uk-form-width-large uk-select ' +
@@ -360,7 +365,7 @@ function RecordForm(props) {
           >
             <option value=""> No Source Archive </option>
             {props.sourceArchives.map(({ id, name }) => (
-              <option key={id} value={id}>
+              <option key={id} value={name}>
                 {' '}
                 {name}{' '}
               </option>
@@ -369,7 +374,7 @@ function RecordForm(props) {
         </div>
       </div>
 
-      <div class="uk-margin">
+      <div className="uk-margin">
         <label className="uk-form-label"> Collections </label>
         <div className="uk-form-controls uk-form-controls-text">
           <div>
@@ -379,7 +384,7 @@ function RecordForm(props) {
           </div>
 
           <div className="uk-grid-small uk-child-width-1-2 uk-grid">
-            {props.collections.map(({ id, name }, index) => {
+            {props.collections.map(({ id, name }) => {
               return (
                 <label key={id}>
                   <input
@@ -402,11 +407,33 @@ function RecordForm(props) {
         </div>
       </div>
 
+      {!newRecord && (
+        <div className="uk-margin">
+          <label className="uk-form-label"> Record Status </label>
+          <div className="uk-form-controls">
+            <select
+              className="uk-form-width-large uk-select"
+              value={recordStatus}
+              onChange={(e) => {
+                setRecordStatus(e.target.value)
+              }}
+            >
+              {props.recordStatus.map(({ id, name }) => (
+                <option key={id} value={name}>
+                  {' '}
+                  {name}{' '}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      )}
+
       <div className="uk-form-width-large">
         <input
           className="uk-button uk-button-primary uk-margin-top"
           type="submit"
-          value="Add Record"
+          value={props.buttonText + ' Record'}
         />
       </div>
     </form>

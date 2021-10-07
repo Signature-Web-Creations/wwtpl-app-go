@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom'
 import { UrlFor } from '../routes.js'
+import { useAuth } from '../auth.js'
 
 function RecordRow(props) {
+  const auth = useAuth()
   const handleDeleteRecord = () => {
     // intiate delete record
   }
@@ -16,7 +18,7 @@ function RecordRow(props) {
     }
   }
 
-  const editUrl = UrlFor('editRecord', {id: props.id}) 
+  const editUrl = UrlFor('editRecord', { id: props.id })
 
   return (
     <tr>
@@ -27,13 +29,15 @@ function RecordRow(props) {
           uk-icon="file-edit"
         ></Link>
       </td>
-      <td>
-        <button
-          onClick={handleDeleteRecord}
-          className="uk-icon-link uk-margin-small-right"
-          uk-icon="trash"
-        ></button>
-      </td>
+      {auth.user.role === 'admin' && (
+        <td>
+          <button
+            onClick={handleDeleteRecord}
+            className="uk-icon-link uk-margin-small-right"
+            uk-icon="trash"
+          ></button>
+        </td>
+      )}
       <td>{props.date}</td>
       <td>{props.title}</td>
       <td>

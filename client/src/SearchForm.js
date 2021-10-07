@@ -32,10 +32,11 @@ export default function SearchForm(props) {
   const show = showAdvancedSearch ? 'show' : ''
   const advancedSearchClassName = `advancedSearchOptions uk-grid-small ${show}`
 
-  // If logged in
-  const advancedSearchOptionsClass = !props.isLoggedIn
-    ? 'uk-width-1-3@s'
-    : 'uk-width-1-4@s'
+  // If user is an admin
+  const advancedSearchOptionsClass =
+    props.user !== undefined && props.user.role !== 'editor'
+      ? 'uk-width-1-4@s'
+      : 'uk-width-1-3@s'
 
   return (
     <form
@@ -57,6 +58,7 @@ export default function SearchForm(props) {
             }}
           />
         </div>
+
         <div className="uk-width-1-3@s">
           <select
             className="uk-select"
@@ -74,6 +76,7 @@ export default function SearchForm(props) {
             ))}
           </select>
         </div>
+
         <div
           className="advancedSearchButton uk-width-auto@s uk-grid-small"
           uk-grid="true"
@@ -88,6 +91,7 @@ export default function SearchForm(props) {
               }}
             ></button>
           </div>
+
           <div className="uk-width-auto">
             <button
               className="uk-button uk-button-default"
@@ -99,6 +103,7 @@ export default function SearchForm(props) {
               }}
             ></button>
           </div>
+
           <div className="uk-width-auto">
             <button
               className="uk-button uk-button-primary searchButton"
@@ -128,6 +133,7 @@ export default function SearchForm(props) {
             ))}
           </select>
         </div>
+
         <div className={advancedSearchOptionsClass}>
           <select
             className="uk-select"
@@ -145,6 +151,7 @@ export default function SearchForm(props) {
             ))}
           </select>
         </div>
+
         <div className={advancedSearchOptionsClass}>
           <select
             className="uk-select"
@@ -162,7 +169,8 @@ export default function SearchForm(props) {
             ))}
           </select>
         </div>
-        {props.isLoggedIn && (
+
+        {props.user !== undefined && props.user.role !== 'editor' && (
           <div className={advancedSearchOptionsClass}>
             <select
               className="uk-select"

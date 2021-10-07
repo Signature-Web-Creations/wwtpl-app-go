@@ -86,7 +86,6 @@ export default function Dashboard() {
         setPages(pages)
         setYears(years)
         setStatus(status)
-        console.log('Collections: ', collections.collections)
         setCollections(collections.collections)
         setSourceArchives(sourceArchives)
         setRecordTypes(recordTypes)
@@ -97,21 +96,25 @@ export default function Dashboard() {
 
   return (
     <>
-      <Link
-        to={UrlFor('addUser')}
-        className="uk-button uk-button-primary uk-margin-right"
-      >
-        {' '}
-        Add New User{' '}
-      </Link>
+      {auth.user.role === 'admin' && (
+        <Link
+          to={UrlFor('addUser')}
+          className="uk-button uk-button-primary uk-margin-right"
+        >
+          {' '}
+          Add New User{' '}
+        </Link>
+      )}
 
-      <Link
-        to={UrlFor('showUsers')}
-        className="uk-button uk-button-default uk-margin-right"
-      >
-        {' '}
-        Manage Users{' '}
-      </Link>
+      {auth.user.role === 'admin' && (
+        <Link
+          to={UrlFor('showUsers')}
+          className="uk-button uk-button-default uk-margin-right"
+        >
+          {' '}
+          Manage Users{' '}
+        </Link>
+      )}
 
       <Link to={UrlFor('newRecord')} className="uk-button uk-button-default">
         {' '}
@@ -124,7 +127,7 @@ export default function Dashboard() {
         collections={collections}
         sourceArchives={sourceArchives}
         status={recordStatus}
-        isLoggedIn={auth.user}
+        user={auth.user}
         onSubmit={handleSearch}
       />
       <PaginationButtons currentPage={!offset ? 0 : offset} pages={pages} />
@@ -133,7 +136,7 @@ export default function Dashboard() {
        * List of pending records by default
        * Needs to include a records status in the records
        */}
-      <AdminListings searched={searched} records={records} />
+      <AdminListings searched={searched} records={records} user={auth.user} />
     </>
   )
 }
