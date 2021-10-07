@@ -130,7 +130,11 @@ export default function Dashboard() {
         user={auth.user}
         onSubmit={handleSearch}
       />
-      <PaginationButtons currentPage={!offset ? 0 : offset} pages={pages} />
+      <PaginationButtons
+        currentPage={!offset ? 0 : offset}
+        pages={pages}
+        type="admin"
+      />
 
       {/*
        * List of pending records by default
