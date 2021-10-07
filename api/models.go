@@ -13,6 +13,7 @@ type HistoryRecord struct {
 	RecordType     *string `json:"recordType"`
 	Collections    *string `json:"collections"`
 	RecordStatus   *string `json:"recordStatus"`
+	RecordStatusID int64 `json:"recordStatusId"`
 }
 
 type RecordType struct {

@@ -31,6 +31,7 @@ func init() {
     file_name,
     record_type.name,
 		record_status.name,
+		record_status.id,
     (SELECT GROUP_CONCAT(collection.name, ';')
      FROM history_record hr
      LEFT OUTER JOIN record_collections ON hr.id = record_collections.record_id
@@ -126,6 +127,7 @@ func queryRecord(functionName string, query sq.SelectBuilder) (HistoryRecord, er
 		&record.FileName,
 		&record.RecordType,
 		&record.RecordStatus,
+		&record.RecordStatusID,
 		&record.Collections,
 	)
 
