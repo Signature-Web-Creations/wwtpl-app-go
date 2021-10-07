@@ -467,3 +467,40 @@ func SaveRecord(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"success": "Successfully created record"})
 }
+
+type RecordStatusID struct {
+	ID int64 `json:"recordStatusId"`  
+}
+
+func ChangeRecordStatus(c *gin.Context) {
+	var json RecordStatusID
+	var err error
+
+	user, ok := getAuthenticatedUser(c)
+	if !ok || user.Role == "editor" {
+		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "User is not authorized"})
+		return
+	}
+
+
+	recordID, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err = c.ShouldBindJSON(&json); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+
+	err = ChangeStatus(recordID, json.ID) 
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Couldn't process request. Try again later"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"success": "Successfully changed status"})
+	return 
+}

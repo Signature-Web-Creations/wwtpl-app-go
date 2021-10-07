@@ -679,9 +679,9 @@ func InsertRecord(user User, record HistoryRecordJSON) error {
 
 	result, err := tx.Exec(`
 	 INSERT INTO history_record
-	 (title, content, date, origin, author, record_type_id, source_archive_id, entered_by, created_by)
+	 (title, content, date, origin, author, record_type_id, source_archive_id, entered_by, created_by, date_entered
 	 VALUES
-	 (?, ?, ?, ?, ?, ?, ?, ?, ?)
+	 (?, ?, ?, ?, ?, ?, ?, ?, ?, DATE('now'))
 	 `, record.Title, record.Content, date, record.Origin, record.Author, record.RecordTypeId,
 		record.SourceArchiveId, user.FirstName+" "+user.LastName, user.ID,
 	)
@@ -713,5 +713,16 @@ func InsertRecord(user User, record HistoryRecordJSON) error {
 	}
 
 	tx.Commit()
+	return nil
+} 
+
+func ChangeStatus(recordID int64, recordStatusID int64) error {
+	query := sq.Update("history_record").Set("record_status", recordStatusID)
+	query = query.Where("id = ?", recordID)
+	_, err := query.RunWith(db).Exec()
+
+	if err != nil {
+		return fmt.Errorf("ChangeStatus: %v", err)
+	}
 	return nil
 }

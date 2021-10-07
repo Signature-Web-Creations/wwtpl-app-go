@@ -31,6 +31,7 @@ func initRouter() *gin.Engine {
 	router.GET("/api/records/", GetListingInformation)
 	router.GET("/api/records/:id", RecordDetail)
 	router.POST("/api/records", SaveRecord)
+	router.POST("/api/records/status/:id", ChangeRecordStatus) 
 
 	return router
 }
