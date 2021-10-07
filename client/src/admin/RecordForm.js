@@ -430,11 +430,27 @@ function RecordForm(props) {
       )}
 
       <div className="uk-form-width-large">
-        <input
-          className="uk-button uk-button-primary uk-margin-top"
-          type="submit"
-          value={props.buttonText + ' Record'}
-        />
+        {newRecord && (
+          <div>
+            <input
+              className="uk-button uk-button-default uk-margin-top uk-margin-right"
+              type="button"
+              value="Save"
+            />
+            <input
+              className="uk-button uk-button-primary uk-margin-top"
+              type="submit"
+              value="Submit For Approval"
+            />
+          </div>
+        )}
+        {!newRecord && (
+          <input
+            className="uk-button uk-button-primary uk-margin-top"
+            type="submit"
+            value="Update Record"
+          />
+        )}
       </div>
     </form>
   )
