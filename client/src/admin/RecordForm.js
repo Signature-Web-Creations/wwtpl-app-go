@@ -154,7 +154,7 @@ function RecordForm(props) {
           setAuthor(r.author)
           setRecordType(r.recordType)
           setSourceArchive(r.sourceArchive)
-          setRecordStatus(r.recordStatus)
+          setRecordStatus(r.recordStatusId)
 
           let c = []
           r.collections.split(';').forEach((col) => {
@@ -184,7 +184,7 @@ function RecordForm(props) {
     return n
   }
 
-  const handleSubmit = (str) => {
+  const handleSubmit = (number) => {
     if (validateForm()) {
       const record = {
         title: title.trim(),
@@ -195,7 +195,7 @@ function RecordForm(props) {
         recordType: parseIntOrError(recordType),
         sourceArchive: parseIntOrError(sourceArchive),
         collections: collections.map(parseIntOrError),
-        recordStatus: str && str === 'publish' ? 'publish' : recordStatus,
+        recordStatus: number ? number : recordStatus,
       }
 
       let request
@@ -416,12 +416,22 @@ function RecordForm(props) {
           type="button"
           value="Save"
         />
-        <input
-          className="uk-button uk-button-primary uk-margin-top"
-          onClick={handleSubmit('publish')}
-          type="button"
-          value="Save &amp; Publish"
-        />
+        {(recordStatus === 2 || recordStatus === 4) && (
+          <input
+            className="uk-button uk-button-primary uk-margin-top"
+            onClick={handleSubmit(3)}
+            type="button"
+            value="Save &amp; Publish"
+          />
+        )}
+        {recordStatus === 1 && (
+          <input
+            className="uk-button uk-button-primary uk-margin-top"
+            onClick={handleSubmit(2)}
+            type="button"
+            value="Submit for Approval"
+          />
+        )}
       </div>
     </form>
   )
