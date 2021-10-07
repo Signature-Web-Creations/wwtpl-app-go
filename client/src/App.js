@@ -67,7 +67,7 @@ function App() {
       searchSourceArchive,
       searchRecordType,
     }
-    getPublicListingData(params).then(({ records, pages, years, status }) => {
+    getPublicListingData(params).then(({ records, pages, years }) => {
       setRecords(records)
       setPages(pages)
       setYears(years)
