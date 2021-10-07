@@ -179,7 +179,7 @@ func queryRecords(functionName string, query sq.SelectBuilder) ([]HistoryRecord,
 	return records, nil
 }
 
-// Returns listings for an editor 
+// Returns listings for an editor
 // It should only include records that were created by the editor
 // and have a record status of 1 (saved but not submitted)
 func EditorListings(user User, params map[string]interface{}) ([]HistoryRecord, int, error) {
@@ -188,7 +188,7 @@ func EditorListings(user User, params map[string]interface{}) ([]HistoryRecord, 
 	query = query.Where(sq.Eq{"record_status_id": 1})
 	query = query.Where(sq.Eq{"deleted_at": nil})
 	query = query.OrderBy("date(history_record.date)").OrderBy("history_record.title")
-	query = addFilters(query, params) 
+	query = addFilters(query, params)
 	query = query.Limit(uint64(recordsPerPage))
 	query = query.Offset(uint64(params["offset"].(int)) * recordsPerPage)
 
@@ -209,7 +209,7 @@ func EditorListings(user User, params map[string]interface{}) ([]HistoryRecord, 
 	return records, pages, nil
 }
 
-// Returns listings for a publisher 
+// Returns listings for a publisher
 func PublisherListings(user User, params map[string]interface{}) ([]HistoryRecord, int, error) {
 	query := historyRecords
 	query = addFilters(query, params)
@@ -218,6 +218,8 @@ func PublisherListings(user User, params map[string]interface{}) ([]HistoryRecor
 		sq.Or{
 			sq.Eq{"record_status_id": 1, "created_by": user.ID}, // Saved and created by the publisher
 			sq.Eq{"record_status_id": 2}, // Created and pending approval
+			sq.Eq{"record_status_id": 3}, // Created and published
+			sq.Eq{"record_status_id": 4}, // Created and unpublished
 		},
 	)
 
@@ -230,7 +232,7 @@ func PublisherListings(user User, params map[string]interface{}) ([]HistoryRecor
 		return nil, 0, err
 	}
 
-	
+
 	query = sq.Select("COUNT(*)").From("history_record")
 	query = addFilters(query, params)
 	query = query.Where(sq.Eq{"deleted_at": nil})
@@ -238,6 +240,8 @@ func PublisherListings(user User, params map[string]interface{}) ([]HistoryRecor
 		sq.Or{
 			sq.Eq{"record_status_id": 1, "created_by": user.ID}, // Saved and created by the publisher
 			sq.Eq{"record_status_id": 2}, // Created and pending approval
+			sq.Eq{"record_status_id": 3}, // Created and published
+			sq.Eq{"record_status_id": 4}, // Created and unpublished
 		},
 	)
 	pages, err := runCountQuery(query)
@@ -271,7 +275,7 @@ func AdminListings(params map[string]interface{}) ([]HistoryRecord, int, error) 
 }
 
 
-// Returns published history records that are not deleted. 
+// Returns published history records that are not deleted.
 // filters the result based on given parameters
 func PublishedHistoryRecords(params map[string]interface{}) ([]HistoryRecord, error) {
 	query := addFilters(PublishedRecords(), params)
@@ -346,7 +350,7 @@ func CountPages(params map[string]interface{}) (int, error) {
 }
 
 
-// Counts records that are published not deleted and 
+// Counts records that are published not deleted and
 // are not filtered by given params
 func CountPublishedPages(params map[string]interface{}) (int, error) {
 	query := sq.Select("COUNT(*)").From("history_record")
@@ -691,7 +695,7 @@ func InsertRecord(user User, record HistoryRecordJSON) error {
 	fmt.Printf("RecordId: %d\n", recordId)
 
 	query := sq.Insert("record_collections")
-	query = query.Columns("record_id", "collection_id") 
+	query = query.Columns("record_id", "collection_id")
 	for _, collectionId := range record.Collections {
 		query = query.Values(recordId, collectionId)
 	}
@@ -702,7 +706,7 @@ func InsertRecord(user User, record HistoryRecordJSON) error {
 		return fmt.Errorf("Error creating query for collections: %v", err)
 	}
 
-	_, err = tx.Exec(sql, arguments...) 
+	_, err = tx.Exec(sql, arguments...)
 	if err != nil {
 		tx.Rollback()
 		return fmt.Errorf("Error inserting collections: %v", err)
