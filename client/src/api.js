@@ -182,6 +182,20 @@ export async function saveRecord(record) {
   return response.json()
 }
 
+export async function updateRecord(record) {
+  const response = await fetch(`/api/records/${record.id}`, {
+    method: 'POST',
+    mode: 'same-origin',
+    cache: 'no-cache',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(record),
+  })
+  return response.json()
+}
+
 export async function changeRecordStatus(recordId, recordStatusId) {
   const response = await fetch(`/api/records/status/${recordId}`, {
     method: 'POST',
