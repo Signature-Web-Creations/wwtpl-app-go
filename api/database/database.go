@@ -644,11 +644,11 @@ func InsertRecord(user models.User, record models.HistoryRecordJSON) error {
 	fmt.Println(record.Date)
 	result, err := tx.Exec(`
 	 INSERT INTO history_record
-	 (title, content, date, origin, author, record_type_id, source_archive_id, entered_by, created_by, date_entered)
+	 (title, content, date, origin, author, record_type_id, source_archive_id, entered_by, created_by, date_entered, record_status_id)
 	 VALUES
-	 (?, ?, ?, ?, ?, ?, ?, ?, ?, DATE('now'))
+	 (?, ?, ?, ?, ?, ?, ?, ?, ?, DATE('now'), ?)
 	 `, record.Title, record.Content, record.Date, record.Origin, record.Author, record.RecordTypeId,
-		record.SourceArchiveId, user.FirstName+" "+user.LastName, user.ID,
+		record.SourceArchiveId, user.FirstName+" "+user.LastName, user.ID, record.RecordStatusID,
 	)
 
 	if err != nil {

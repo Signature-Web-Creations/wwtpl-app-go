@@ -410,7 +410,7 @@ function RecordForm(props) {
           type="button"
           value="Save"
         />
-        {recordStatus !== IN_PROGRESS && (
+        {(!newRecord && recordStatus !== IN_PROGRESS) && (
           <input
             className="uk-button uk-button-primary uk-margin-top"
             onClick={() => {
@@ -420,7 +420,7 @@ function RecordForm(props) {
             value="Save &amp; Publish"
           />
         )}
-        {recordStatus === IN_PROGRESS && (
+        {(newRecord || recordStatus === IN_PROGRESS) && (
           <input
             className="uk-button uk-button-primary uk-margin-top"
             onClick={() => {
