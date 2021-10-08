@@ -26,6 +26,7 @@ func init() {
     history_record.content,
     history_record.origin,
     history_record.author,
+		source_archive.id,
     source_archive.name,
     attachment_type_name,
     file_name,
@@ -109,12 +110,11 @@ func addFilters(query sq.SelectBuilder, params map[string]interface{}) sq.Select
 	return query
 }
 
-// Executes query either returning a single HistoryRecord or an error
-// functionName is given for error reporting
-func queryRecord(functionName string, query sq.SelectBuilder) (models.HistoryRecord, error) {
+func rowToRecord(row sq.RowScanner) (models.HistoryRecord, error) {
 	var record models.HistoryRecord
-	row := query.RunWith(db).QueryRow()
 
+	var sourceArchiveID *int64
+	var sourceArchive *string
 	err := row.Scan(
 		&record.ID,
 		&record.Date,
@@ -122,7 +122,8 @@ func queryRecord(functionName string, query sq.SelectBuilder) (models.HistoryRec
 		&record.Content,
 		&record.Origin,
 		&record.Author,
-		&record.SourceArchive,
+		&sourceArchiveID,
+		&sourceArchive,
 		&record.AttachmentType,
 		&record.FileName,
 		&record.RecordType,
@@ -132,12 +133,21 @@ func queryRecord(functionName string, query sq.SelectBuilder) (models.HistoryRec
 	)
 
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return record, fmt.Errorf("%s: no such record", functionName)
+		return record, fmt.Errorf("%rowToRecord: %v", err)
+	}
+
+	if sourceArchiveID != nil {
+		record.SourceArchive = &models.SourceArchive{
+			ID: *sourceArchiveID,
+			Name: *sourceArchive,
 		}
-		return record, fmt.Errorf("%s: %v", functionName, err)
 	}
 	return record, nil
+}
+// Executes query either returning a single HistoryRecord or an error
+// functionName is given for error reporting
+func queryRecord(functionName string, query sq.SelectBuilder) (models.HistoryRecord, error) {
+	return rowToRecord(query.RunWith(db).QueryRow())
 }
 
 // Executes query either returning a slice of HistoryRecords or an error
@@ -153,22 +163,7 @@ func queryRecords(functionName string, query sq.SelectBuilder) ([]models.History
 	defer rows.Close()
 
 	for rows.Next() {
-		var record models.HistoryRecord
-		err := rows.Scan(
-			&record.ID,
-			&record.Date,
-			&record.Title,
-			&record.Content,
-			&record.Origin,
-			&record.Author,
-			&record.SourceArchive,
-			&record.AttachmentType,
-			&record.FileName,
-			&record.RecordType,
-			&record.RecordStatus,
-			&record.RecordStatusID,
-			&record.Collections,
-		)
+		record, err := rowToRecord(rows)
 		if err != nil {
 			return nil, fmt.Errorf("%s: %v", functionName, err)
 		}

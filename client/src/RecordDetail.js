@@ -134,7 +134,7 @@ function SourceArchiveRow(props) {
           Source Archive
         </strong>
       </td>
-      <td>{getValueOrDefault(props.sourceArchive, "Unknown")}</td>
+      <td>{getValueOrDefault(props.sourceArchive.name, "Unknown")}</td>
     </tr>
   );
 }

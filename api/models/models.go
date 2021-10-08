@@ -22,7 +22,7 @@ type HistoryRecord struct {
 	Content        string  `json:"content"`
 	Origin         string  `json:"origin"`
 	Author         string  `json:"author"`
-	SourceArchive  *string `json:"sourceArchive"`
+	SourceArchive  *SourceArchive `json:"sourceArchive"`
 	AttachmentType *string `json:"attachmentType"`
 	FileName       *string `json:"fileName"`
 	RecordType     *string `json:"recordType"`
