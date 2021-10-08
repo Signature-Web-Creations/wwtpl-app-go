@@ -33,6 +33,7 @@ func Create() *gin.Engine {
 	router.GET("/api/records/", controllers.GetListingInformation)
 	router.GET("/api/records/:id", controllers.RecordDetail)
 	router.POST("/api/records", controllers.SaveRecord)
+	router.POST("/api/records/:id", controllers.UpdateRecord)
 	router.POST("/api/records/status/:id", controllers.ChangeRecordStatus) 
 
 	return router

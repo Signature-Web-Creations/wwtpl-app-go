@@ -41,7 +41,7 @@ function RecordRow(props) {
       <td>{props.date}</td>
       <td>{props.title}</td>
       <td>
-        <span className={handleStatusColor(props.status)}>{props.status}</span>
+        <span className={handleStatusColor(props.status.name)}>{props.status.name}</span>
       </td>
     </tr>
   )

@@ -29,7 +29,6 @@ export default function Dashboard() {
   const [records, setRecords] = useState(null)
   const [years, setYears] = useState([])
   const [pages, setPages] = useState(null)
-  const [status, setStatus] = useState(null)
   const [recordTypes, setRecordTypes] = useState([])
   const [collections, setCollections] = useState([])
   const [sourceArchives, setSourceArchives] = useState([])
@@ -56,26 +55,20 @@ export default function Dashboard() {
       searchRecordType,
       searchStatus,
     }
-    getListingData(params).then(({ records, pages, years, status }) => {
+    getListingData(params).then(({ records, pages, years}) => {
       setRecords(records)
       setPages(pages)
       setYears(years)
-      setStatus(status)
       setSearched(true)
     })
   }
 
   useEffect(() => {
-    // Ran into an issue where it was attempting to get listing
-    // data even when the user was not logged in. It would
-    // subsequently crash when the promise failed to resolve.
-    // Added the line below so that it doesn't even try it.
     getListingData({ offset }).then(
       ({
         records,
         pages,
         years,
-        status,
         collections,
         sourceArchives,
         recordTypes,
@@ -84,7 +77,6 @@ export default function Dashboard() {
         setRecords(records)
         setPages(pages)
         setYears(years)
-        setStatus(status)
         setCollections(collections.collections)
         setSourceArchives(sourceArchives)
         setRecordTypes(recordTypes)

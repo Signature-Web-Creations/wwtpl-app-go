@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
-import { getRecordByID, saveRecord, changeRecordStatus } from '../api'
+import { getRecordByID, saveRecord, updateRecord, changeRecordStatus } from '../api'
 
 import MessageBox from '../MessageBox'
 
@@ -108,12 +108,12 @@ function RecordForm(props) {
     errors.date = validateDate()
     valid = valid && errors.date === null
 
-    if (blank(recordType)) {
+    if (recordType === "") {
       errors.recordType = 'You need to select a record type'
       valid = false
     }
 
-    if (blank(sourceArchive)) {
+    if (sourceArchive === "") {
       errors.sourceArchive = 'You need to select a source archive'
       valid = false
     }
@@ -137,13 +137,13 @@ function RecordForm(props) {
           setDate(r.date)
           setOrigin(r.origin)
           setAuthor(r.author)
-          setRecordType(r.recordType)
-          setSourceArchive(r.sourceArchive)
+          setRecordType(r.recordType.id)
+          setSourceArchive(r.sourceArchive.id)
           if (r.recordStatusId === PUBLISHED) {
             changeRecordStatus(id, UNPUBLISHED)
             setRecordStatus(UNPUBLISHED)
           } else {
-            setRecordStatus(r.recordStatusId)
+            setRecordStatus(r.recordStatus.id)
           }
 
           let c = []
@@ -176,7 +176,7 @@ function RecordForm(props) {
 
   const handleSubmit = (recordStatusId) => {
     if (validateForm()) {
-      const record = {
+      const formData = {
         title: title.trim(),
         content: content.trim(),
         date: date.trim(),
@@ -188,26 +188,25 @@ function RecordForm(props) {
         recordStatus: recordStatusId === undefined ? IN_PROGRESS : recordStatusId,
       }
 
-      console.log('Handle Submit Record: ', recordStatus)
-
-      let request
-
       if (newRecord) {
-        request = saveRecord(record)
+        saveRecord(formData).then((data) => {
+          if (data.error) {
+            setMessage({ message: data.error, type: 'error' })
+          } else {
+            clearForm()
+            setMessage({ message: data.success, type: 'success' })
+          }
+        })
       } else {
-        // Thinking about having a separate function or endpoint 
-        // for updating a record
-        request = saveRecord(Object.assign(record, { id }))
+        updateRecord(parseIntOrError(id), formData).then((data) => {
+          if (data.error) {
+            setMessage({message: data.error, type: 'error' })
+          } else {
+            setMessage({ message: data.success, type: 'success' })
+          }
+        })
       }
 
-      request.then((data) => {
-        if (data.error) {
-          setMessage({ message: data.error, type: 'error' })
-        } else {
-          clearForm()
-          setMessage({ message: data.success, type: 'success' })
-        }
-      })
     } else {
       setMessage({
         message: 'Please fill out required fields correctly',

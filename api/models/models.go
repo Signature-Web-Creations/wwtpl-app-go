@@ -9,8 +9,8 @@ type HistoryRecordJSON struct {
 	Author          string  `json:"author"`
 	AttachmentType  *string `json:"attachmentType"`
 	FileName        *string `json:"fileName"`
-	RecordTypeId    int64   `json:"recordType"`
-	SourceArchiveId int64   `json:"sourceArchive"`
+	RecordTypeID    int64   `json:"recordType"`
+	SourceArchiveID int64   `json:"sourceArchive"`
 	Collections     []int64 `json:"collections"`
 	RecordStatusID  int64   `json:"recordStatus"`
 }

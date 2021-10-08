@@ -659,14 +659,13 @@ func InsertRecord(user models.User, record models.HistoryRecordJSON) error {
 
 	tx, err := db.Begin()
 
-	fmt.Println(record.Date)
 	result, err := tx.Exec(`
 	 INSERT INTO history_record
 	 (title, content, date, origin, author, record_type_id, source_archive_id, entered_by, created_by, date_entered, record_status_id)
 	 VALUES
 	 (?, ?, ?, ?, ?, ?, ?, ?, ?, DATE('now'), ?)
-	 `, record.Title, record.Content, record.Date, record.Origin, record.Author, record.RecordTypeId,
-		record.SourceArchiveId, user.FirstName+" "+user.LastName, user.ID, record.RecordStatusID,
+	 `, record.Title, record.Content, record.Date, record.Origin, record.Author, record.RecordTypeID,
+		record.SourceArchiveID, user.FirstName+" "+user.LastName, user.ID, record.RecordStatusID,
 	)
 
 	if err != nil {
@@ -695,6 +694,68 @@ func InsertRecord(user models.User, record models.HistoryRecordJSON) error {
 		return fmt.Errorf("Error inserting collections: %v", err)
 	}
 
+	tx.Commit()
+	return nil
+}
+
+func UpdateRecord(recordId int64, record models.HistoryRecordJSON) error {
+	tx, err := db.Begin()
+
+	_, err = tx.Exec(`
+	 DELETE FROM record_collections
+	 WHERE record_id = ?
+	`, recordId)
+
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("Error deleting record_collections: %v", err)
+	}
+
+	query := sq.Insert("record_collections")
+	query = query.Columns("record_id", "collection_id")
+	for _, collectionId := range record.Collections {
+		query = query.Values(recordId, collectionId)
+	}
+
+	sql, arguments, err := query.ToSql()
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("Error creating query for collections: %v", err)
+	}
+
+	fmt.Println("Inserted record collections")
+
+	_, err = tx.Exec(sql, arguments...)
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("Error inserting collections: %v", err)
+	}
+
+	updateQuery := sq.Update("history_record").Where("id = ?", recordId)
+
+	updateQuery = updateQuery.Set("title", record.Title)
+	updateQuery = updateQuery.Set("date", record.Date)
+	updateQuery = updateQuery.Set("content", record.Content)
+	updateQuery = updateQuery.Set("origin", record.Origin)
+	updateQuery = updateQuery.Set("author", record.Author)
+	updateQuery = updateQuery.Set("record_type_id", record.RecordTypeID)
+	updateQuery = updateQuery.Set("source_archive_id", record.SourceArchiveID)
+	updateQuery = updateQuery.Set("record_status_id", record.RecordStatusID)
+
+	fmt.Println("Updated history record")
+	sql, arguments, err = query.ToSql()
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("Error creating update query: %v", err)
+	}
+
+	_, err = tx.Exec(sql, arguments...)
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("Error updating history record: %v", err)
+	}
+
+	fmt.Println("Commiting changes")
 	tx.Commit()
 	return nil
 }
