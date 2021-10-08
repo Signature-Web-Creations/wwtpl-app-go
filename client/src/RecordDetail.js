@@ -121,7 +121,7 @@ function RecordTypeRow(props) {
           Type
         </strong>
       </td>
-      <td>{getValueOrDefault(props.recordType, "Unknown")}</td>
+      <td>{getValueOrDefault(props.recordType.name, "Unknown")}</td>
     </tr>
   );
 }

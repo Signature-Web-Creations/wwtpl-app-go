@@ -12,23 +12,22 @@ type HistoryRecordJSON struct {
 	RecordTypeId    int64   `json:"recordType"`
 	SourceArchiveId int64   `json:"sourceArchive"`
 	Collections     []int64 `json:"collections"`
-	RecordStatusID  int64 	`json:"recordStatus"`
+	RecordStatusID  int64   `json:"recordStatus"`
 }
 
 type HistoryRecord struct {
-	ID             int64   `json:"id"`
-	Date           string  `json:"date"`
-	Title          string  `json:"title"`
-	Content        string  `json:"content"`
-	Origin         string  `json:"origin"`
-	Author         string  `json:"author"`
+	ID             int64          `json:"id"`
+	Date           string         `json:"date"`
+	Title          string         `json:"title"`
+	Content        string         `json:"content"`
+	Origin         string         `json:"origin"`
+	Author         string         `json:"author"`
 	SourceArchive  *SourceArchive `json:"sourceArchive"`
-	AttachmentType *string `json:"attachmentType"`
-	FileName       *string `json:"fileName"`
-	RecordType     *string `json:"recordType"`
-	Collections    *string `json:"collections"`
-	RecordStatus   *string `json:"recordStatus"`
-	RecordStatusID int64 `json:"recordStatusId"`
+	AttachmentType *string        `json:"attachmentType"`
+	FileName       *string        `json:"fileName"`
+	RecordType     *RecordType    `json:"recordType"`
+	Collections    *string        `json:"collections"`
+	RecordStatus   *RecordStatus  `json:"recordStatus"`
 }
 
 type RecordType struct {
@@ -86,6 +85,6 @@ type NewUser struct {
 
 func (u User) Authorized(userLevel int) bool {
 	return (u.Role == "editor" && userLevel == 1) ||
-				 (u.Role == "publisher" && userLevel <= 2) ||
-				 (u.Role == "admin")
+		(u.Role == "publisher" && userLevel <= 2) ||
+		(u.Role == "admin")
 }

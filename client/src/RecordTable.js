@@ -22,7 +22,7 @@ function PublicListings(props) {
             key={id}
             date={date}
             title={title}
-            type={recordType}
+            type={recordType.name}
           />
         ))}
       </tbody>

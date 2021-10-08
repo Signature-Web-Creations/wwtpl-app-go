@@ -30,9 +30,10 @@ func init() {
     source_archive.name,
     attachment_type_name,
     file_name,
+		record_type.id,
     record_type.name,
-		record_status.name,
 		record_status.id,
+		record_status.name,
     (SELECT GROUP_CONCAT(collection.name, ';')
      FROM history_record hr
      LEFT OUTER JOIN record_collections ON hr.id = record_collections.record_id
@@ -115,6 +116,13 @@ func rowToRecord(row sq.RowScanner) (models.HistoryRecord, error) {
 
 	var sourceArchiveID *int64
 	var sourceArchive *string
+
+	var recordTypeID *int64
+	var recordType *string
+
+	var recordStatusID *int64
+	var recordStatus *string 
+
 	err := row.Scan(
 		&record.ID,
 		&record.Date,
@@ -126,9 +134,10 @@ func rowToRecord(row sq.RowScanner) (models.HistoryRecord, error) {
 		&sourceArchive,
 		&record.AttachmentType,
 		&record.FileName,
-		&record.RecordType,
-		&record.RecordStatus,
-		&record.RecordStatusID,
+		&recordTypeID,
+		&recordType,
+		&recordStatusID,
+		&recordStatus,
 		&record.Collections,
 	)
 
@@ -140,6 +149,20 @@ func rowToRecord(row sq.RowScanner) (models.HistoryRecord, error) {
 		record.SourceArchive = &models.SourceArchive{
 			ID: *sourceArchiveID,
 			Name: *sourceArchive,
+		}
+	}
+
+	if recordStatusID != nil {
+		record.RecordStatus = &models.RecordStatus{
+			ID: *recordStatusID,
+			Name: *recordStatus,
+		}
+	}
+
+	if recordTypeID != nil {
+		record.RecordType = &models.RecordType{
+			ID: *recordTypeID, 
+			Name: *recordType,
 		}
 	}
 	return record, nil
