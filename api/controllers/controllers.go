@@ -1,4 +1,4 @@
-package main
+package controllers
 
 import (
 	"fmt"
@@ -6,6 +6,8 @@ import (
 	"strconv"
 	"time"
 
+	"example.com/wwtl-app/models"
+	db "example.com/wwtl-app/database"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
@@ -19,7 +21,7 @@ func PublicRecordDetail(c *gin.Context) {
 		return
 	}
 
-	record, err := HistoryRecordByID(id)
+	record, err := db.HistoryRecordByID(id)
 	if err != nil {
 		fmt.Printf("Error: %v", err)
 		c.IndentedJSON(http.StatusOK, record)
@@ -54,7 +56,7 @@ func RecordDetail(c *gin.Context) {
 		return
 	}
 
-	record, err := GetRecordDetail(id)
+	record, err := db.GetRecordDetail(id)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internval server error"})
@@ -103,15 +105,15 @@ func GetListingInformation(c *gin.Context) {
 	results := make(map[string]interface{})
 	params := getQueryParams(c)
 
-	var records []HistoryRecord
+	var records []models.HistoryRecord
 	var pages int 
 	switch user.Role {
 		case "editor": 
-			records, pages, err = EditorListings(user, params)
+			records, pages, err = db.EditorListings(user, params)
 		case "publisher": 
-			records, pages, err = PublisherListings(user, params)
+			records, pages, err = db.PublisherListings(user, params)
 		case "admin": 
-			records, pages, err = AdminListings(params)
+			records, pages, err = db.AdminListings(params)
 		default:
 			c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "An internal service error has occured."})
 			fmt.Printf("GetListingInformation: unknown user role: '%s'\n", user.Role)
@@ -127,7 +129,7 @@ func GetListingInformation(c *gin.Context) {
 	results["records"] = records
 	results["pages"] = pages
 
-	years, err := GetYears()
+	years, err := db.GetYears()
 	if err != nil {
 		fmt.Printf("Error: %v", err)
 		c.IndentedJSON(http.StatusOK, nil)
@@ -135,7 +137,7 @@ func GetListingInformation(c *gin.Context) {
 	}
 	results["years"] = years
 
-	collections, err := GetCollections()
+	collections, err := db.GetCollections()
 	if err != nil {
 		fmt.Printf("Error: %v", err)
 		c.IndentedJSON(http.StatusOK, nil)
@@ -143,7 +145,7 @@ func GetListingInformation(c *gin.Context) {
 	} 
 	results["collections"] = collections
 
-	sourceArchives, err := GetSourceArchives()
+	sourceArchives, err := db.GetSourceArchives()
 	if err != nil {
 		fmt.Printf("Error: %v", err)
 		c.IndentedJSON(http.StatusOK, nil)
@@ -152,7 +154,7 @@ func GetListingInformation(c *gin.Context) {
 	}
 	results["sourceArchives"] = sourceArchives
 
-	recordTypes, err := GetRecordTypes()
+	recordTypes, err := db.GetRecordTypes()
 	if err != nil {
 		fmt.Printf("Error: %v", err)
 		c.IndentedJSON(http.StatusOK, nil)
@@ -160,7 +162,7 @@ func GetListingInformation(c *gin.Context) {
 	}
 	results["recordTypes"] = recordTypes
 
-	recordStatus, err := GetRecordStatuses()
+	recordStatus, err := db.GetRecordStatuses()
 	if err != nil {
 		fmt.Printf("Error: %v", err)
 		c.IndentedJSON(http.StatusOK, nil)
@@ -178,7 +180,7 @@ func GetListingInformation(c *gin.Context) {
 func GetPublicListings(c *gin.Context) {
 	params := getQueryParams(c)
 
-	records, err := PublishedHistoryRecords(params)
+	records, err := db.PublishedHistoryRecords(params)
 	results := make(map[string]interface{})
 
 	if err != nil {
@@ -189,7 +191,7 @@ func GetPublicListings(c *gin.Context) {
 
 	results["records"] = records
 
-	pages, err := CountPublishedPages(params)
+	pages, err := db.CountPublishedPages(params)
 	if err != nil {
 		fmt.Printf("Error: %v", err)
 		c.IndentedJSON(http.StatusOK, nil)
@@ -197,7 +199,7 @@ func GetPublicListings(c *gin.Context) {
 	} 
 	results["pages"] = pages
 
-	years, err := GetYears()
+	years, err := db.GetYears()
 	if err != nil {
 		fmt.Printf("Error: %v", err)
 		c.IndentedJSON(http.StatusOK, nil)
@@ -205,7 +207,7 @@ func GetPublicListings(c *gin.Context) {
 	}
 	results["years"] = years
 
-	collections, err := GetCollections()
+	collections, err := db.GetCollections()
 	if err != nil {
 		fmt.Printf("Error: %v", err)
 		c.IndentedJSON(http.StatusOK, nil)
@@ -213,7 +215,7 @@ func GetPublicListings(c *gin.Context) {
 	} 
 	results["collections"] = collections
 
-	sourceArchives, err := GetSourceArchives()
+	sourceArchives, err := db.GetSourceArchives()
 	if err != nil {
 		fmt.Printf("Error: %v", err)
 		c.IndentedJSON(http.StatusOK, nil)
@@ -222,7 +224,7 @@ func GetPublicListings(c *gin.Context) {
 	}
 	results["sourceArchives"] = sourceArchives
 
-	recordTypes, err := GetRecordTypes()
+	recordTypes, err := db.GetRecordTypes()
 	if err != nil {
 		fmt.Printf("Error: %v", err)
 		c.IndentedJSON(http.StatusOK, nil)
@@ -230,7 +232,7 @@ func GetPublicListings(c *gin.Context) {
 	}
 	results["recordTypes"] = recordTypes
 
-	recordStatus, err := GetRecordStatuses()
+	recordStatus, err := db.GetRecordStatuses()
 	if err != nil {
 		fmt.Printf("Error: %v", err)
 		c.IndentedJSON(http.StatusOK, nil)
@@ -243,17 +245,10 @@ func GetPublicListings(c *gin.Context) {
 
 // User Authentication Controllers
 
-type NewUser struct {
-	FirstName string `json:"firstName" binding:"required"`
-	LastName  string `json:"lastName" binding:"required"`
-	Username  string `json:"username" binding:"required"`
-	Password  string `json:"password" binding:"required"`
-	RoleId    int64  `json:"roleId" binding:"required"`
-}
 
 // Creates an new user if valid
 func RegisterUser(c *gin.Context) {
-	var json NewUser
+	var json models.NewUser
 
 	if err := c.ShouldBindJSON(&json); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -266,7 +261,7 @@ func RegisterUser(c *gin.Context) {
 		return
 	}
 
-	err := CreateUser(json)
+	err := db.CreateUser(json)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -293,7 +288,7 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	user, err := GetUserByUsername(json.Username)
+	user, err := db.GetUserByUsername(json.Username)
 
 	if err != nil {
 		fmt.Println(err)
@@ -334,9 +329,9 @@ func Login(c *gin.Context) {
 // Returns the user if they are authenticated, otherwise returns an false
 // Used to check authentication in controllers where users need to be logged
 // in
-func getAuthenticatedUser(c *gin.Context) (User, bool) {
+func getAuthenticatedUser(c *gin.Context) (models.User, bool) {
 
-	var user User
+	var user models.User
 
 	cookie, err := c.Cookie("jwt")
 	if err != nil {
@@ -358,7 +353,7 @@ func getAuthenticatedUser(c *gin.Context) (User, bool) {
 		return user, false
 	}
 
-	user, err = GetUserByID(id)
+	user, err = db.GetUserByID(id)
 	if err != nil {
 		return user, false
 	}
@@ -382,7 +377,7 @@ func GetUsersList(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "User is not authorized"})
 	}
 
-	users, err := GetUsers()
+	users, err := db.GetUsers()
 	if err != nil {
 		fmt.Printf("GetUsersList: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "The server encountered an error. Try again later."})
@@ -396,7 +391,7 @@ func Logout(c *gin.Context) {
 }
 
 func GetUserRoles(c *gin.Context) {
-	roles, err := GetRoles()
+	roles, err := db.GetRoles()
 	if err != nil {
 		fmt.Printf("GetUserRoles: %v\n", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve user roles."})
@@ -430,7 +425,7 @@ func DisableUser(c *gin.Context) {
 		return
 	}
 
-	err := UpdateUser(json.ID, data)
+	err := db.UpdateUser(json.ID, data)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Couldn't process request. Try again later"})
 		fmt.Printf("DisableUser: %v\n", err.Error())
@@ -441,7 +436,7 @@ func DisableUser(c *gin.Context) {
 }
 
 func SaveRecord(c *gin.Context) {
-	var json HistoryRecordJSON
+	var json models.HistoryRecordJSON
 	var err error
 
 	user, ok := getAuthenticatedUser(c)
@@ -456,7 +451,7 @@ func SaveRecord(c *gin.Context) {
 	}
 
 	if json.ID == 0 {
-		err = InsertRecord(user, json)
+		err = db.InsertRecord(user, json)
 	}
 
 	if err != nil {
@@ -495,7 +490,7 @@ func ChangeRecordStatus(c *gin.Context) {
 	}
 
 
-	err = ChangeStatus(recordID, json.ID) 
+	err = db.ChangeStatus(recordID, json.ID) 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Couldn't process request. Try again later"})
 		return

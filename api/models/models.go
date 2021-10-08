@@ -1,4 +1,18 @@
-package main
+package models
+
+type HistoryRecordJSON struct {
+	ID              int64   `json:"id"`
+	Date            string  `json:"date"`
+	Title           string  `json:"title"`
+	Content         string  `json:"content"`
+	Origin          string  `json:"origin"`
+	Author          string  `json:"author"`
+	AttachmentType  *string `json:"attachmentType"`
+	FileName        *string `json:"fileName"`
+	RecordTypeId    int64   `json:"recordType"`
+	SourceArchiveId int64   `json:"sourceArchive"`
+	Collections     []int64 `json:"collections"`
+}
 
 type HistoryRecord struct {
 	ID             int64   `json:"id"`
@@ -59,6 +73,14 @@ type User struct {
 	Password  []byte `json:"-"`
 	Active    bool   `json:"active"`
 	Role      string `json:"role"`
+}
+
+type NewUser struct {
+	FirstName string `json:"firstName" binding:"required"`
+	LastName  string `json:"lastName" binding:"required"`
+	Username  string `json:"username" binding:"required"`
+	Password  string `json:"password" binding:"required"`
+	RoleId    int64  `json:"roleId" binding:"required"`
 }
 
 func (u User) Authorized(userLevel int) bool {
