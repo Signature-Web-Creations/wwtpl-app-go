@@ -4,9 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	"regexp"
 	"strconv"
-	"strings"
 
 	"example.com/wwtl-app/models"
 
@@ -638,43 +636,18 @@ func UpdateUser(userId int64, fields map[string]interface{}) error {
 	return nil
 }
 
-
-// Formats a date either in the format yyyy or mm/dd/yyyy
-// to yyyy-mm-dd. If only year is given month and day
-// defaults to 01/01. If it couldn't not format the date
-// returns error
-func formatDate(dateStr string) (string, error) {
-	date := regexp.MustCompile(`^\d{2}/\d{2}/\d{4}$`)
-	yearOnly := regexp.MustCompile(`^\d{4}$`)
-
-	if date.Match([]byte(dateStr)) {
-		segments := strings.Split(dateStr, "/")
-		month := segments[0]
-		day := segments[1]
-		year := segments[2]
-		return (year + "-" + month + "-" + day), nil
-	} else if yearOnly.Match([]byte(dateStr)) {
-		return fmt.Sprintf("%s-01-01", dateStr), nil
-	} else {
-		return dateStr, fmt.Errorf("Cannot format date: %s", dateStr)
-	}
-}
-
 // Inserts a history record
 func InsertRecord(user models.User, record models.HistoryRecordJSON) error {
-	date, err := formatDate(record.Date)
-	if err != nil {
-		return fmt.Errorf("InsertRecord: %v", err)
-	}
 
 	tx, err := db.Begin()
 
+	fmt.Println(record.Date)
 	result, err := tx.Exec(`
 	 INSERT INTO history_record
-	 (title, content, date, origin, author, record_type_id, source_archive_id, entered_by, created_by, date_entered
+	 (title, content, date, origin, author, record_type_id, source_archive_id, entered_by, created_by, date_entered)
 	 VALUES
 	 (?, ?, ?, ?, ?, ?, ?, ?, ?, DATE('now'))
-	 `, record.Title, record.Content, date, record.Origin, record.Author, record.RecordTypeId,
+	 `, record.Title, record.Content, record.Date, record.Origin, record.Author, record.RecordTypeId,
 		record.SourceArchiveId, user.FirstName+" "+user.LastName, user.ID,
 	)
 

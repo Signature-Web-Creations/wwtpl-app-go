@@ -1,9 +1,14 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { getRecordByID, saveRecord, changeRecordStatus } from '../api'
-import moment from 'moment'
 
 import MessageBox from '../MessageBox'
+
+// Record Status 
+const IN_PROGRESS = 1
+const PENDING_APPROVAL = 2
+const PUBLISHED = 3
+const UNPUBLISHED = 4
 
 // Returns true if string is blank
 function blank(s) {
@@ -86,25 +91,7 @@ function RecordForm(props) {
     if (blank(date)) {
       return 'Date is required.'
     }
-
-    if (date.trim().match(/^\d{4}$/)) {
-      let year = parseInt(date)
-      let currentYear = new Date().getFullYear()
-      if (year < 1800 || year > currentYear) {
-        return `Year has to be between 1800 and ${currentYear}`
-      }
-      return false
-    }
-
-    if (date.trim().match(/^\d{2}\/\d{2}\/\d{4}$/)) {
-      const m = moment(date.trim(), 'MM/DD/YYYY')
-      if (m.isValid()) {
-        return 'Date is not valid'
-      }
-      return false
-    }
-
-    return 'Date format is either YYYY or MM/DD/YYYY'
+    return null
   }
 
   // Validates all of the fields on the form.
@@ -119,7 +106,7 @@ function RecordForm(props) {
     }
 
     errors.date = validateDate()
-    valid = valid && errors.date === false
+    valid = valid && errors.date === null
 
     if (blank(recordType)) {
       errors.recordType = 'You need to select a record type'
@@ -135,9 +122,7 @@ function RecordForm(props) {
       errors.collections = 'You need to select at least one collection'
     }
 
-    console.log('Validation errors: ', errors)
     setValidationErrors(Object.assign(validationErrors, errors))
-    console.log(validationErrors)
     return valid
   }
 
@@ -154,9 +139,9 @@ function RecordForm(props) {
           setAuthor(r.author)
           setRecordType(r.recordType)
           setSourceArchive(r.sourceArchive)
-          if (r.recordStatusId === 3) {
-            changeRecordStatus(id, 4)
-            setRecordStatus(4)
+          if (r.recordStatusId === PUBLISHED) {
+            changeRecordStatus(id, UNPUBLISHED)
+            setRecordStatus(UNPUBLISHED)
           } else {
             setRecordStatus(r.recordStatusId)
           }
@@ -189,7 +174,7 @@ function RecordForm(props) {
     return n
   }
 
-  const handleSubmit = (number) => {
+  const handleSubmit = (recordStatusId) => {
     if (validateForm()) {
       const record = {
         title: title.trim(),
@@ -200,14 +185,18 @@ function RecordForm(props) {
         recordType: parseIntOrError(recordType),
         sourceArchive: parseIntOrError(sourceArchive),
         collections: collections.map(parseIntOrError),
-        recordStatus: number ? number : recordStatus,
+        recordStatus: recordStatusId === undefined ? IN_PROGRESS : recordStatusId,
       }
+
+      console.log('Handle Submit Record: ', recordStatus)
 
       let request
 
       if (newRecord) {
         request = saveRecord(record)
       } else {
+        // Thinking about having a separate function or endpoint 
+        // for updating a record
         request = saveRecord(Object.assign(record, { id }))
       }
 
@@ -347,7 +336,7 @@ function RecordForm(props) {
           >
             <option value=""> No Record Type </option>
             {props.recordTypes.map(({ id, name }) => (
-              <option key={id} value={name}>
+              <option key={id} value={id}>
                 {' '}
                 {name}{' '}
               </option>
@@ -372,7 +361,7 @@ function RecordForm(props) {
           >
             <option value=""> No Source Archive </option>
             {props.sourceArchives.map(({ id, name }) => (
-              <option key={id} value={name}>
+              <option key={id} value={id}>
                 {' '}
                 {name}{' '}
               </option>
@@ -417,25 +406,25 @@ function RecordForm(props) {
       <div className="uk-form-width-large">
         <input
           className="uk-button uk-button-default uk-margin-top uk-margin-right"
-          onClick={handleSubmit}
+          onClick={() => {handleSubmit()}}
           type="button"
           value="Save"
         />
-        {recordStatus !== 1 && (
+        {recordStatus !== IN_PROGRESS && (
           <input
             className="uk-button uk-button-primary uk-margin-top"
             onClick={() => {
-              handleSubmit(3)
+              handleSubmit(PUBLISHED)
             }}
             type="button"
             value="Save &amp; Publish"
           />
         )}
-        {recordStatus === 1 && (
+        {recordStatus === IN_PROGRESS && (
           <input
             className="uk-button uk-button-primary uk-margin-top"
             onClick={() => {
-              handleSubmit(2)
+              handleSubmit(PENDING_APPROVAL)
             }}
             type="button"
             value="Submit for Approval"
