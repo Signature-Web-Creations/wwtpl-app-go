@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
-import { getRecordByID, saveRecord } from '../api'
+import { getRecordByID, saveRecord, changeRecordStatus } from '../api'
 import moment from 'moment'
 
 import MessageBox from '../MessageBox'
@@ -154,7 +154,12 @@ function RecordForm(props) {
           setAuthor(r.author)
           setRecordType(r.recordType)
           setSourceArchive(r.sourceArchive)
-          setRecordStatus(r.recordStatusId)
+          if (r.recordStatusId === 3) {
+            changeRecordStatus(id, 4)
+            setRecordStatus(4)
+          } else {
+            setRecordStatus(r.recordStatusId)
+          }
 
           let c = []
           r.collections.split(';').forEach((col) => {

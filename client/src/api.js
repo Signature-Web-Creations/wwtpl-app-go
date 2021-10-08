@@ -1,4 +1,3 @@
-
 const getQueryParameters = (params) => {
   const queryParameters = []
   if (params.offset && params.offset !== null) {
@@ -36,7 +35,7 @@ const getQueryParameters = (params) => {
       `recordStatus=${encodeURIComponent(params.searchRecordStatus)}`,
     )
   }
-  return queryParameters 
+  return queryParameters
 }
 
 const buildURLWithQueryParameters = (baseUri, params) => {
@@ -49,7 +48,7 @@ const buildURLWithQueryParameters = (baseUri, params) => {
   }
 }
 
-// Returns listing data for dashboard. 
+// Returns listing data for dashboard.
 // Records are returned based on if the user is an editor, publisher
 // or admin
 export function getListingData(params) {
@@ -67,17 +66,17 @@ export function getPublicRecordByID(id) {
   return fetch(`/api/public/records/${id}`).then((res) => res.json())
 }
 
-// Retrieves a record by its id regardless of status. 
+// Retrieves a record by its id regardless of status.
 // User must be logged in
 export async function getRecordByID(id) {
   const response = await fetch(`/api/records/${id}`, {
-    method: 'GET', 
-    mode: 'same-origin', 
+    method: 'GET',
+    mode: 'same-origin',
     cache: 'no-cache',
-    credentials: 'include'
+    credentials: 'include',
   })
 
-  return await response.json() 
+  return await response.json()
 }
 
 export async function login(username, password) {
@@ -106,7 +105,7 @@ export async function logout() {
   })
 }
 
-// Returns user data for the logged in user. 
+// Returns user data for the logged in user.
 // If user is not logged in returns an error message
 export function getUserData() {
   return fetch(`/api/user`).then((res) => res.json())
@@ -116,15 +115,15 @@ export function getUserData() {
 // and an admin to succeed
 export async function createUser(userData) {
   const response = await fetch('/api/user', {
-      method: 'POST',
-      mode: 'same-origin',
-      cache: 'no-cache',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json'
-      }, 
+    method: 'POST',
+    mode: 'same-origin',
+    cache: 'no-cache',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
 
-      body: JSON.stringify(userData)
+    body: JSON.stringify(userData),
   })
 
   return response.json()
@@ -134,51 +133,65 @@ export async function createUser(userData) {
 // authenticated returns a 401 unauthorized
 export async function getUsers() {
   const response = await fetch('/api/users', {
-      method: 'GET',
-      mode: 'same-origin',
-      cache: 'no-cache',
-      credentials: 'include'
+    method: 'GET',
+    mode: 'same-origin',
+    cache: 'no-cache',
+    credentials: 'include',
   })
 
   return response.json()
 }
 
-// Returns a list of user roles. 
+// Returns a list of user roles.
 export async function getUserRoles() {
   const response = await fetch('/api/user_roles', {
-    method: 'GET', 
-    mode: 'same-origin', 
-    cache: 'no-cache', 
+    method: 'GET',
+    mode: 'same-origin',
+    cache: 'no-cache',
   })
 
   return response.json()
 }
 
-// Disables a user 
+// Disables a user
 export async function disableUser(userId) {
   const response = await fetch('/api/user/disable', {
-    method: 'POST', 
-    mode: 'same-origin', 
-    cache: 'no-cache', 
-    credentials: 'include', 
+    method: 'POST',
+    mode: 'same-origin',
+    cache: 'no-cache',
+    credentials: 'include',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
-    body: JSON.stringify({userId}) 
+    body: JSON.stringify({ userId }),
   })
-  return response.json() 
+  return response.json()
 }
 
 export async function saveRecord(record) {
   const response = await fetch('/api/records', {
-    method: 'POST', 
-    mode: 'same-origin', 
+    method: 'POST',
+    mode: 'same-origin',
     cache: 'no-cache',
-    credentials: 'include', 
+    credentials: 'include',
     headers: {
-      'Content-Type': 'application/json'
-    }, 
-    body: JSON.stringify(record) 
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(record),
+  })
+  return response.json()
+}
+
+export async function changeRecordStatus(recordId, recordStatusId) {
+  const response = await fetch(`/api/records/status/${recordId}`, {
+    method: 'POST',
+    mode: 'same-origin',
+    cache: 'no-cache',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ recordId, recordStatusId }),
   })
   return response.json()
 }
