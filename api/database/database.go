@@ -1,4 +1,4 @@
-package main
+package database
 
 import (
 	"database/sql"
@@ -7,6 +7,8 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+
+	"example.com/wwtl-app/models"
 
 	sq "github.com/Masterminds/squirrel"
 	_ "github.com/mattn/go-sqlite3"
@@ -111,8 +113,8 @@ func addFilters(query sq.SelectBuilder, params map[string]interface{}) sq.Select
 
 // Executes query either returning a single HistoryRecord or an error
 // functionName is given for error reporting
-func queryRecord(functionName string, query sq.SelectBuilder) (HistoryRecord, error) {
-	var record HistoryRecord
+func queryRecord(functionName string, query sq.SelectBuilder) (models.HistoryRecord, error) {
+	var record models.HistoryRecord
 	row := query.RunWith(db).QueryRow()
 
 	err := row.Scan(
@@ -142,8 +144,8 @@ func queryRecord(functionName string, query sq.SelectBuilder) (HistoryRecord, er
 
 // Executes query either returning a slice of HistoryRecords or an error
 // functionName is given for error reporting
-func queryRecords(functionName string, query sq.SelectBuilder) ([]HistoryRecord, error) {
-	var records []HistoryRecord
+func queryRecords(functionName string, query sq.SelectBuilder) ([]models.HistoryRecord, error) {
+	var records []models.HistoryRecord
 	rows, err := query.RunWith(db).Query()
 
 	if err != nil {
@@ -153,7 +155,7 @@ func queryRecords(functionName string, query sq.SelectBuilder) ([]HistoryRecord,
 	defer rows.Close()
 
 	for rows.Next() {
-		var record HistoryRecord
+		var record models.HistoryRecord
 		err := rows.Scan(
 			&record.ID,
 			&record.Date,
@@ -185,7 +187,7 @@ func queryRecords(functionName string, query sq.SelectBuilder) ([]HistoryRecord,
 // Returns listings for an editor
 // It should only include records that were created by the editor
 // and have a record status of 1 (saved but not submitted)
-func EditorListings(user User, params map[string]interface{}) ([]HistoryRecord, int, error) {
+func EditorListings(user models.User, params map[string]interface{}) ([]models.HistoryRecord, int, error) {
 	query := historyRecords
 	query = query.Where(sq.Eq{"created_by": user.ID})
 	query = query.Where(sq.Eq{"record_status_id": 1})
@@ -213,7 +215,7 @@ func EditorListings(user User, params map[string]interface{}) ([]HistoryRecord, 
 }
 
 // Returns listings for a publisher
-func PublisherListings(user User, params map[string]interface{}) ([]HistoryRecord, int, error) {
+func PublisherListings(user models.User, params map[string]interface{}) ([]models.HistoryRecord, int, error) {
 	query := historyRecords
 	query = addFilters(query, params)
 	query = query.Where(sq.Eq{"deleted_at": nil})
@@ -257,7 +259,7 @@ func PublisherListings(user User, params map[string]interface{}) ([]HistoryRecor
 }
 
 // Returns listings for an admin
-func AdminListings(params map[string]interface{}) ([]HistoryRecord, int, error) {
+func AdminListings(params map[string]interface{}) ([]models.HistoryRecord, int, error) {
 	query := historyRecords
 	query = addFilters(query, params)
 	query = query.OrderBy("date(history_record.date)").OrderBy("history_record.title")
@@ -280,7 +282,7 @@ func AdminListings(params map[string]interface{}) ([]HistoryRecord, int, error) 
 
 // Returns published history records that are not deleted.
 // filters the result based on given parameters
-func PublishedHistoryRecords(params map[string]interface{}) ([]HistoryRecord, error) {
+func PublishedHistoryRecords(params map[string]interface{}) ([]models.HistoryRecord, error) {
 	query := addFilters(PublishedRecords(), params)
 	query = query.OrderBy("date(history_record.date)").OrderBy("history_record.title")
 	query = query.Limit(uint64(recordsPerPage))
@@ -290,14 +292,14 @@ func PublishedHistoryRecords(params map[string]interface{}) ([]HistoryRecord, er
 
 // Returns a HistoryRecord detail
 // Used in the admin interface
-func GetRecordDetail(id int64) (HistoryRecord, error) {
+func GetRecordDetail(id int64) (models.HistoryRecord, error) {
 	query := historyRecords.Where("history_record.id = ?", id)
 	return queryRecord("GetRecordDetail", query)
 }
 
 // Returns HistoryRecord detail
 // History Record must be published and not deleted
-func HistoryRecordByID(id int64) (HistoryRecord, error) {
+func HistoryRecordByID(id int64) (models.HistoryRecord, error) {
 	query := PublishedRecords().Where(sq.Eq{`history_record.id`: id})
 	return queryRecord(fmt.Sprintf("HistoryRecordByID: %d", id), query)
 }
@@ -364,7 +366,7 @@ func CountPublishedPages(params map[string]interface{}) (int, error) {
 }
 
 type CollectionInfo struct {
-	Collections    []Collection     `json:"collections"`
+	Collections    []models.Collection     `json:"collections"`
 	CollectionToID map[string]int64 `json:"collectionToId"`
 }
 
@@ -382,7 +384,7 @@ func GetCollections() (CollectionInfo, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		var collection Collection
+		var collection models.Collection
 		err := rows.Scan(
 			&collection.ID,
 			&collection.Name)
@@ -401,8 +403,8 @@ func GetCollections() (CollectionInfo, error) {
 	return collectionInfo, nil
 }
 
-func GetSourceArchives() ([]SourceArchive, error) {
-	var sourceArchives []SourceArchive
+func GetSourceArchives() ([]models.SourceArchive, error) {
+	var sourceArchives []models.SourceArchive
 
 	query := sq.Select("id, name").From("source_archive")
 	rows, err := query.RunWith(db).Query()
@@ -414,7 +416,7 @@ func GetSourceArchives() ([]SourceArchive, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		var sourceArchive SourceArchive
+		var sourceArchive models.SourceArchive
 		err := rows.Scan(
 			&sourceArchive.ID,
 			&sourceArchive.Name)
@@ -432,8 +434,8 @@ func GetSourceArchives() ([]SourceArchive, error) {
 	return sourceArchives, nil
 }
 
-func GetRecordTypes() ([]RecordType, error) {
-	var recordTypes []RecordType
+func GetRecordTypes() ([]models.RecordType, error) {
+	var recordTypes []models.RecordType
 
 	query := sq.Select("id, name").From("record_type")
 	rows, err := query.RunWith(db).Query()
@@ -445,7 +447,7 @@ func GetRecordTypes() ([]RecordType, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		var recordType RecordType
+		var recordType models.RecordType
 		err := rows.Scan(
 			&recordType.ID,
 			&recordType.Name)
@@ -463,8 +465,8 @@ func GetRecordTypes() ([]RecordType, error) {
 	return recordTypes, nil
 }
 
-func GetRecordStatuses() ([]RecordStatus, error) {
-	var recordStatuses []RecordStatus
+func GetRecordStatuses() ([]models.RecordStatus, error) {
+	var recordStatuses []models.RecordStatus
 
 	query := sq.Select("id, name").From("record_status")
 	rows, err := query.RunWith(db).Query()
@@ -476,7 +478,7 @@ func GetRecordStatuses() ([]RecordStatus, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		var recordStatus RecordStatus
+		var recordStatus models.RecordStatus
 		err := rows.Scan(
 			&recordStatus.ID,
 			&recordStatus.Name)
@@ -496,7 +498,7 @@ func GetRecordStatuses() ([]RecordStatus, error) {
 
 // Users
 
-func CreateUser(user NewUser) error {
+func CreateUser(user models.NewUser) error {
 	query := sq.Insert("user").Columns("firstName", "lastName", "username", "password", "role_id")
 	password, _ := bcrypt.GenerateFromPassword([]byte(user.Password), 14)
 	query = query.Values(user.FirstName, user.LastName, user.Username, password, user.RoleId)
@@ -507,8 +509,8 @@ func CreateUser(user NewUser) error {
 	return nil
 }
 
-func GetUserByUsername(username string) (User, error) {
-	var user User
+func GetUserByUsername(username string) (models.User, error) {
+	var user models.User
 
 	query := sq.Select("user.id, firstName, lastName, username, password, active, user_roles.name")
 	query = query.From("user")
@@ -528,8 +530,8 @@ func GetUserByUsername(username string) (User, error) {
 	return user, nil
 }
 
-func GetUserByID(id int) (User, error) {
-	var user User
+func GetUserByID(id int) (models.User, error) {
+	var user models.User
 
 	query := sq.Select("user.id, firstName, lastName, username, password, user_roles.name")
 	query = query.From("user")
@@ -549,8 +551,8 @@ func GetUserByID(id int) (User, error) {
 	return user, nil
 }
 
-func GetUsers() ([]User, error) {
-	var users []User
+func GetUsers() ([]models.User, error) {
+	var users []models.User
 
 	query := sq.Select("user.id, firstName, lastName, username, user_roles.name")
 	query = query.From("user")
@@ -565,7 +567,7 @@ func GetUsers() ([]User, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		var user User
+		var user models.User
 		err := rows.Scan(
 			&user.ID,
 			&user.FirstName,
@@ -587,8 +589,8 @@ func GetUsers() ([]User, error) {
 	return users, nil
 }
 
-func GetRoles() ([]UserRole, error) {
-	var roles []UserRole
+func GetRoles() ([]models.UserRole, error) {
+	var roles []models.UserRole
 
 	query := sq.Select("id, name")
 	query = query.From("user_roles")
@@ -602,7 +604,7 @@ func GetRoles() ([]UserRole, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		var role UserRole
+		var role models.UserRole
 		err := rows.Scan(
 			&role.ID,
 			&role.Name,
@@ -636,19 +638,6 @@ func UpdateUser(userId int64, fields map[string]interface{}) error {
 	return nil
 }
 
-type HistoryRecordJSON struct {
-	ID              int64   `json:"id"`
-	Date            string  `json:"date"`
-	Title           string  `json:"title"`
-	Content         string  `json:"content"`
-	Origin          string  `json:"origin"`
-	Author          string  `json:"author"`
-	AttachmentType  *string `json:"attachmentType"`
-	FileName        *string `json:"fileName"`
-	RecordTypeId    int64   `json:"recordType"`
-	SourceArchiveId int64   `json:"sourceArchive"`
-	Collections     []int64 `json:"collections"`
-}
 
 // Formats a date either in the format yyyy or mm/dd/yyyy
 // to yyyy-mm-dd. If only year is given month and day
@@ -672,7 +661,7 @@ func formatDate(dateStr string) (string, error) {
 }
 
 // Inserts a history record
-func InsertRecord(user User, record HistoryRecordJSON) error {
+func InsertRecord(user models.User, record models.HistoryRecordJSON) error {
 	date, err := formatDate(record.Date)
 	if err != nil {
 		return fmt.Errorf("InsertRecord: %v", err)
