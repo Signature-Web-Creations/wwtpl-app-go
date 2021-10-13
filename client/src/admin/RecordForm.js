@@ -153,7 +153,6 @@ function RecordForm(props) {
           if (r.recordStatus.id === PUBLISHED) {
             changeRecordStatus(id, UNPUBLISHED)
             setRecordStatus(UNPUBLISHED)
-            console.log('Changing records status for published record')
           } else {
             setRecordStatus(r.recordStatus.id)
           }
@@ -232,6 +231,7 @@ function RecordForm(props) {
   return (
     <form
       className="uk-form-horizontal uk-margin-large uk-margin-top"
+      encType="multipart/form-data"
       onSubmit={handleSubmit}
     >
       {message.message && (
@@ -272,6 +272,16 @@ function RecordForm(props) {
         </div>
       </div>
 
+      <div className="uk-margin">
+        <label htmlFor="file" className="uk-form-label"> Image </label>
+        <div className="uk-form-controls">
+          <input
+            type="file"
+            name="file"
+            accept=".jpg, .jpeg, .png"
+          />
+        </div>
+      </div> 
       <div className="uk-margin">
         <label className="uk-form-label"> Content </label>
         <div className="uk-form-controls">

@@ -1,6 +1,6 @@
 package models
 
-type HistoryRecordJSON struct {
+type HistoryRecordForm struct {
 	ID              int64   `json:"id"`
 	Date            string  `json:"date"`
 	Title           string  `json:"title"`

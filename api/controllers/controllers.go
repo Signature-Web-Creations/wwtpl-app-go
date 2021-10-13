@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"example.com/wwtl-app/models"
@@ -435,22 +436,75 @@ func DisableUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"success": "Successfully disabled user"})
 }
 
-func SaveRecord(c *gin.Context) {
-	var json models.HistoryRecordJSON
-	var err error
 
+// Populates and validates a form 
+func Validate(c *gin.Context, form *models.HistoryRecordForm) error {
+	form.Title = c.PostForm("title")
+	if form.Title == "" {
+		return fmt.Errorf("Validate: %s", "Title is required")
+	}
+
+	form.Content = c.PostForm("content")
+
+	form.Date = c.PostForm("date")
+	if form.Date == "" {
+		return fmt.Errorf("Validate: %s", "Date is required")
+	}
+
+	form.Origin = c.PostForm("origin") 
+	form.Author = c.PostForm("author")
+
+	recordTypeID, err := strconv.ParseInt(c.PostForm("recordType"), 10, 64)
+	if err != nil {
+		return fmt.Errorf("Validate: Couldn't convert record type")
+	}
+	form.RecordTypeID = recordTypeID
+
+	sourceArchiveID, err := strconv.ParseInt(c.PostForm("sourceArchive"), 10, 64)
+	if err != nil {
+		return fmt.Errorf("Validate: Couldn't convert source archive")
+	}
+	form.SourceArchiveID = sourceArchiveID
+
+	recordStatusID, err := strconv.ParseInt(c.PostForm("recordStatus"), 10, 64)
+	if err != nil {
+		return fmt.Errorf("Validate: Couldn't convert record status")
+	}
+	form.RecordStatusID = recordStatusID
+
+	var collections []int64
+
+	for _, collection := range strings.Split(c.PostForm("collections"), ",") {
+		collectionID, err := strconv.ParseInt(collection, 10, 64)
+		if err != nil {
+			return fmt.Errorf("Validate: Couldn't convert collections => %s", collection)
+		}
+		collections = append(collections, collectionID)
+	}
+	form.Collections = collections
+
+	return nil 
+}
+
+func SaveRecord(c *gin.Context) {
+	var form models.HistoryRecordForm
+	var err error
+	
 	user, ok := getAuthenticatedUser(c)
 	if !ok {
 		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "User is not authorized"})
 		return
 	}
 
-	if err = c.ShouldBindJSON(&json); err != nil {
+	err = Validate(c, &form)
+
+	if err != nil {
+		fmt.Println(err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	err = db.InsertRecord(user, json)
+	err = db.InsertRecord(user, form)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Couldn't process request. Try again later"})
@@ -458,11 +512,11 @@ func SaveRecord(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"success": "Successfully created record"})
+	c.JSON(http.StatusOK, gin.H{"success": "Successfully created record", "form": form})
 }
 
 func UpdateRecord(c *gin.Context) {
-	var json models.HistoryRecordJSON
+	var json models.HistoryRecordForm
 	var err error
 
 	recordID, err := strconv.ParseInt(c.Param("id"), 10, 64)

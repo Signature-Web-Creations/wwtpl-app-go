@@ -169,15 +169,23 @@ export async function disableUser(userId) {
 }
 
 export async function saveRecord(record) {
+  const formData = new FormData()
+
+  formData.append('title', record.title)
+  formData.append('content', record.content)
+  formData.append('date', record.date)
+  formData.append('author', record.author)
+  formData.append('recordType', record.recordType)
+  formData.append('sourceArchive', record.sourceArchive)
+  formData.append('collections', record.collections)
+  formData.append('recordStatus', record.recordStatus)
+
   const response = await fetch('/api/records', {
     method: 'POST',
     mode: 'same-origin',
     cache: 'no-cache',
     credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(record),
+    body: formData
   })
   return response.json()
 }

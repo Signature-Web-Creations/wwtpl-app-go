@@ -655,7 +655,7 @@ func UpdateUser(userId int64, fields map[string]interface{}) error {
 }
 
 // Inserts a history record
-func InsertRecord(user models.User, record models.HistoryRecordJSON) error {
+func InsertRecord(user models.User, record models.HistoryRecordForm) error {
 
 	tx, err := db.Begin()
 
@@ -698,7 +698,7 @@ func InsertRecord(user models.User, record models.HistoryRecordJSON) error {
 	return nil
 }
 
-func UpdateRecord(recordId int64, record models.HistoryRecordJSON) error {
+func UpdateRecord(recordId int64, record models.HistoryRecordForm) error {
 	tx, err := db.Begin()
 
 	_, err = tx.Exec(`
