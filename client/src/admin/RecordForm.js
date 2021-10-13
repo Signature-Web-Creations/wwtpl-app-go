@@ -137,8 +137,19 @@ function RecordForm(props) {
           setDate(r.date)
           setOrigin(r.origin)
           setAuthor(r.author)
-          setRecordType(r.recordType.id)
-          setSourceArchive(r.sourceArchive.id)
+
+          // Some records did not have a record type
+          // this if keeps them from crashing the site
+          if (r.recordType !== null) {
+            setRecordType(r.recordType.id)
+          }
+
+          // Some records did not have a source archive
+          // this if keeps them from crashing the site
+          if (r.sourceArchive !== null) {
+            setSourceArchive(r.sourceArchive.id)
+          }
+
           if (r.recordStatusId === PUBLISHED) {
             changeRecordStatus(id, UNPUBLISHED)
             setRecordStatus(UNPUBLISHED)
