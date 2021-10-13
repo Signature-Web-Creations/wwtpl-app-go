@@ -723,16 +723,16 @@ func UpdateRecord(recordId int64, record models.HistoryRecordJSON) error {
 		return fmt.Errorf("Error creating query for collections: %v", err)
 	}
 
-	fmt.Println("Inserted record collections")
-
 	_, err = tx.Exec(sql, arguments...)
+
+	
 	if err != nil {
 		tx.Rollback()
 		return fmt.Errorf("Error inserting collections: %v", err)
 	}
 
+	// Updating fields in history record
 	updateQuery := sq.Update("history_record").Where("id = ?", recordId)
-
 	updateQuery = updateQuery.Set("title", record.Title)
 	updateQuery = updateQuery.Set("date", record.Date)
 	updateQuery = updateQuery.Set("content", record.Content)
@@ -742,11 +742,12 @@ func UpdateRecord(recordId int64, record models.HistoryRecordJSON) error {
 	updateQuery = updateQuery.Set("source_archive_id", record.SourceArchiveID)
 	updateQuery = updateQuery.Set("record_status_id", record.RecordStatusID)
 
-	fmt.Println("Updated history record")
-	sql, arguments, err = query.ToSql()
+	sql, arguments, err = updateQuery.ToSql()
 	if err != nil {
 		tx.Rollback()
 		return fmt.Errorf("Error creating update query: %v", err)
+	} else {
+		fmt.Println(sql)
 	}
 
 	_, err = tx.Exec(sql, arguments...)
@@ -754,7 +755,8 @@ func UpdateRecord(recordId int64, record models.HistoryRecordJSON) error {
 		tx.Rollback()
 		return fmt.Errorf("Error updating history record: %v", err)
 	}
-
+	fmt.Println("Updated history record")
+	
 	fmt.Println("Commiting changes")
 	tx.Commit()
 	return nil

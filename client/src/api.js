@@ -182,7 +182,7 @@ export async function saveRecord(record) {
   return response.json()
 }
 
-export async function updateRecord(recordId, updates) {
+export async function updateRecord(recordId, record) {
   const response = await fetch(`/api/records/${recordId}`, {
     method: 'POST',
     mode: 'same-origin',
@@ -191,7 +191,7 @@ export async function updateRecord(recordId, updates) {
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(updates),
+    body: JSON.stringify(record),
   })
   return response.json()
 }
