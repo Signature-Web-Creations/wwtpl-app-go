@@ -763,7 +763,7 @@ func UpdateRecord(recordId int64, record models.HistoryRecordJSON) error {
 }
 
 func ChangeStatus(recordID int64, recordStatusID int64) error {
-	query := sq.Update("history_record").Set("record_status", recordStatusID)
+	query := sq.Update("history_record").Set("record_status_id", recordStatusID)
 	query = query.Where("id = ?", recordID)
 	_, err := query.RunWith(db).Exec()
 

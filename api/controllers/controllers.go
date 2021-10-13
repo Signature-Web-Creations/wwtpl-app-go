@@ -521,6 +521,7 @@ func ChangeRecordStatus(c *gin.Context) {
 
 	err = db.ChangeStatus(recordID, json.ID) 
 	if err != nil {
+		fmt.Printf("ChangeRecordStatus: %v\n", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Couldn't process request. Try again later"})
 		return
 	}

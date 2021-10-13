@@ -31,7 +31,7 @@ function RecordForm(props) {
   const [recordType, setRecordType] = useState('')
   const [sourceArchive, setSourceArchive] = useState('')
   const [collections, setCollections] = useState([])
-  const [recordStatus, setRecordStatus] = useState('')
+  const [recordStatus, setRecordStatus] = useState(null)
 
   const newRecord = id === undefined
 
@@ -150,9 +150,10 @@ function RecordForm(props) {
             setSourceArchive(r.sourceArchive.id)
           }
 
-          if (r.recordStatusId === PUBLISHED) {
+          if (r.recordStatus.id === PUBLISHED) {
             changeRecordStatus(id, UNPUBLISHED)
             setRecordStatus(UNPUBLISHED)
+            console.log('Changing records status for published record')
           } else {
             setRecordStatus(r.recordStatus.id)
           }
@@ -196,7 +197,7 @@ function RecordForm(props) {
         recordType: parseIntOrError(recordType),
         sourceArchive: parseIntOrError(sourceArchive),
         collections: collections.map(parseIntOrError),
-        recordStatus: recordStatusId === undefined ? IN_PROGRESS : recordStatusId,
+        recordStatus: recordStatusId === null ? IN_PROGRESS : recordStatusId,
       }
 
       if (newRecord) {
@@ -416,7 +417,7 @@ function RecordForm(props) {
       <div className="uk-form-width-large">
         <input
           className="uk-button uk-button-default uk-margin-top uk-margin-right"
-          onClick={() => {handleSubmit()}}
+          onClick={() => {handleSubmit(recordStatus)}}
           type="button"
           value="Save"
         />
