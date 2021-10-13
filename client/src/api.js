@@ -168,9 +168,8 @@ export async function disableUser(userId) {
   return response.json()
 }
 
-export async function saveRecord(record) {
+const recordToForm = (record) =>  {
   const formData = new FormData()
-
   formData.append('title', record.title)
   formData.append('content', record.content)
   formData.append('date', record.date)
@@ -180,13 +179,19 @@ export async function saveRecord(record) {
   formData.append('collections', record.collections)
   formData.append('recordStatus', record.recordStatus)
 
+  return formData
+}
+
+export async function saveRecord(record) {
+
   const response = await fetch('/api/records', {
     method: 'POST',
     mode: 'same-origin',
     cache: 'no-cache',
     credentials: 'include',
-    body: formData
+    body: recordToForm(record),
   })
+
   return response.json()
 }
 
@@ -196,10 +201,7 @@ export async function updateRecord(recordId, record) {
     mode: 'same-origin',
     cache: 'no-cache',
     credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(record),
+    body: recordToForm(record),
   })
   return response.json()
 }

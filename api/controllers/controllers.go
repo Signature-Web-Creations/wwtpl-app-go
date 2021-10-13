@@ -516,7 +516,7 @@ func SaveRecord(c *gin.Context) {
 }
 
 func UpdateRecord(c *gin.Context) {
-	var json models.HistoryRecordForm
+	var form models.HistoryRecordForm
 	var err error
 
 	recordID, err := strconv.ParseInt(c.Param("id"), 10, 64)
@@ -531,13 +531,17 @@ func UpdateRecord(c *gin.Context) {
 		return
 	}
 
-	if err = c.ShouldBindJSON(&json); err != nil {
+
+	err = Validate(c, &form)
+
+	if err != nil {
+		fmt.Println(err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 
-	if err = db.UpdateRecord(recordID, json); err != nil {
+	if err = db.UpdateRecord(recordID, form); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Couldn't process request. Try again later"})
 		fmt.Printf("InsertRecord: %v\n", err.Error())
 		return
