@@ -208,7 +208,7 @@ func EditorListings(user models.User, params map[string]interface{}) ([]models.H
 	query = query.Where(sq.Eq{"created_by": user.ID})
 	query = query.Where(sq.Eq{"record_status_id": 1})
 	query = query.Where(sq.Eq{"deleted_at": nil})
-	query = query.OrderBy("date(history_record.date)").OrderBy("history_record.title")
+	query = query.OrderBy("date(history_record.date_entered) DESC", "history_record.title")
 	query = addFilters(query, params)
 	query = query.Limit(uint64(recordsPerPage))
 	query = query.Offset(uint64(params["offset"].(int)) * recordsPerPage)
@@ -244,7 +244,7 @@ func PublisherListings(user models.User, params map[string]interface{}) ([]model
 		},
 	)
 
-	query = query.OrderBy("date(history_record.date)").OrderBy("history_record.title")
+	query = query.OrderBy("date(history_record.date_entered) DESC", "history_record.title")
 	query = query.Limit(uint64(recordsPerPage))
 	query = query.Offset(uint64(params["offset"].(int)) * recordsPerPage)
 
@@ -278,7 +278,7 @@ func PublisherListings(user models.User, params map[string]interface{}) ([]model
 func AdminListings(params map[string]interface{}) ([]models.HistoryRecord, int, error) {
 	query := historyRecords
 	query = addFilters(query, params)
-	query = query.OrderBy("date(history_record.date)").OrderBy("history_record.title")
+	query = query.OrderBy("date(history_record.date_entered) DESC", "history_record.title")
 	query = query.Limit(uint64(recordsPerPage))
 	query = query.Offset(uint64(params["offset"].(int)) * recordsPerPage)
 
