@@ -2,7 +2,9 @@ package controllers
 
 import (
 	"fmt"
+	"mime/multipart"
 	"net/http"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -444,6 +446,13 @@ func Validate(c *gin.Context, form *models.HistoryRecordForm) error {
 		return fmt.Errorf("Validate: %s", "Title is required")
 	}
 
+
+	file, err := c.FormFile("file") 
+	if err != nil {
+		return err
+	}
+	form.File = file
+
 	form.Content = c.PostForm("content")
 
 	form.Date = c.PostForm("date")
@@ -453,6 +462,7 @@ func Validate(c *gin.Context, form *models.HistoryRecordForm) error {
 
 	form.Origin = c.PostForm("origin") 
 	form.Author = c.PostForm("author")
+
 
 	recordTypeID, err := strconv.ParseInt(c.PostForm("recordType"), 10, 64)
 	if err != nil {
@@ -486,6 +496,20 @@ func Validate(c *gin.Context, form *models.HistoryRecordForm) error {
 	return nil 
 }
 
+const mediaDir = "./public/media"
+
+// Upload file to media directory
+func UploadFile(c *gin.Context, file *multipart.FileHeader) (string, error) {
+	filename := filepath.Base(file.Filename)	
+	dst := filepath.Join(mediaDir, filename)	
+
+	if err := c.SaveUploadedFile(file, dst); err != nil {
+		return "", fmt.Errorf("UploadFile err: %s", err.Error())
+	}
+
+	return filename, nil
+}
+
 func SaveRecord(c *gin.Context) {
 	var form models.HistoryRecordForm
 	var err error
@@ -502,6 +526,21 @@ func SaveRecord(c *gin.Context) {
 		fmt.Println(err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
+	}
+
+	if form.File != nil {
+		filename, err := UploadFile(c, form.File)
+		if err != nil {
+			fmt.Println(err)
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to upload file"})
+			return 
+		}
+
+		// Everything uploaded file is an image for now. 
+		// Later we will add support for other types of files
+		const image = 1 
+		form.AttachmentType = image
+		form.Filename = &filename
 	}
 
 	err = db.InsertRecord(user, form)
@@ -531,7 +570,6 @@ func UpdateRecord(c *gin.Context) {
 		return
 	}
 
-
 	err = Validate(c, &form)
 
 	if err != nil {
@@ -540,10 +578,24 @@ func UpdateRecord(c *gin.Context) {
 		return
 	}
 
+	if form.File != nil {
+		filename, err := UploadFile(c, form.File)
+		if err != nil {
+			fmt.Println(err)
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to upload file"})
+			return 
+		}
+
+		// Everything uploaded file is an image for now. 
+		// Later we will add support for other types of files
+		const image = 1 
+		form.AttachmentType = image
+		form.Filename = &filename
+	}
 
 	if err = db.UpdateRecord(recordID, form); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Couldn't process request. Try again later"})
-		fmt.Printf("InsertRecord: %v\n", err.Error())
+		fmt.Printf("UpdateRecord: %v\n", err.Error())
 		return
 	}
 

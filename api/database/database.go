@@ -746,8 +746,6 @@ func UpdateRecord(recordId int64, record models.HistoryRecordForm) error {
 	if err != nil {
 		tx.Rollback()
 		return fmt.Errorf("Error creating update query: %v", err)
-	} else {
-		fmt.Println(sql)
 	}
 
 	_, err = tx.Exec(sql, arguments...)
@@ -755,9 +753,6 @@ func UpdateRecord(recordId int64, record models.HistoryRecordForm) error {
 		tx.Rollback()
 		return fmt.Errorf("Error updating history record: %v", err)
 	}
-	fmt.Println("Updated history record")
-	
-	fmt.Println("Commiting changes")
 	tx.Commit()
 	return nil
 }
