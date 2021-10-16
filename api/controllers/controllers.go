@@ -33,14 +33,6 @@ func PublicRecordDetail(c *gin.Context) {
 	}
 }
 
-// Options that determine whether to
-// return a HistoryRecord
-type HistoryRecordOptions struct {
-	KeepDeleted  bool  `json:"keepDeleted"`
-	AdminOnly    bool  `json:"adminOnly`
-	RecordStatus int64 `json:"recordStatus"`
-}
-
 // Returns a HistoryRecord by it's id
 // User must be authenticated
 // It decides whether to return a HistoryRecord by options
