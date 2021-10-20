@@ -38,7 +38,8 @@ func init() {
      FROM history_record hr
      LEFT OUTER JOIN record_collections ON hr.id = record_collections.record_id
      LEFT OUTER JOIN collection ON record_collections.collection_id = collection.id
-     WHERE history_record.id = hr.id) AS collections
+     WHERE history_record.id = hr.id) AS collections,
+		history_record.deleted_at
   `).From(`history_record`)
 
 	historyRecords = historyRecords.LeftJoin(`(
@@ -75,6 +76,10 @@ func PublishedRecords() sq.SelectBuilder {
 }
 
 func addFilters(query sq.SelectBuilder, params map[string]interface{}) sq.SelectBuilder {
+	if params == nil {
+		return query
+	}
+
 	if params["query"] != "" {
 		queryParam := fmt.Sprintf("%%%s%%", params["query"])
 		query = query.Where(sq.Or{
@@ -123,6 +128,8 @@ func rowToRecord(row sq.RowScanner) (models.HistoryRecord, error) {
 	var recordStatusID *int64
 	var recordStatus *string 
 
+	var deletedAt *string
+
 	err := row.Scan(
 		&record.ID,
 		&record.Date,
@@ -139,10 +146,11 @@ func rowToRecord(row sq.RowScanner) (models.HistoryRecord, error) {
 		&recordStatusID,
 		&recordStatus,
 		&record.Collections,
+		&deletedAt,
 	)
 
 	if err != nil {
-		return record, fmt.Errorf("%rowToRecord: %v", err)
+		return record, fmt.Errorf("rowToRecord: %v", err)
 	}
 
 	if sourceArchiveID != nil {
@@ -165,6 +173,8 @@ func rowToRecord(row sq.RowScanner) (models.HistoryRecord, error) {
 			Name: *recordType,
 		}
 	}
+
+	record.Deleted = deletedAt != nil
 	return record, nil
 }
 // Executes query either returning a single HistoryRecord or an error
@@ -278,7 +288,7 @@ func PublisherListings(user models.User, params map[string]interface{}) ([]model
 func AdminListings(params map[string]interface{}) ([]models.HistoryRecord, int, error) {
 	query := historyRecords
 	query = addFilters(query, params)
-	query = query.OrderBy("date(history_record.date_entered) DESC", "history_record.title")
+	query = query.OrderBy("date(history_record.date_entered) DESC", "history_record.id desc", "history_record.title")
 	query = query.Limit(uint64(recordsPerPage))
 	query = query.Offset(uint64(params["offset"].(int)) * recordsPerPage)
 
@@ -783,6 +793,30 @@ func ChangeStatus(recordID int64, recordStatusID int64) error {
 
 	if err != nil {
 		return fmt.Errorf("ChangeStatus: %v", err)
+	}
+	return nil
+}
+
+func DeleteRecord(recordID int64) error {
+	query := sq.Update("history_record").Set("deleted_at", "date('now')")
+	query = query.Where("id = ?", recordID)
+
+	_, err := query.RunWith(db).Exec()
+	
+	if err != nil {
+		return fmt.Errorf("DeleteRecord: %v", err)
+	}
+	return nil
+}
+
+func RestoreRecord(recordID int64) error {
+	query := sq.Update("history_record").Set("deleted_at", nil)
+	query = query.Where("id = ?", recordID)
+
+	_, err := query.RunWith(db).Exec()
+	
+	if err != nil {
+		return fmt.Errorf("DeleteRecord: %v", err)
 	}
 	return nil
 }

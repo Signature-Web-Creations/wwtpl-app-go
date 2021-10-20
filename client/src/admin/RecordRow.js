@@ -4,9 +4,6 @@ import { useAuth } from '../auth.js'
 
 function RecordRow(props) {
   const auth = useAuth()
-  const handleDeleteRecord = () => {
-    // intiate delete record
-  }
 
   const handleStatusColor = (status) => {
     if (status === 'unpublished') {
@@ -32,7 +29,7 @@ function RecordRow(props) {
       {auth.user.role === 'admin' && (
         <td>
           <button
-            onClick={handleDeleteRecord}
+            onClick={props.onDelete}
             className="uk-icon-link uk-margin-small-right"
             uk-icon="trash"
           ></button>
@@ -41,7 +38,10 @@ function RecordRow(props) {
       <td>{props.date}</td>
       <td>{props.title}</td>
       <td>
-        <span className={handleStatusColor(props.status.name)}>{props.status.name}</span>
+        {props.deleted 
+          ? <span> Deleted </span>
+          : <span className={handleStatusColor(props.status.name)}>{props.status.name}</span>
+        }
       </td>
     </tr>
   )

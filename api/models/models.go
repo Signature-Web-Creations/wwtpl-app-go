@@ -50,6 +50,7 @@ type HistoryRecord struct {
 	RecordType     *RecordType    `json:"recordType"`
 	Collections    *string        `json:"collections"`
 	RecordStatus   *RecordStatus  `json:"recordStatus"`
+	Deleted				 bool 				  `json:"deleted"`
 }
 
 type RecordType struct {

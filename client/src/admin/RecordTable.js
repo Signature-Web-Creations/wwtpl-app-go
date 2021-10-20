@@ -19,18 +19,21 @@ function AdminListings(props) {
         </tr>
       </thead>
       <tbody>
-        {props.records.map(({ id, date, title, recordStatus }) => (
+        {props.records.map(({ id, date, title, recordStatus, deleted }) => (
           <RecordRow
             id={id}
             key={id}
             date={date}
             title={title}
             status={recordStatus}
+            deleted={deleted}
+            onDelete={() => {props.onDelete(id)}}
           />
         ))}
       </tbody>
     </table>
   )
+
 }
 
 export default function RecordTable(props) {
@@ -41,6 +44,6 @@ export default function RecordTable(props) {
       return null
     }
   } else {
-    return <AdminListings records={props.records} />
+    return <AdminListings records={props.records} onDelete={props.onDelete}/>
   }
 }

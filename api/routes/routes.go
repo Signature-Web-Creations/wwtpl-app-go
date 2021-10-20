@@ -35,6 +35,8 @@ func Create() *gin.Engine {
 	router.POST("/api/records", controllers.SaveRecord)
 	router.POST("/api/records/:id", controllers.UpdateRecord)
 	router.POST("/api/records/status/:id", controllers.ChangeRecordStatus) 
+	router.POST("/api/records/delete/:id", controllers.DeleteRecord)
+	router.POST("/api/records/restore/:id", controllers.RestoreRecord)
 
 	return router
 }

@@ -694,5 +694,47 @@ func ChangeRecordStatus(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"success": "Successfully changed status"})
-	return
+}
+
+func DeleteRecord(c *gin.Context) {
+	user, ok := getAuthenticatedUser(c)
+	if !ok ||user.Role != "admin" {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "Could not find resource."})
+		return
+	}
+
+	recordID, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Internal server error"})
+		return
+	}
+
+	if err := db.DeleteRecord(recordID); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
+		return 
+	}
+
+	c.JSON(http.StatusOK, gin.H{"success": "Successfully deleted record"})
+}
+
+
+func RestoreRecord(c *gin.Context) {
+	user, ok := getAuthenticatedUser(c)
+	if !ok ||user.Role != "admin" {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "Could not find resource."})
+		return
+	}
+
+	recordID, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Internal server error"})
+		return
+	}
+
+	if err := db.RestoreRecord(recordID); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
+		return 
+	}
+
+	c.JSON(http.StatusOK, gin.H{"success": "Successfully deleted record"})
 }

@@ -224,3 +224,29 @@ export async function changeRecordStatus(recordId, recordStatusId) {
   })
   return response.json()
 }
+
+export async function deleteRecord(recordId) {
+  const response = await fetch(`/api/records/delete/${recordId}`, {
+    method: 'POST',
+    mode: 'same-origin',
+    cache: 'no-cache',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    }
+  })
+  return response
+}
+
+export async function restoreRecord(recordId) {
+  const response = await fetch(`/api/records/restore/${recordId}`, {
+    method: 'POST',
+    mode: 'same-origin',
+    cache: 'no-cache',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    }
+  })
+  return response
+}

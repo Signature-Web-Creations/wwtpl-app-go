@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { UrlFor } from './routes'
-import { getListingData } from './api'
+import { getListingData, deleteRecord } from './api'
 import { useSearchParams } from './hooks'
 import { useAuth } from './auth.js'
 import AdminListings from './admin/RecordTable'
@@ -35,6 +35,19 @@ export default function Dashboard() {
   const [recordStatus, setRecordStatus] = useState([])
 
   const [searched, setSearched] = useState(false)
+
+  const handleDelete = function (id) {
+    let updatedRecords = records.map((r) => { 
+      if (r.id === id) {
+        r.deleted = true
+        return r
+      } else {
+        return r
+      } 
+    }) 
+    deleteRecord(id)
+    setRecords(updatedRecords)
+  }
 
   const handleSearch = (searchParams) => {
     if (!auth.user) return
@@ -131,7 +144,7 @@ export default function Dashboard() {
        * List of pending records by default
        * Needs to include a records status in the records
        */}
-      <AdminListings searched={searched} records={records} user={auth.user} />
+      <AdminListings searched={searched} records={records} user={auth.user} onDelete={handleDelete} />
     </>
   )
 }
