@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	database.Connect()
+	database.Connect("archive.db")
 	fmt.Println("Running Williamsport-Washington Township Public Library - History Database")
 	fmt.Println("Server is listening on localhost:8080")
 	fmt.Println("Successfuly connected to Database")

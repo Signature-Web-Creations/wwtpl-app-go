@@ -1,16 +1,19 @@
 package controllers
 
 import (
+	"bytes"
 	"fmt"
+	"io"
 	"mime/multipart"
 	"net/http"
+	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
 
-	"example.com/wwtl-app/models"
 	db "example.com/wwtl-app/database"
+	"example.com/wwtl-app/models"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
@@ -85,15 +88,15 @@ func getQueryParams(c *gin.Context) map[string]interface{} {
 }
 
 // Gets Listing information for editors, admins, and publishers
-// and returns it as in JSON body. The only difference between 
+// and returns it as in JSON body. The only difference between
 // editors, publishers and admins is the corresponding database
 // function that is used to retrieve records. Users that are not
-// logged in receive a 401. 
+// logged in receive a 401.
 func GetListingInformation(c *gin.Context) {
 	var err error
 	user, ok := getAuthenticatedUser(c)
 	if !ok {
-		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "User is not authorized"})
+		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "Not found"})
 		return
 	}
 
@@ -101,25 +104,25 @@ func GetListingInformation(c *gin.Context) {
 	params := getQueryParams(c)
 
 	var records []models.HistoryRecord
-	var pages int 
+	var pages int
 	switch user.Role {
-		case "editor": 
-			records, pages, err = db.EditorListings(user, params)
-		case "publisher": 
-			records, pages, err = db.PublisherListings(user, params)
-		case "admin": 
-			records, pages, err = db.AdminListings(params)
-		default:
-			c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "An internal service error has occured."})
-			fmt.Printf("GetListingInformation: unknown user role: '%s'\n", user.Role)
-			return
+	case "editor":
+		records, pages, err = db.EditorListings(user, params)
+	case "publisher":
+		records, pages, err = db.PublisherListings(user, params)
+	case "admin":
+		records, pages, err = db.AdminListings(params)
+	default:
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "An internal service error has occured."})
+		fmt.Printf("GetListingInformation: unknown user role: '%s'\n", user.Role)
+		return
 	}
 
 	if err != nil {
 		fmt.Printf("Error: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "An internal service error has occured."})
 		return
-	} 
+	}
 
 	results["records"] = records
 	results["pages"] = pages
@@ -137,7 +140,7 @@ func GetListingInformation(c *gin.Context) {
 		fmt.Printf("Error: %v", err)
 		c.IndentedJSON(http.StatusOK, nil)
 		return
-	} 
+	}
 	results["collections"] = collections
 
 	sourceArchives, err := db.GetSourceArchives()
@@ -162,16 +165,16 @@ func GetListingInformation(c *gin.Context) {
 		fmt.Printf("Error: %v", err)
 		c.IndentedJSON(http.StatusOK, nil)
 		return
-	} 
+	}
 	results["recordStatus"] = recordStatus
 
 	c.IndentedJSON(http.StatusOK, results)
 }
 
-// Sends JSON information for public listings. 
-// Includes records, number of pages, 
+// Sends JSON information for public listings.
+// Includes records, number of pages,
 // record_statuses, source archives, collections
-// and years.  
+// and years.
 func GetPublicListings(c *gin.Context) {
 	params := getQueryParams(c)
 
@@ -182,7 +185,7 @@ func GetPublicListings(c *gin.Context) {
 		fmt.Printf("Error: %v", err)
 		c.IndentedJSON(http.StatusOK, nil)
 		return
-	} 
+	}
 
 	results["records"] = records
 
@@ -191,7 +194,7 @@ func GetPublicListings(c *gin.Context) {
 		fmt.Printf("Error: %v", err)
 		c.IndentedJSON(http.StatusOK, nil)
 		return
-	} 
+	}
 	results["pages"] = pages
 
 	years, err := db.GetYears()
@@ -207,7 +210,7 @@ func GetPublicListings(c *gin.Context) {
 		fmt.Printf("Error: %v", err)
 		c.IndentedJSON(http.StatusOK, nil)
 		return
-	} 
+	}
 	results["collections"] = collections
 
 	sourceArchives, err := db.GetSourceArchives()
@@ -232,14 +235,13 @@ func GetPublicListings(c *gin.Context) {
 		fmt.Printf("Error: %v", err)
 		c.IndentedJSON(http.StatusOK, nil)
 		return
-	} 
+	}
 	results["recordStatus"] = recordStatus
 
 	c.IndentedJSON(http.StatusOK, results)
 }
 
 // User Authentication Controllers
-
 
 // Creates an new user if valid
 func RegisterUser(c *gin.Context) {
@@ -430,20 +432,12 @@ func DisableUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"success": "Successfully disabled user"})
 }
 
-
-// Populates and validates a form 
+// Populates and validates a form
 func Validate(c *gin.Context, form *models.HistoryRecordForm) error {
 	form.Title = c.PostForm("title")
 	if form.Title == "" {
 		return fmt.Errorf("Validate: %s", "Title is required")
 	}
-
-
-	file, err := c.FormFile("file") 
-	if err != nil {
-		return err
-	}
-	form.File = file
 
 	form.Content = c.PostForm("content")
 
@@ -452,9 +446,8 @@ func Validate(c *gin.Context, form *models.HistoryRecordForm) error {
 		return fmt.Errorf("Validate: %s", "Date is required")
 	}
 
-	form.Origin = c.PostForm("origin") 
+	form.Origin = c.PostForm("origin")
 	form.Author = c.PostForm("author")
-
 
 	recordTypeID, err := strconv.ParseInt(c.PostForm("recordType"), 10, 64)
 	if err != nil {
@@ -485,27 +478,122 @@ func Validate(c *gin.Context, form *models.HistoryRecordForm) error {
 	}
 	form.Collections = collections
 
-	return nil 
+	file, err := c.FormFile("file")
+	if err == nil {
+		form.File = file
+	}
+
+	return nil
 }
 
 const mediaDir = "./public/media"
 
-// Upload file to media directory
-func UploadFile(c *gin.Context, file *multipart.FileHeader) (string, error) {
-	filename := filepath.Base(file.Filename)	
-	dst := filepath.Join(mediaDir, filename)	
+// Uploads a form to a given url
+func Upload(client *http.Client, method, url string, cookies []*http.Cookie, values map[string]io.Reader) (*http.Response, error) {
+	var b bytes.Buffer
+	var err error
+	w := multipart.NewWriter(&b)
+	for key, r := range values {
+		var fw io.Writer
+		if x, ok := r.(io.Closer); ok {
+			defer x.Close()
+		}
 
-	if err := c.SaveUploadedFile(file, dst); err != nil {
-		return "", fmt.Errorf("UploadFile err: %s", err.Error())
+		// Add a file
+		if x, ok := r.(*os.File); ok {
+			if fw, err = w.CreateFormFile(key, x.Name()); err != nil {
+				return nil, err
+			}
+		} else {
+			if fw, err = w.CreateFormField(key); err != nil {
+				return nil, err
+			}
+		}
+
+		if _, err := io.Copy(fw, r); err != nil {
+			return nil, err
+		}
 	}
 
-	return filename, nil
+	w.Close()
+
+	req, err := http.NewRequest(method, url, &b)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Set("Content-Type", w.FormDataContentType())
+	for _, cookie := range cookies {
+		req.AddCookie(cookie)
+	}
+
+	return client.Do(req)
+}
+
+// Save file to media directory
+func SaveFile(c *gin.Context, form *models.HistoryRecordForm) error {
+	file := form.File
+
+	src, err := file.Open()
+	if err != nil {
+		return err
+	}
+	defer src.Close()
+
+	out, err := os.CreateTemp(mediaDir, "uploads")
+	if err != nil {
+		return fmt.Errorf("SaveFile - %s", err.Error())
+	}
+	filename := filepath.Base(out.Name())
+	defer out.Close() 
+
+	_, err = io.Copy(out, src)
+
+	if _, err = io.Copy(out, src); err != nil {
+		return fmt.Errorf("SaveFile err: %s", err.Error())
+	}
+
+
+	f, err := form.File.Open()
+	if err != nil {
+		return fmt.Errorf("SaveFile err: %s", err.Error())
+	}
+	defer f.Close()
+
+	buffer := make([]byte, 512)
+	_, err = f.Read(buffer)
+	if err != nil {
+		return fmt.Errorf("SaveFile err: %s", err.Error())
+	}
+
+	var attachmentTypeId int64
+	switch http.DetectContentType(buffer) {
+	case "application/pdf":
+		attachmentTypeId = models.Document
+	case "text/plain":
+		attachmentTypeId = models.Document
+	case "image/gif":
+		attachmentTypeId = models.Image
+	case "image/png":
+		attachmentTypeId = models.Image
+	case "image/jpeg":
+		attachmentTypeId = models.Image
+	default:
+		attachmentTypeId = models.Document
+	}
+
+	form.Attachment = &models.FileAttachment{
+		AttachmentTypeId: attachmentTypeId,
+		Filename:         filename,
+	}
+
+	return nil
 }
 
 func SaveRecord(c *gin.Context) {
 	var form models.HistoryRecordForm
 	var err error
-	
+
 	user, ok := getAuthenticatedUser(c)
 	if !ok {
 		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "User is not authorized"})
@@ -521,21 +609,15 @@ func SaveRecord(c *gin.Context) {
 	}
 
 	if form.File != nil {
-		filename, err := UploadFile(c, form.File)
+		err := SaveFile(c, &form)
 		if err != nil {
 			fmt.Println(err)
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to upload file"})
-			return 
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
 		}
-
-		// Everything uploaded file is an image for now. 
-		// Later we will add support for other types of files
-		const image = 1 
-		form.AttachmentType = image
-		form.Filename = &filename
 	}
 
-	err = db.InsertRecord(user, form)
+	newRecordId, err := db.InsertRecord(user, form)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Couldn't process request. Try again later"})
@@ -543,7 +625,7 @@ func SaveRecord(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"success": "Successfully created record", "form": form})
+	c.JSON(http.StatusOK, gin.H{"success": "Successfully created record", "newRecordId": newRecordId})
 }
 
 func UpdateRecord(c *gin.Context) {
@@ -570,21 +652,6 @@ func UpdateRecord(c *gin.Context) {
 		return
 	}
 
-	if form.File != nil {
-		filename, err := UploadFile(c, form.File)
-		if err != nil {
-			fmt.Println(err)
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to upload file"})
-			return 
-		}
-
-		// Everything uploaded file is an image for now. 
-		// Later we will add support for other types of files
-		const image = 1 
-		form.AttachmentType = image
-		form.Filename = &filename
-	}
-
 	if err = db.UpdateRecord(recordID, form); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Couldn't process request. Try again later"})
 		fmt.Printf("UpdateRecord: %v\n", err.Error())
@@ -595,7 +662,7 @@ func UpdateRecord(c *gin.Context) {
 }
 
 type RecordStatusID struct {
-	ID int64 `json:"recordStatusId"`  
+	ID int64 `json:"recordStatusId"`
 }
 
 func ChangeRecordStatus(c *gin.Context) {
@@ -608,7 +675,6 @@ func ChangeRecordStatus(c *gin.Context) {
 		return
 	}
 
-
 	recordID, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -620,8 +686,7 @@ func ChangeRecordStatus(c *gin.Context) {
 		return
 	}
 
-
-	err = db.ChangeStatus(recordID, json.ID) 
+	err = db.ChangeStatus(recordID, json.ID)
 	if err != nil {
 		fmt.Printf("ChangeRecordStatus: %v\n", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Couldn't process request. Try again later"})
@@ -629,5 +694,5 @@ func ChangeRecordStatus(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"success": "Successfully changed status"})
-	return 
+	return
 }

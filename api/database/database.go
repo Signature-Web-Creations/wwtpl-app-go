@@ -53,8 +53,8 @@ func init() {
 	historyRecords = historyRecords.LeftJoin(`record_status ON history_record.record_status_id = record_status.id`)
 }
 
-func Connect() {
-	dsn := "file:archive.db"
+func Connect(filename string) {
+	dsn := fmt.Sprintf("file:%s", filename)
 
 	var err error
 	db, err = sql.Open("sqlite3", dsn)
@@ -133,7 +133,7 @@ func rowToRecord(row sq.RowScanner) (models.HistoryRecord, error) {
 		&sourceArchiveID,
 		&sourceArchive,
 		&record.AttachmentType,
-		&record.FileName,
+		&record.Filename,
 		&recordTypeID,
 		&recordType,
 		&recordStatusID,
@@ -655,7 +655,7 @@ func UpdateUser(userId int64, fields map[string]interface{}) error {
 }
 
 // Inserts a history record
-func InsertRecord(user models.User, record models.HistoryRecordForm) error {
+func InsertRecord(user models.User, record models.HistoryRecordForm) (int64, error) {
 
 	tx, err := db.Begin()
 
@@ -670,11 +670,10 @@ func InsertRecord(user models.User, record models.HistoryRecordForm) error {
 
 	if err != nil {
 		tx.Rollback()
-		return fmt.Errorf("Error inserting record: %v", err)
+		return 0, fmt.Errorf("Error inserting record: %v", err)
 	}
 
 	recordId, err := result.LastInsertId()
-	fmt.Printf("RecordId: %d\n", recordId)
 
 	query := sq.Insert("record_collections")
 	query = query.Columns("record_id", "collection_id")
@@ -682,20 +681,40 @@ func InsertRecord(user models.User, record models.HistoryRecordForm) error {
 		query = query.Values(recordId, collectionId)
 	}
 
+
 	sql, arguments, err := query.ToSql()
 	if err != nil {
 		tx.Rollback()
-		return fmt.Errorf("Error creating query for collections: %v", err)
+		return 0, fmt.Errorf("Error creating query for collections: %v", err)
 	}
 
 	_, err = tx.Exec(sql, arguments...)
 	if err != nil {
 		tx.Rollback()
-		return fmt.Errorf("Error inserting collections: %v", err)
+		return 0, fmt.Errorf("Error inserting collections: %v", err)
+	}
+
+	if record.Attachment != nil {
+		attachment := record.Attachment
+		query = sq.Insert("file_attachment")
+		query = query.Columns("record_id", "file_name", "attachment_type_id")
+		query = query.Values(recordId, attachment.Filename, attachment.AttachmentTypeId)
+
+		sql, arguments, err := query.ToSql()
+		if err != nil {
+			tx.Rollback()
+			return 0, fmt.Errorf("Error creating query for file_attachment: %v", err)
+		}
+
+		_, err = tx.Exec(sql, arguments...)
+		if err != nil {
+			tx.Rollback()
+			return 0, fmt.Errorf("Error saving file_attachment: %v", err)
+		}
 	}
 
 	tx.Commit()
-	return nil
+	return recordId, nil
 }
 
 func UpdateRecord(recordId int64, record models.HistoryRecordForm) error {

@@ -1,18 +1,40 @@
 package models
 
+import (
+	"mime/multipart"
+)
+
+// Attachment Types
+// Currently the application only really supports pdf and jpg, gif, and png
+// Pdfs are documents
+// jgp, gif, and png are images
+// Starts at 1 to correspond with database
+const (
+	Image = iota + 1
+	Video
+	Audio
+	Document
+)
+
+type FileAttachment struct {
+	AttachmentTypeId int64  `json:"attachment_type_id"`
+	Filename         string `json:"file_name"`
+	RecordId         int64  `json:"record_id"`
+}
+
 type HistoryRecordForm struct {
-	ID              int64   `json:"id"`
-	Date            string  `json:"date"`
-	Title           string  `json:"title"`
-	Content         string  `json:"content"`
-	Origin          string  `json:"origin"`
-	Author          string  `json:"author"`
-	AttachmentType  *string `json:"attachmentType"`
-	FileName        *string `json:"fileName"`
-	RecordTypeID    int64   `json:"recordType"`
-	SourceArchiveID int64   `json:"sourceArchive"`
-	Collections     []int64 `json:"collections"`
-	RecordStatusID  int64   `json:"recordStatus"`
+	ID              int64                 `json:"id"`
+	Date            string                `json:"date"`
+	Title           string                `json:"title"`
+	Content         string                `json:"content"`
+	Origin          string                `json:"origin"`
+	Author          string                `json:"author"`
+	Attachment      *FileAttachment       `json:"-"`
+	File            *multipart.FileHeader `json:"-"`
+	RecordTypeID    int64                 `json:"recordType"`
+	SourceArchiveID int64                 `json:"sourceArchive"`
+	Collections     []int64               `json:"collections"`
+	RecordStatusID  int64                 `json:"recordStatus"`
 }
 
 type HistoryRecord struct {
@@ -24,7 +46,7 @@ type HistoryRecord struct {
 	Author         string         `json:"author"`
 	SourceArchive  *SourceArchive `json:"sourceArchive"`
 	AttachmentType *string        `json:"attachmentType"`
-	FileName       *string        `json:"fileName"`
+	Filename       *string        `json:"fileName"`
 	RecordType     *RecordType    `json:"recordType"`
 	Collections    *string        `json:"collections"`
 	RecordStatus   *RecordStatus  `json:"recordStatus"`

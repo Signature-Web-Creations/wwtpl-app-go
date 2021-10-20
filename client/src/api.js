@@ -172,6 +172,11 @@ const recordToForm = (record) =>  {
   const formData = new FormData()
   formData.append('title', record.title)
   formData.append('content', record.content)
+
+  if (record.file !== null) {
+    formData.append('file', record.file)
+  }
+
   formData.append('date', record.date)
   formData.append('author', record.author)
   formData.append('recordType', record.recordType)

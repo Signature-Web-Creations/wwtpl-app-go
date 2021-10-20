@@ -24,6 +24,7 @@ function RecordForm(props) {
 
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
+  const [file, setFile] = useState(null)
   const [date, setDate] = useState('')
   const [origin, setOrigin] = useState('')
   const [author, setAuthor] = useState('')
@@ -190,6 +191,7 @@ function RecordForm(props) {
       const formData = {
         title: title.trim(),
         content: content.trim(),
+        file: file,
         date: date.trim(),
         origin: origin.trim(),
         author: author.trim(),
@@ -279,6 +281,9 @@ function RecordForm(props) {
             type="file"
             name="file"
             accept=".jpg, .jpeg, .png"
+            onChange={(e) => {
+              setFile(e.target.files[0])
+            }}
           />
         </div>
       </div> 
