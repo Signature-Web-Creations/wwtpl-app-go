@@ -738,3 +738,27 @@ func RestoreRecord(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"success": "Successfully deleted record"})
 }
+
+func GetSourceArchives(c *gin.Context) {
+	sourceArchives, err := db.GetSourceArchives()
+
+	if err != nil {
+		fmt.Printf("GetSourceArchives - %v\n", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve resource"})
+		return 
+	}
+
+	c.JSON(http.StatusOK, gin.H{"sourceArchives": sourceArchives})
+}
+
+func GetCollections(c *gin.Context) {
+	collections, err := db.GetCollections()
+
+	if err != nil {
+		fmt.Printf("GetCollections - %v\n", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve resource"})
+		return 
+	}
+
+	c.JSON(http.StatusOK, gin.H{"collections": collections.Collections})
+}
