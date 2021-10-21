@@ -822,3 +822,21 @@ func RestoreRecord(recordID int64) error {
 	return nil
 }
 
+// A function for inserting new values in 
+// Source Archives, Collections, and Record Types
+// Because the only thing that would change between
+// the 3 functions is the table name I decided to put
+// One function here. 
+func InsertName(tableName, name string) error {
+	query := sq.Insert(tableName) 
+	query = query.Columns("name") 
+	query = query.Values(name) 
+
+	_, err := query.RunWith(db).Exec() 
+	if err != nil {
+		return fmt.Errorf("Insert %s: %v", tableName, err)
+	}
+
+	return nil
+}
+

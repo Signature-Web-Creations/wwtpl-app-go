@@ -40,6 +40,11 @@ func Create() *gin.Engine {
 
 	router.GET("/api/sourceArchives", controllers.GetSourceArchives)
 	router.GET("/api/collections", controllers.GetCollections)
+	router.GET("/api/recordTypes", controllers.GetRecordTypes)
+
+	router.POST("/api/sourceArchives", controllers.AddName("source archive", "source_archive"))
+	router.POST("/api/collections", controllers.AddName("collection", "collection"))
+	router.POST("/api/recordTypes", controllers.AddName("record type", "record_type"))
 
 	return router
 }

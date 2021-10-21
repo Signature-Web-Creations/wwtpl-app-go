@@ -751,6 +751,18 @@ func GetSourceArchives(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"sourceArchives": sourceArchives})
 }
 
+func GetRecordTypes(c *gin.Context) {
+	recordTypes, err := db.GetRecordTypes()
+
+	if err != nil {
+		fmt.Printf("GetRecordTypes - %v\n", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve resource"})
+		return 
+	}
+
+	c.JSON(http.StatusOK, gin.H{"recordTypes": recordTypes})
+}
+
 func GetCollections(c *gin.Context) {
 	collections, err := db.GetCollections()
 
@@ -761,4 +773,29 @@ func GetCollections(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"collections": collections.Collections})
+}
+
+func AddName(displayName, tableName string) func(c *gin.Context) {
+	return func(c *gin.Context) {	
+		user, ok := getAuthenticatedUser(c)
+		if !ok ||user.Role != "admin" {
+			c.IndentedJSON(http.StatusNotFound, gin.H{"error": "Could not find resource."})
+			return
+		}
+
+		name := c.PostForm("name") 
+		if name == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "name is required"})
+			return 
+		}
+
+		err := db.InsertName(tableName, "name")
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to insert name"})
+			return
+		}
+
+		c.JSON(http.StatusOK,
+			gin.H{"success": fmt.Sprintf("Successfully inserted %s", displayName)})
+	}
 }
