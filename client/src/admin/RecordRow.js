@@ -31,7 +31,7 @@ function RecordRow(props) {
           <button
             onClick={props.onDelete}
             className="uk-icon-link uk-margin-small-right"
-            uk-icon="trash"
+            uk-icon={props.deleted ? "refresh" : "trash"}
           ></button>
         </td>
       )}
@@ -39,7 +39,7 @@ function RecordRow(props) {
       <td>{props.title}</td>
       <td>
         {props.deleted 
-          ? <span> Deleted </span>
+          ? <span className={handleStatusColor("deleted")}> Deleted </span>
           : <span className={handleStatusColor(props.status.name)}>{props.status.name}</span>
         }
       </td>
