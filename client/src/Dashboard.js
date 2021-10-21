@@ -106,15 +106,6 @@ export default function Dashboard() {
 
   return (
     <>
-      {auth.user.role === 'admin' && (
-        <Link
-          to={UrlFor('addUser')}
-          className="uk-button uk-button-primary uk-margin-right"
-        >
-          {' '}
-          Add New User{' '}
-        </Link>
-      )}
 
       {auth.user.role === 'admin' && (
         <Link

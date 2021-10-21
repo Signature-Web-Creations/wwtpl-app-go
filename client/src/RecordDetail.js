@@ -23,6 +23,17 @@ function TitleRow(props) {
   )
 }
 
+function PdfRow(props) {
+  return (
+    <tr>
+      <td><strong> Document </strong></td>
+      <td>
+        <embed src={`/media/${props.src}`} type="application/pdf" width="100%" height="600px" />
+      </td>
+    </tr>
+  )
+}
+
 function ImageRow(props) {
   return (
     <tr>
@@ -35,6 +46,8 @@ function ImageRow(props) {
 function FileAttachmentRow(props) {
   if (props.attachmentType === null) {
     return null;
+  } else if (props.attachmentType === 'document') {
+    return <PdfRow src={props.fileName} />
   }
   else if (props.attachmentType === 'image') {
     return <ImageRow alt={props.title} src={props.fileName} />

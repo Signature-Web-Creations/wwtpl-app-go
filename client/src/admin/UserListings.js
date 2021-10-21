@@ -1,6 +1,7 @@
 import {Link} from 'react-router-dom'
 import {getUsers, disableUser} from '../api'
 import {useState, useEffect} from 'react'
+import {UrlFor} from '../routes.js'
 
 function UserRow(props) {
 
@@ -57,28 +58,39 @@ export default function UserListings(props) {
   }, [])
 
   return (
-    <table className="uk-table uk-table-middle uk-table-divider uk-table-hover uk-margin-medium">
-      <thead>
-        <tr>
-          <th className="uk-table-small"></th>
-          <th className="uk-table-small"></th>
-          <th className="uk-width-small">Last Name</th>
-          <th>First Name</th>
-          <th>Username</th>
-          <th>Role</th>
-        </tr>
-      </thead>
-      <tbody>
-        {users.map(({id, firstName, lastName, username, role}) => (
-          <UserRow
-            id={id}
-            firstName={firstName}
-            lastName={lastName}
-            username={username}
-            role={role}
-          />
-        ))}
-      </tbody>
-    </table>
+    <div>
+      <Link
+        to={UrlFor('addUser')}
+        className="uk-button uk-button-primary uk-margin-right"
+      >
+        {' '}
+        Add New User{' '}
+      </Link>
+
+
+      <table className="uk-table uk-table-middle uk-table-divider uk-table-hover uk-margin-medium">
+        <thead>
+          <tr>
+            <th className="uk-table-small"></th>
+            <th className="uk-table-small"></th>
+            <th className="uk-width-small">Last Name</th>
+            <th>First Name</th>
+            <th>Username</th>
+            <th>Role</th>
+          </tr>
+        </thead>
+        <tbody>
+          {users.map(({id, firstName, lastName, username, role}) => (
+            <UserRow
+              id={id}
+              firstName={firstName}
+              lastName={lastName}
+              username={username}
+              role={role}
+            />
+          ))}
+        </tbody>
+      </table>
+    </div>
   )
 }
