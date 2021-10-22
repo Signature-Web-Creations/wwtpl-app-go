@@ -1,3 +1,4 @@
+rm -r api/public
 cd client
 yarn build
 mv build ../api/public

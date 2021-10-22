@@ -840,3 +840,48 @@ func InsertName(tableName, name string) error {
 	return nil
 }
 
+// Returns page views for today. 
+func PageViewsForToday() (int, error) {
+	var count int
+	var err error
+
+	query := sq.Select("count").From("page_views").Where("date = date('now')") 
+	row := query.RunWith(db).QueryRow()
+
+	if err = row.Scan(&count); err != nil {
+		if err == sql.ErrNoRows {
+			return 0, nil
+		} else {
+			return 0, err
+		} 
+	}
+
+	return count, nil
+}
+
+// Track daily page views
+func LogPageViews() error {
+	var err error
+
+	fmt.Println("Logging page views") 
+	query := sq.Select("count").From("page_views").Where("date = date('now')")
+	row := query.RunWith(db).QueryRow()
+
+	var count int64
+	if err = row.Scan(&count); err == sql.ErrNoRows {
+		insert := sq.Insert("page_views").Columns("date", "count").Values(`"date('now')"`, 1) 
+		fmt.Println("Inserting count for today") 
+		if _, err = insert.RunWith(db).Exec(); err != nil {
+			return err
+		}
+	} else {
+		update := sq.Update("page_views").Set("count", count + 1).Where("date = date('now')") 
+		fmt.Println("Updating count for today.") 
+		if _, err = update.RunWith(db).Exec(); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+

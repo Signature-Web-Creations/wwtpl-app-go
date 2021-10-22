@@ -13,18 +13,18 @@ import (
 func createUser() {
 	var user models.NewUser 
 
-	fmt.Println("Enter first name. ")
+	fmt.Printf("Enter first name. ")
 	fmt.Scanln(&user.FirstName)
-	fmt.Println("Enter last name. ")
+	fmt.Printf("Enter last name. ")
 	fmt.Scanln(&user.LastName)
-	fmt.Println("Enter username. ")
+	fmt.Printf("Enter username. ")
 	fmt.Scanln(&user.Username)
-	fmt.Println("Enter password. ")
+	fmt.Printf("Enter password. ")
 	fmt.Scanln(&user.Password)
 
 
 	var roleId string
-	fmt.Println("Enter a role (1 for editor, 2 for publisher, 3 for admin). ")
+	fmt.Printf("Enter a role (1 for editor, 2 for publisher, 3 for admin). ")
 	fmt.Scanln(&roleId)
 	role, err := strconv.ParseInt(roleId, 10, 64) 
 	if err != nil {
@@ -35,6 +35,7 @@ func createUser() {
 
 	if err = database.CreateUser(user); err != nil {
 		fmt.Printf("Failed to create new user. %v\n", err)
+		return 
 	} 
 	fmt.Println("Successfully created new user.")
 }

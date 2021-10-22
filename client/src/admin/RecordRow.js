@@ -9,7 +9,9 @@ function RecordRow(props) {
     if (status === 'unpublished') {
       return 'uk-label uk-label-warning'
     } else if (status === 'deleted') {
-      return 'uk-label uk-label-error'
+      return 'uk-label uk-label-danger'
+    } else if (status == "pending_approval") {
+      return 'uk-label'
     } else {
       return 'uk-label uk-label-success'
     }

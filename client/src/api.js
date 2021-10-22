@@ -250,3 +250,16 @@ export async function restoreRecord(recordId) {
   })
   return response
 }
+
+export function getSourceArchives() {
+  const response = fetch('/api/sourceArchives', {
+    method: 'GET', 
+    mode: 'same-origin', 
+    cache: 'no-cache', 
+    credentials: 'include', 
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+  return response
+}

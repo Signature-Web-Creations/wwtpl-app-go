@@ -5,6 +5,8 @@ const routes = {
   logout: '/logout',
   showUsers: '/users',
   addUser: '/adduser',
+  showSourceArchives: '/sourceArchives',
+  addSourceArchive: '/addSourceArchive',
   newRecord: '/record/new',
   editRecord: {
     url: '/record/edit',

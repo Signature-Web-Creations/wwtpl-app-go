@@ -62,3 +62,16 @@ That is a validation constraint more than an database one.
 There is a many to many relationship between Collections and Records. 
 
 Admins need the ability to add collections. 
+
+# Running the go server 
+Before you start the server you need to set an environment variable.
+Set env=dev for development. It will use the database development.db
+Set env=prod for production. It will use the database archive.db
+
+Failure to set this environment variable will cause the server to crash. 
+archive.db is currenlty "clean" Try to keep it that way. 
+
+
+# Creating Users
+Run `go run . createUser` to create a user. 
+

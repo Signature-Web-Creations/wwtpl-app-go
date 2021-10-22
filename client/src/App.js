@@ -18,6 +18,7 @@ import { useAuth, PrivateRoute } from './auth.js'
 import RecordForm from './admin/RecordForm'
 import UserForm from './admin/UserForm'
 import UserListings from './admin/UserListings'
+import SourceArchiveListings from './admin/SourceArchiveListings'
 
 function getOffset(searchParameters) {
   let offsetParam = searchParameters.get('offset')
@@ -182,6 +183,10 @@ function App() {
           <UserForm />
         </PrivateRoute>
 
+        <PrivateRoute path={UrlFor('showSourceArchives')}>
+          <SourceArchiveListings />
+        </PrivateRoute>
+
         <PrivateRoute path={UrlFor('showUsers')}>
           <UserListings />
         </PrivateRoute>
@@ -189,29 +194,29 @@ function App() {
           <Redirect to={UrlFor('home')} />
         </Route>
 
-        {auth.user ? (
-          <Route path={UrlFor('home')}>
+        <Route path={UrlFor('home')}>
+          {auth.user ? (
             <Redirect to={UrlFor('adminHome')} />
-          </Route>
-        ) : (
-          <Route exact path={UrlFor('home')}>
-            <Header>
-              <h1 className="uk-text-lead"> History Listing </h1>
-              <SearchForm
-                years={!years ? [] : years}
-                recordTypes={recordTypes}
-                collections={collections}
-                sourceArchives={sourceArchives}
-                onSubmit={handleSearch}
-              />
-              <PaginationButtons
-                currentPage={!offset ? 0 : offset}
-                pages={pages}
-              />
-            </Header>
-            <RecordTable searched={searched} records={records} />
-          </Route>
-        )}
+          ) : (
+            <>
+              <Header>
+                <h1 className="uk-text-lead"> History Listing </h1>
+                <SearchForm
+                  years={!years ? [] : years}
+                  recordTypes={recordTypes}
+                  collections={collections}
+                  sourceArchives={sourceArchives}
+                  onSubmit={handleSearch}
+                />
+                <PaginationButtons
+                  currentPage={!offset ? 0 : offset}
+                  pages={pages}
+                />
+              </Header>
+              <RecordTable searched={searched} records={records} />
+            </>
+         )}
+        </Route>
       </Switch>
     </div>
   )

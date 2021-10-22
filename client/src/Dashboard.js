@@ -117,6 +117,16 @@ export default function Dashboard() {
         </Link>
       )}
 
+      {auth.user.role === 'admin' && (
+        <Link
+          to={UrlFor('showSourceArchives')}
+          className="uk-button uk-button-default uk-margin-right"
+        >
+          {' '}
+          Manage Source Archives{' '}
+        </Link>
+      )}
+
       <Link to={UrlFor('newRecord')} className="uk-button uk-button-default">
         {' '}
         New Record{' '}
