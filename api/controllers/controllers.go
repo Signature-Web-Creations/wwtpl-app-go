@@ -48,7 +48,7 @@ func RecordDetail(c *gin.Context) {
 		return
 	}
 
-	_, ok := getAuthenticatedUser(c)
+	_, ok := GetAuthenticatedUser(c)
 	if !ok {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "User is not authorized."})
 		return
@@ -94,7 +94,7 @@ func getQueryParams(c *gin.Context) map[string]interface{} {
 // logged in receive a 401.
 func GetListingInformation(c *gin.Context) {
 	var err error
-	user, ok := getAuthenticatedUser(c)
+	user, ok := GetAuthenticatedUser(c)
 	if !ok {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "Not found"})
 		return
@@ -252,7 +252,7 @@ func RegisterUser(c *gin.Context) {
 		return
 	}
 
-	user, ok := getAuthenticatedUser(c)
+	user, ok := GetAuthenticatedUser(c)
 	if !ok || user.Role != "admin" {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "User is not authorized."})
 		return
@@ -326,7 +326,7 @@ func Login(c *gin.Context) {
 // Returns the user if they are authenticated, otherwise returns an false
 // Used to check authentication in controllers where users need to be logged
 // in
-func getAuthenticatedUser(c *gin.Context) (models.User, bool) {
+func GetAuthenticatedUser(c *gin.Context) (models.User, bool) {
 
 	var user models.User
 
@@ -359,7 +359,7 @@ func getAuthenticatedUser(c *gin.Context) (models.User, bool) {
 }
 
 func GetLoggedInUser(c *gin.Context) {
-	user, ok := getAuthenticatedUser(c)
+	user, ok := GetAuthenticatedUser(c)
 	if !ok {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "User is not logged in"})
 		return
@@ -369,7 +369,7 @@ func GetLoggedInUser(c *gin.Context) {
 }
 
 func GetUsersList(c *gin.Context) {
-	user, ok := getAuthenticatedUser(c)
+	user, ok := GetAuthenticatedUser(c)
 	if !ok || user.Role != "admin" {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "User is not authorized"})
 	}
@@ -398,7 +398,7 @@ func GetUserRoles(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, gin.H{"roles": roles})
 }
 
-// JSON that represents a specific user
+
 // used to select a user when editing/disabling
 // users
 type UserID struct {
@@ -406,30 +406,41 @@ type UserID struct {
 }
 
 func DisableUser(c *gin.Context) {
-	var json UserID
-	data := map[string]interface{}{
-		"active": 0,
-	}
-
-	user, ok := getAuthenticatedUser(c)
-	if !ok || user.Role != "admin" {
-		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "User is not authorized"})
-		return
-	}
-
-	if err := c.ShouldBindJSON(&json); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	err := db.UpdateUser(json.ID, data)
+	userId, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Couldn't process request. Try again later"})
-		fmt.Printf("DisableUser: %v\n", err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to disable user"})
+		return
+	}
+
+	err = db.UpdateUser(userId, map[string]interface{}{
+		"active": 0,
+	})
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to disable user"})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"success": "Successfully disabled user"})
+}
+
+func EnableUser(c *gin.Context) {
+	userId, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to disable user"})
+		return
+	}
+
+	err = db.UpdateUser(userId, map[string]interface{}{
+		"active": 1,
+	})
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to enable user"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"success": "Successfully enabled user"})
 }
 
 // Populates and validates a form
@@ -594,7 +605,7 @@ func SaveRecord(c *gin.Context) {
 	var form models.HistoryRecordForm
 	var err error
 
-	user, ok := getAuthenticatedUser(c)
+	user, ok := GetAuthenticatedUser(c)
 	if !ok {
 		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "User is not authorized"})
 		return
@@ -638,7 +649,7 @@ func UpdateRecord(c *gin.Context) {
 		return
 	}
 
-	_, ok := getAuthenticatedUser(c)
+	_, ok := GetAuthenticatedUser(c)
 	if !ok {
 		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "User is not authorized"})
 		return
@@ -669,7 +680,7 @@ func ChangeRecordStatus(c *gin.Context) {
 	var json RecordStatusID
 	var err error
 
-	user, ok := getAuthenticatedUser(c)
+	user, ok := GetAuthenticatedUser(c)
 	if !ok || user.Role == "editor" {
 		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "User is not authorized"})
 		return
@@ -697,7 +708,7 @@ func ChangeRecordStatus(c *gin.Context) {
 }
 
 func DeleteRecord(c *gin.Context) {
-	user, ok := getAuthenticatedUser(c)
+	user, ok := GetAuthenticatedUser(c)
 	if !ok ||user.Role != "admin" {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "Could not find resource."})
 		return
@@ -719,7 +730,7 @@ func DeleteRecord(c *gin.Context) {
 
 
 func RestoreRecord(c *gin.Context) {
-	user, ok := getAuthenticatedUser(c)
+	user, ok := GetAuthenticatedUser(c)
 	if !ok ||user.Role != "admin" {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "Could not find resource."})
 		return
@@ -777,7 +788,7 @@ func GetCollections(c *gin.Context) {
 
 func AddName(displayName, tableName string) func(c *gin.Context) {
 	return func(c *gin.Context) {	
-		user, ok := getAuthenticatedUser(c)
+		user, ok := GetAuthenticatedUser(c)
 		if !ok ||user.Role != "admin" {
 			c.IndentedJSON(http.StatusNotFound, gin.H{"error": "Could not find resource."})
 			return

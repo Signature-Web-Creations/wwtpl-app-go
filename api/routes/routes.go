@@ -2,6 +2,7 @@ package routes
 
 import (
 	"fmt"
+	"net/http"
 
 	"example.com/wwtl-app/controllers"
 	"example.com/wwtl-app/database"
@@ -10,6 +11,19 @@ import (
 	// "github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
 )
+
+// Returns 404 if user is not logged in or logged in user is not admin
+func adminOnly(fn func(c *gin.Context)) func(c *gin.Context){
+	return func(c *gin.Context) {
+		user, ok := controllers.GetAuthenticatedUser(c)
+		if !ok || user.Role != "admin" {
+			c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "User is not authorized"})
+			return
+		}
+
+		fn(c) 
+	}
+}
 
 func logPageView(fn func(c *gin.Context)) func(c *gin.Context) {
 	return func(c *gin.Context) {
@@ -100,12 +114,15 @@ func Create() *gin.Engine {
 	router.POST("/api/user", controllers.RegisterUser)
 	router.POST("/api/login", controllers.Login)
 	router.POST("/api/logout", controllers.Logout)
+
+	// User 
 	router.GET("/api/user", controllers.GetLoggedInUser)
 	router.GET("/api/users", controllers.GetUsersList)
 	router.GET("/api/user_roles", controllers.GetUserRoles)
-	router.POST("/api/user/disable", controllers.DisableUser)
+	router.POST("/api/user/disable/:id", adminOnly(controllers.DisableUser))
+	router.POST("/api/user/enable/:id", adminOnly(controllers.EnableUser))
 
-	// Dashboard / Admin Routes
+	// Records 
 	router.GET("/api/records/", controllers.GetListingInformation)
 	router.GET("/api/records/:id", controllers.RecordDetail)
 	router.POST("/api/records", controllers.SaveRecord)

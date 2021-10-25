@@ -1,26 +1,10 @@
 import {Link} from 'react-router-dom'
-import {getUsers, disableUser} from '../api'
+import {getUsers, disableUser, enableUser} from '../api'
 import {useState, useEffect} from 'react'
 import {UrlFor} from '../routes.js'
 
 function UserRow(props) {
-
-  const {id, firstName, lastName, username, role} = props
-
-  const deleteUser = function (e){
-    e.preventDefault();
-    const userId = parseInt(id) 
-    if (isNaN(userId)) {
-      console.log('Id was not a number') 
-    }
-    disableUser(id).then(response => {
-      if (response.error) {
-        console.log(response.error)
-      } else {
-        console.log(response.success)
-      }
-    })
-  }
+  const {id, firstName, lastName, username, role, active} = props
 
   return (
     <tr>
@@ -32,22 +16,42 @@ function UserRow(props) {
         ></Link>
       </td>
       <td>
-        <Link
-          onClick={deleteUser}
+        <button
+          onClick={props.changeStatus}
           className="uk-icon-link uk-margin-small-right"
-          uk-icon="trash"
-        ></Link>
+          uk-icon={active ? "trash" : "refresh"}
+        ></button>
       </td> 
       <td>{lastName}</td>
       <td>{firstName}</td>
       <td>{username}</td>
       <td>{role}</td>
+      <td>{active ? "Active" : "Inactive"}</td>
     </tr>
   )
 }
 
 export default function UserListings(props) {
   const [users, setUsers] = useState([]) 
+
+  const toggleStatus = (userId) => {
+    let active = true;
+    const updatedUsers = users.map(user => {
+      if (user.id === userId) {
+        user.active = !user.active
+        active = !user.active
+        return user
+      } else {
+        return user
+      }
+    })
+    if (active) {
+      disableUser(userId)
+    } else {
+      enableUser(userId)
+    }
+    setUsers(updatedUsers)
+  }
 
   useEffect(() => {
     getUsers().then((data) => {
@@ -77,16 +81,21 @@ export default function UserListings(props) {
             <th>First Name</th>
             <th>Username</th>
             <th>Role</th>
+            <th>Status</th>
           </tr>
         </thead>
         <tbody>
-          {users.map(({id, firstName, lastName, username, role}) => (
+          {users.map(({id, firstName, lastName, username, role, active}) => (
             <UserRow
               id={id}
               firstName={firstName}
               lastName={lastName}
               username={username}
               role={role}
+              active={active}
+              changeStatus={() => {
+                toggleStatus(id)
+              }}
             />
           ))}
         </tbody>

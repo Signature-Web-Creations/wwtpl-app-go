@@ -155,7 +155,7 @@ export async function getUserRoles() {
 
 // Disables a user
 export async function disableUser(userId) {
-  const response = await fetch('/api/user/disable', {
+  const response = await fetch(`/api/user/disable/${userId}`, {
     method: 'POST',
     mode: 'same-origin',
     cache: 'no-cache',
@@ -163,7 +163,20 @@ export async function disableUser(userId) {
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ userId }),
+  })
+  return response.json()
+}
+
+// Enables a user
+export async function enableUser(userId) {
+  const response = await fetch(`/api/user/enable/${userId}`, {
+    method: 'POST',
+    mode: 'same-origin',
+    cache: 'no-cache',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
   })
   return response.json()
 }

@@ -581,7 +581,7 @@ func GetUserByID(id int) (models.User, error) {
 func GetUsers() ([]models.User, error) {
 	var users []models.User
 
-	query := sq.Select("user.id, firstName, lastName, username, user_roles.name")
+	query := sq.Select("user.id, firstName, lastName, username, user_roles.name, active")
 	query = query.From("user")
 	query = query.InnerJoin("user_roles on user.role_id = user_roles.id")
 
@@ -601,6 +601,7 @@ func GetUsers() ([]models.User, error) {
 			&user.LastName,
 			&user.Username,
 			&user.Role,
+			&user.Active,
 		)
 
 		if err != nil {
