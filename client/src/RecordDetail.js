@@ -44,11 +44,9 @@ function ImageRow(props) {
 }
 
 function FileAttachmentRow(props) {
-  console.log('FileAttachment: ', props.attachmentType)
   if (props.attachmentType === null) {
     return null;
   } else if (props.attachmentType === 'document') {
-    console.log('Loading a pdf')
     return <PdfRow src={props.fileName} />
   } else if (props.attachmentType === 'image') {
     return <ImageRow alt={props.title} src={props.fileName} />

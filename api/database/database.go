@@ -560,17 +560,17 @@ func GetUserByUsername(username string) (models.User, error) {
 func GetUserByID(id int) (models.User, error) {
 	var user models.User
 
-	query := sq.Select("user.id, firstName, lastName, username, password, user_roles.name")
+	query := sq.Select("user.id, firstName, lastName, username, password, user_roles.name, active")
 	query = query.From("user")
 	query = query.InnerJoin("user_roles on user.role_id = user_roles.id")
 	query = query.Where("user.id = ?", id)
 
 	row := query.RunWith(db).QueryRow()
-	err := row.Scan(&user.ID, &user.FirstName, &user.LastName, &user.Username, &user.Password, &user.Role)
+	err := row.Scan(&user.ID, &user.FirstName, &user.LastName, &user.Username, &user.Password, &user.Role, &user.Active)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return user, fmt.Errorf("GetUserByID: no user with username '%d'", id)
+			return user, fmt.Errorf("GetUserByID: no user with id '%d'", id)
 		}
 		return user, fmt.Errorf("GetUserByID %d: %v", id, err)
 	}
@@ -654,8 +654,14 @@ func GetRoles() ([]models.UserRole, error) {
 // Updates a user with given userId
 func UpdateUser(userId int64, fields map[string]interface{}) error {
 	query := sq.Update("user")
+
 	for field, value := range fields {
-		query = query.Set(field, value)
+		if field == "password" {
+			password, _ := bcrypt.GenerateFromPassword([]byte(value.(string)), 14)
+			query = query.Set(field, password) 
+		} else {
+			query = query.Set(field, value)
+		}
 	}
 	query = query.Where("id = ?", userId)
 	_, err := query.RunWith(db).Exec()
@@ -729,6 +735,13 @@ func InsertRecord(user models.User, record models.HistoryRecordForm) (int64, err
 	return recordId, nil
 }
 
+// Deletes file attachment from record with given Id
+func DeleteAttachment(recordId int64) error {
+	query := sq.Delete("file_attachment").Where("record_id = ?", recordId)
+	_, err := query.RunWith(db).Exec() 
+	return err
+}
+
 func UpdateRecord(recordId int64, record models.HistoryRecordForm) error {
 	tx, err := db.Begin()
 
@@ -777,6 +790,25 @@ func UpdateRecord(recordId int64, record models.HistoryRecordForm) error {
 	if err != nil {
 		tx.Rollback()
 		return fmt.Errorf("Error creating update query: %v", err)
+	}
+
+	if record.Attachment != nil {
+		attachment := record.Attachment
+		query = sq.Insert("file_attachment")
+		query = query.Columns("record_id", "file_name", "attachment_type_id")
+		query = query.Values(recordId, attachment.Filename, attachment.AttachmentTypeId)
+
+		sql, arguments, err := query.ToSql()
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("Error creating query for file_attachment: %v", err)
+		}
+
+		_, err = tx.Exec(sql, arguments...)
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("Error saving file_attachment: %v", err)
+		}
 	}
 
 	_, err = tx.Exec(sql, arguments...)

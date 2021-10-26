@@ -5,6 +5,12 @@ const routes = {
   logout: '/logout',
   showUsers: '/users',
   addUser: '/adduser',
+  editUser: {
+    url: '/user/edit',
+    params: {
+      id: ':id'
+    }
+  },
   showSourceArchives: '/sourceArchives',
   addSourceArchive: '/addSourceArchive',
   newRecord: '/record/new',

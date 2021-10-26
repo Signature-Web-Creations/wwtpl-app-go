@@ -129,6 +129,34 @@ export async function createUser(userData) {
   return response.json()
 }
 
+// Updates a user. User must be authenticated
+// and an admin to succeed
+export async function updateUser(userId, userData) {
+  const response = await fetch(`/api/user/${userId}`, {
+    method: 'POST',
+    mode: 'same-origin',
+    cache: 'no-cache',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+
+    body: JSON.stringify(userData),
+  })
+
+  return response.json()
+}
+
+export async function getUser(userId) {
+  const response = await fetch(`/api/users/${userId}`, {
+    method: 'GET',
+    mode: 'same-origin',
+    cache: 'no-cache',
+    credentials: 'include',
+  })
+  return response.json() 
+}
+
 // Returns a json list of users. If the user is not
 // authenticated returns a 401 unauthorized
 export async function getUsers() {
@@ -196,6 +224,7 @@ const recordToForm = (record) =>  {
   formData.append('sourceArchive', record.sourceArchive)
   formData.append('collections', record.collections)
   formData.append('recordStatus', record.recordStatus)
+  formData.append('shouldKeepFile', record.shouldKeepFile)
 
   return formData
 }

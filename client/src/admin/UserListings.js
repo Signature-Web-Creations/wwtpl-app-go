@@ -10,7 +10,7 @@ function UserRow(props) {
     <tr>
       <td> 
         <Link
-          to={`/editUser/${id}`}
+          to={UrlFor('editUser', {id})}
           className="uk-icon-link uk-margin-small-right"
           uk-icon="file-edit"
         ></Link>

@@ -183,6 +183,10 @@ function App() {
           <UserForm />
         </PrivateRoute>
 
+        <PrivateRoute path={UrlFor('editUser')}>
+          <UserForm /> 
+        </PrivateRoute>
+
         <PrivateRoute path={UrlFor('showSourceArchives')}>
           <SourceArchiveListings />
         </PrivateRoute>

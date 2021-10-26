@@ -106,6 +106,14 @@ type NewUser struct {
 	RoleId    int64  `json:"roleId" binding:"required"`
 }
 
+type UpdatedUser struct {
+	FirstName string `json:"firstName" binding:"required"`
+	LastName  string `json:"lastName" binding:"required"`
+	Username  string `json:"username"`
+	Password  string `json:"password"`
+	RoleId    int64  `json:"roleId" binding:"required"`
+}
+
 func (u User) Authorized(userLevel int) bool {
 	return (u.Role == "editor" && userLevel == 1) ||
 		(u.Role == "publisher" && userLevel <= 2) ||

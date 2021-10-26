@@ -267,6 +267,37 @@ func RegisterUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"success": "Successfully created user"})
 }
 
+// Updates a user 
+func UpdateUser(c *gin.Context) {
+	var json models.UpdatedUser 
+
+	userId, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Could not update user"}) 
+		return
+	}
+
+	if err = c.ShouldBindJSON(&json); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	data := make(map[string]interface{})
+	data["firstName"] = json.FirstName
+	data["lastName"] = json.LastName
+	if json.Username != "" {
+		data["username"] = json.Username
+	}
+	if json.Password != "" {
+		data["password"] = json.Password
+	}
+	data["role_id"] = json.RoleId
+
+	err = db.UpdateUser(userId, data)
+
+	c.JSON(http.StatusOK, gin.H{"success": "Successfully updated user"})
+}
+
 // TODO: replace secret key with a randomly generated file loaded from confifuration file
 const SecretKey = "secret"
 
@@ -663,6 +694,17 @@ func UpdateRecord(c *gin.Context) {
 		return
 	}
 
+	if c.PostForm("shouldKeepFile") == "false" {
+		if form.File != nil {
+			err := SaveFile(c, &form)
+			if err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+				return
+			}
+		}
+		db.DeleteAttachment(recordID)
+	}
+
 	if err = db.UpdateRecord(recordID, form); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Couldn't process request. Try again later"})
 		fmt.Printf("UpdateRecord: %v\n", err.Error())
@@ -748,6 +790,22 @@ func RestoreRecord(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"success": "Successfully deleted record"})
+}
+
+func GetUser(c *gin.Context) {
+	userId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Could not get user information"})
+		return 
+	}
+
+	user, err := db.GetUserByID(userId) 
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not get user information"})
+		return
+	} 
+
+	c.JSON(http.StatusOK, gin.H{"user": user})
 }
 
 func GetSourceArchives(c *gin.Context) {

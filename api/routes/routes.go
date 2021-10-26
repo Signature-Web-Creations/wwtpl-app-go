@@ -118,9 +118,11 @@ func Create() *gin.Engine {
 	// User 
 	router.GET("/api/user", controllers.GetLoggedInUser)
 	router.GET("/api/users", controllers.GetUsersList)
+	router.GET("/api/users/:id", adminOnly(controllers.GetUser))
 	router.GET("/api/user_roles", controllers.GetUserRoles)
 	router.POST("/api/user/disable/:id", adminOnly(controllers.DisableUser))
 	router.POST("/api/user/enable/:id", adminOnly(controllers.EnableUser))
+	router.POST("/api/user/:id", adminOnly(controllers.UpdateUser))
 
 	// Records 
 	router.GET("/api/records/", controllers.GetListingInformation)

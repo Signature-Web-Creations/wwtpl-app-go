@@ -19,12 +19,43 @@ function ValidationError(props) {
   return <label className="uk-form-danger"> *{props.error} </label>
 }
 
+function FileInput(props) {
+  return (
+    <div className="uk-form-controls">
+      <input
+        type="file"
+        name="file"
+        accept=".jpg, .jpeg, .png, .pdf"
+        onChange={props.onChange}
+      />
+    </div>
+  )
+}
+
+function FileView(props) {
+  let embed = null;
+  if (props.attachmentType === "image") {
+    embed = <img alt="file attachment" src={`/media/${props.fileName}`} />
+  } else if (props.attachmentType === "document") {
+    embed = <embed src={`/media/${props.fileName}`} type="application/pdf" width="100%" height="600px" />
+  }
+  return (
+    embed
+  )
+}
+  
 function RecordForm(props) {
   let { id } = useParams()
 
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
+
   const [file, setFile] = useState(null)
+  const [fileName, setFileName] = useState(null)
+  const [attachmentType, setAttachmentType] = useState(null) 
+  const [shouldKeepFile, setShouldKeepFile] = useState(false)
+  const [hasFile, setHasFile] = useState(null) 
+
   const [date, setDate] = useState('')
   const [origin, setOrigin] = useState('')
   const [author, setAuthor] = useState('')
@@ -144,6 +175,14 @@ function RecordForm(props) {
           if (r.recordType !== null) {
             setRecordType(r.recordType.id)
           }
+          
+          if (r.attachmentType !== null) {
+            setAttachmentType(r.attachmentType)
+            setFileName(r.fileName)
+            setShouldKeepFile(true)
+            setHasFile(true)
+          }
+
 
           // Some records did not have a source archive
           // this if keeps them from crashing the site
@@ -159,12 +198,17 @@ function RecordForm(props) {
           }
 
           let c = []
-          r.collections.split(';').forEach((col) => {
-            if (props.collectionToId[col]) {
-              c.push(props.collectionToId[col])
-            }
-          })
-          setCollections(c)
+          // Some of the older entries do not have belong to 
+          // any collections. Viewing them will break the 
+          // app.
+          if (r.collections !== null) {
+            r.collections.split(';').forEach((col) => {
+              if (props.collectionToId[col]) {
+                c.push(props.collectionToId[col])
+              }
+            })
+            setCollections(c)
+          }
         }
       })
     }
@@ -199,6 +243,7 @@ function RecordForm(props) {
         sourceArchive: parseIntOrError(sourceArchive),
         collections: collections.map(parseIntOrError),
         recordStatus: recordStatusId === null ? IN_PROGRESS : recordStatusId,
+        shouldKeepFile: shouldKeepFile,
       }
 
       if (newRecord) {
@@ -275,17 +320,33 @@ function RecordForm(props) {
       </div>
 
       <div className="uk-margin">
-        <label htmlFor="file" className="uk-form-label"> Image </label>
-        <div className="uk-form-controls">
-          <input
-            type="file"
-            name="file"
-            accept=".jpg, .jpeg, .png"
-            onChange={(e) => {
-              setFile(e.target.files[0])
-            }}
-          />
-        </div>
+        <label htmlFor="file" className="uk-form-label"> File </label>
+        { shouldKeepFile ? 
+            <FileView 
+              fileName = {fileName}
+              attachmentType = {attachmentType}
+            /> : 
+
+            <FileInput 
+              fileName={fileName} 
+              attachmentType={attachmentType}
+              onChange={(e) => {
+                setFile(e.target.files[0])
+              }}
+            />
+        }
+        { hasFile && 
+          <div>
+            <button
+              onClick={(e) => {
+                e.preventDefault()
+                setShouldKeepFile(!shouldKeepFile)
+              }}
+            >
+              {shouldKeepFile ? "Remove File" : "Undo"}
+            </button>
+          </div>
+        }
       </div> 
       <div className="uk-margin">
         <label className="uk-form-label"> Content </label>

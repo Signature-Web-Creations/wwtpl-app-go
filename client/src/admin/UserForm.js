@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { createUser, getUserRoles } from '../api.js'
+import { useParams } from 'react-router-dom'
+import { createUser, updateUser, getUser, getUserRoles } from '../api.js'
 
 import MessageBox from '../MessageBox.js'
 
@@ -11,14 +12,39 @@ function capitalize(s) {
   return s
 }
 
+const EDITOR = 1
+const PUBLISHER = 2
+const ADMIN = 3
+
+function ToggleButton(props) {
+  return (
+    <button
+      onClick={(e) => {
+        e.preventDefault()
+        props.toggle(!props.on)    
+      }}
+    >
+      {props.on ? props.onText : props.offText}
+    </button>
+  )
+}
+
 function UserForm() {
+
+  const { id } = useParams() 
+  const isNewUser = id === undefined 
+  console.log("Id is:", id)
+  console.log("Is New Record", isNewUser)
+
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
-  // Every role defaults to being an editor. 1 means editor
-  const [roleId, setRoleId] = useState(1)
+  const [disableUsername, setDisableUsername] = useState(false)
+  const [disablePassword, setDisablePassword] = useState(false)
+
+  const [roleId, setRoleId] = useState(EDITOR)
 
   const [roles, setRoles] = useState([])
 
@@ -34,24 +60,68 @@ function UserForm() {
   }
 
   useEffect(() => {
+    if (!isNewUser) {
+      console.log("Getting data for user: ", id)
+      getUser(id).then((data) => {
+        if (data.user) {
+          console.log("Got user data")
+          setFirstName(data.user.firstName)
+          setLastName(data.user.lastName)
+          setUsername(data.user.username)
+
+          if (data.user.role === "editor") {
+            setRoleId(EDITOR)
+          } else if (data.user.role === "publisher") {
+            setRoleId(PUBLISHER)
+          } else if (data.user.role === "admin") {
+            setRoleId(ADMIN)
+          }
+
+          setDisableUsername(true)
+          setDisablePassword(true) 
+        }
+      })
+    }
     getUserRoles().then((data) => {
       if (data.roles) {
         setRoles(data.roles)
       }
     })
-  }, [])
+  }, [id, isNewUser])
 
   const handleSubmit = (event) => {
     event.preventDefault()
     const userData = { firstName, lastName, username, password, roleId }
-    createUser(userData).then((res) => {
-      if (res.success) {
-        setMessage(res.success)
-        clearForm()
-      } else {
-        setError(res.error)
+    if (isNewUser) {
+      createUser(userData).then((res) => {
+        if (res.success) {
+          setMessage(res.success)
+          clearForm()
+        } else {
+          setError(res.error)
+        }
+      })
+    } else {
+      const userData = { firstName, lastName, roleId } 
+      if (!disableUsername) {
+        userData['username'] = username
+      } 
+     
+      // Assuming that if they are changing password 
+      // something is there. A better solution would be
+      // to have validation. Can be changed later
+      if (!disablePassword && password.length !== 0) {
+        userData['password'] = password
       }
-    })
+
+      updateUser(id, userData).then((res) => {
+        if (res.success) {
+          setMessage(res.success)
+        } else {
+          setError(res.error)
+        }
+      })
+    }
   }
 
   const changeFirstName = (event) => {
@@ -60,9 +130,6 @@ function UserForm() {
 
   const changeLastName = (event) => {
     setLastName(event.target.value)
-    setUsername(
-      firstName.charAt(0).toLowerCase() + event.target.value.toLowerCase(),
-    )
   }
 
   const changeUsername = (event) => {
@@ -134,7 +201,16 @@ function UserForm() {
           name="username"
           onChange={changeUsername}
           value={username}
+          disabled={disableUsername}
         />
+        {isNewUser === false && 
+          <ToggleButton 
+            offText="lock username"
+            onText="change username"
+            on={disableUsername} 
+            toggle={setDisableUsername} 
+          />
+        }
       </div>
       <div>
         <label className="uk-form-label uk-margin-top">Password</label>
@@ -144,7 +220,16 @@ function UserForm() {
           name="password"
           onChange={changePassword}
           value={password}
+          disabled={disablePassword}
         />
+        {isNewUser === false && 
+          <ToggleButton 
+            offText="lock password"
+            onText="change password"
+            on={disablePassword} 
+            toggle={setDisablePassword} 
+          />
+        }
       </div>
       <div>
         <label className="uk-form-label uk-margin-top">Role</label>
@@ -161,7 +246,7 @@ function UserForm() {
       <input
         className="uk-button uk-button-primary uk-margin-top"
         type="submit"
-        value="Create User"
+        value={isNewUser ? "Create User" : "Update User"}
       />
     </form>
   )
