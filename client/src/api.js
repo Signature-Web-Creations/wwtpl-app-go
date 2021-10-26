@@ -293,8 +293,8 @@ export async function restoreRecord(recordId) {
   return response
 }
 
-export function getSourceArchives() {
-  const response = fetch('/api/sourceArchives', {
+export async function getSourceArchives() {
+  const response = await fetch('/api/sourceArchives', {
     method: 'GET', 
     mode: 'same-origin', 
     cache: 'no-cache', 
@@ -303,5 +303,33 @@ export function getSourceArchives() {
       'Content-Type': 'application/json'
     }
   })
-  return response
+  return response.json()
+}
+
+export async function addSourceArchive(name) {
+  let formData = new FormData()
+  formData.append("name", name)
+
+  const response = await fetch('/api/sourceArchives', {
+    method: 'POST', 
+    mode: 'same-origin', 
+    cache: 'no-cache', 
+    credentials: 'include', 
+    body: formData,
+  })
+  return response.json()
+}
+
+export async function updateSourceArchive(id, name) {
+  let formData = new FormData()
+  formData.append("name", name)
+
+  const response = await fetch(`/api/sourceArchives/${id}`, {
+    method: 'POST', 
+    mode: 'same-origin', 
+    cache: 'no-cache', 
+    credentials: 'include', 
+    body: formData,
+  })
+  return response.json()
 }

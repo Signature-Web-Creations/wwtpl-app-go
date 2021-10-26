@@ -860,18 +860,33 @@ func RestoreRecord(recordID int64) error {
 // Because the only thing that would change between
 // the 3 functions is the table name I decided to put
 // One function here. 
-func InsertName(tableName, name string) error {
+func InsertName(tableName, name string) (int64, error) {
 	query := sq.Insert(tableName) 
 	query = query.Columns("name") 
 	query = query.Values(name) 
 
-	_, err := query.RunWith(db).Exec() 
+	result, err := query.RunWith(db).Exec() 
+
 	if err != nil {
-		return fmt.Errorf("Insert %s: %v", tableName, err)
+		return 0, fmt.Errorf("Insert %s: %v", tableName, err)
+	}
+
+	return result.LastInsertId()
+}
+
+func UpdateName(id int, tableName, name string) error {
+	query := sq.Update(tableName) 
+	query = query.Set("name", name).Where("id = ?", id)
+
+	_, err := query.RunWith(db).Exec() 
+
+	if err != nil {
+		return fmt.Errorf("Update %s: %v", tableName, err)
 	}
 
 	return nil
 }
+
 
 // Returns page views for today. 
 func PageViewsForToday() (int, error) {

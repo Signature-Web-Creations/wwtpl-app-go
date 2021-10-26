@@ -11,8 +11,34 @@ const routes = {
       id: ':id'
     }
   },
+
   showSourceArchives: '/sourceArchives',
-  addSourceArchive: '/addSourceArchive',
+  addSourceArchive: '/sourceArchives/new',
+  editSourceArchive: {
+    url: '/sourceArchive/edit',
+    params: {
+      id: ':id',
+    },
+  },
+
+  showRecordTypes: '/recordTypes',
+  addRecordType: '/recordTypes/new',
+  editRecordType: {
+    url: '/recordType/edit',
+    params: {
+      id: ':id',
+    },
+  },
+
+  showCollections: '/collections',
+  addCollection: '/collections/new',
+  editCollection: {
+    url: '/collection/edit',
+    params: {
+      id: ':id',
+    },
+  },
+
   newRecord: '/record/new',
   editRecord: {
     url: '/record/edit',

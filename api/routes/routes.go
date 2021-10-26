@@ -141,5 +141,9 @@ func Create() *gin.Engine {
 	router.POST("/api/collections", controllers.AddName("collection", "collection"))
 	router.POST("/api/recordTypes", controllers.AddName("record type", "record_type"))
 
+	router.POST("/api/sourceArchives/:id", controllers.UpdateName("source archive", "source_archive"))
+	router.POST("/api/collections/:id", controllers.UpdateName("collection", "collection"))
+	router.POST("/api/recordTypes/:id", controllers.UpdateName("record type", "record_type"))
+
 	return router
 }

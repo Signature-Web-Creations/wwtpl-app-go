@@ -858,13 +858,44 @@ func AddName(displayName, tableName string) func(c *gin.Context) {
 			return 
 		}
 
-		err := db.InsertName(tableName, "name")
+		rowId, err := db.InsertName(tableName, name)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to insert name"})
 			return
 		}
 
 		c.JSON(http.StatusOK,
-			gin.H{"success": fmt.Sprintf("Successfully inserted %s", displayName)})
+			gin.H{"success": fmt.Sprintf("Successfully inserted %s", displayName), "id": rowId})
+	}
+}
+
+func UpdateName(displayName, tableName string) func(c *gin.Context) {
+	return func(c *gin.Context) {	
+		user, ok := GetAuthenticatedUser(c)
+		if !ok ||user.Role != "admin" {
+			c.IndentedJSON(http.StatusNotFound, gin.H{"error": "Could not find resource."})
+			return
+		}
+
+		id, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Could not process request"})
+			return
+		}
+
+		name := c.PostForm("name") 
+		if name == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "name is required"})
+			return 
+		}
+
+		err = db.UpdateName(id, tableName, name)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to insert name"})
+			return
+		}
+
+		c.JSON(http.StatusOK,
+			gin.H{"success": fmt.Sprintf("Successfully updated %s", displayName)})
 	}
 }
