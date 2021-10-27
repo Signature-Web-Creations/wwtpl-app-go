@@ -2,8 +2,10 @@ import { Link } from 'react-router-dom'
 import { getUsers, disableUser, enableUser } from '../api'
 import { useState, useEffect } from 'react'
 import { UrlFor } from '../routes.js'
+import { useAuth } from '../auth.js'
 
 function UserRow(props) {
+  const auth = useAuth()
   const { id, firstName, lastName, username, role, active } = props
 
   const handleStatusColor = (active) => {
@@ -24,11 +26,13 @@ function UserRow(props) {
         ></Link>
       </td>
       <td>
-        <button
-          onClick={props.changeStatus}
-          className="uk-icon-link uk-margin-small-right"
-          uk-icon={active ? 'trash' : 'refresh'}
-        ></button>
+        {auth.user.username !== username && (
+          <button
+            onClick={props.changeStatus}
+            className="uk-icon-link uk-margin-small-right"
+            uk-icon={active ? 'trash' : 'refresh'}
+          ></button>
+        )}
       </td>
       <td>{lastName}</td>
       <td>{firstName}</td>
