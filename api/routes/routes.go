@@ -137,6 +137,7 @@ func Create() *gin.Engine {
 	router.POST("/api/records/delete/:id", controllers.DeleteRecord)
 	router.POST("/api/records/restore/:id", controllers.RestoreRecord)
 
+	// Managing archives, record types, and collections
 	router.GET("/api/sourceArchives", controllers.GetSourceArchives)
 	router.GET("/api/collections", controllers.GetCollections)
 	router.GET("/api/recordTypes", controllers.GetRecordTypes)
@@ -148,6 +149,8 @@ func Create() *gin.Engine {
 	router.POST("/api/sourceArchives/:id", controllers.UpdateName("source archive", "source_archive"))
 	router.POST("/api/collections/:id", controllers.UpdateName("collection", "collection"))
 	router.POST("/api/recordTypes/:id", controllers.UpdateName("record type", "record_type"))
+
+	router.GET("/api/exportCSV", adminOnly(controllers.ExportPageViews))
 
 	return router
 }

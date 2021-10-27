@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/gin-gonic/gin"
+
 	"example.com/wwtl-app/models"
 	"example.com/wwtl-app/database"
 	"example.com/wwtl-app/routes"
@@ -43,23 +45,29 @@ func createUser() {
 func main() {
 	env := os.Getenv("env") 
 	if env == "" {
-		panic("env is not defined.")
+		panic("env is not set to dev or prod")
 	} else if env == "dev" {
-		fmt.Println("Using database development.db") 
 		database.Connect("development.db")
 	} else if env == "prod" {
-		fmt.Println("Using database archive.db")
 		database.Connect("archive.db")
+		gin.SetMode(gin.ReleaseMode)
+	} else {
+		panic("env is not set to dev or prod")
 	}
 
 	if (len(os.Args) == 1) {
 		fmt.Println("Running Williamsport-Washington Township Public Library - History Database")
-		fmt.Println("Server is listening on localhost:8080")
-		fmt.Println("Successfuly connected to Database")
 		fmt.Println("Close this window or enter Ctrl+C to quit")
 
 		router := routes.Create()
-		router.Run("localhost:8080")
+
+		if env == "dev" {
+			fmt.Println("Server is listening on localhost:8080")
+			router.Run("localhost:8080")
+		} else if env == "prod" {
+			fmt.Println("Server is listening on 0.0.0.0:80")
+			router.Run("0.0.0.0:80")
+		}
 	} else {
 		if os.Args[1] == "createUser" {
 			createUser()

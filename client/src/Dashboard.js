@@ -146,6 +146,16 @@ export default function Dashboard() {
         </Link>
       )}
 
+      {auth.user.role === 'admin' && (
+        <a
+          href="/api/exportCSV"
+          target="_blank"
+          download
+          className="uk-button uk-button-default uk-margin-right uk-margin-top">
+          Export CSV
+        </a>
+      )}
+
       <Link
         to={UrlFor('newRecord')}
         className="uk-button uk-button-default uk-margin-right uk-margin-top"

@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"bytes"
+	"encoding/csv"
 	"fmt"
 	"io"
 	"mime/multipart"
@@ -901,5 +902,37 @@ func UpdateName(displayName, tableName string) func(c *gin.Context) {
 }
 
 func ExportPageViews(c *gin.Context) {
+	b := &bytes.Buffer{}	
+	w := csv.NewWriter(b)
+
+	if err := w.Write([]string{"date", "visits"}); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to make csv file"})
+		return 
+	}
+
+	pageViews, err := db.PageViews()
 	
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to make csv file"})
+		return 
+	}
+
+	for _, pageView := range pageViews {
+		var record []string
+		record = append(record, pageView.Date)
+		record = append(record, strconv.FormatInt(pageView.Count, 10))
+
+		if err := w.Write(record); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to make csv file"})
+			return 
+		}
+	}
+	w.Flush()
+	
+	if err := w.Error(); err != nil {
+	}
+
+	c.Header("Content-Description", "File Transfer")
+	c.Header("Content-Disposition", "attachment; file=views.csv")
+	c.Data(http.StatusOK, "text/csv", b.Bytes())
 }

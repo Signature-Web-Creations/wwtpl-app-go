@@ -937,3 +937,35 @@ func LogPageViews() error {
 	return nil
 }
 
+func PageViews() ([]models.PageView, error) {
+	var pageViews []models.PageView
+
+	query := sq.Select("date(date)", "count").From("page_views")
+	rows, err := query.RunWith(db).Query()
+
+	if err != nil {
+		return nil, fmt.Errorf("PageViews: %v", err)
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var pv models.PageView
+		err := rows.Scan(
+			&pv.Date,
+			&pv.Count,
+		)
+
+		if err != nil {
+			return nil, fmt.Errorf("PageViews: %v", err)
+		}
+		pageViews = append(pageViews, pv)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("PageViews: %v", err)
+	}
+
+	return pageViews, nil
+}
+

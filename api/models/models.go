@@ -119,3 +119,8 @@ func (u User) Authorized(userLevel int) bool {
 		(u.Role == "publisher" && userLevel <= 2) ||
 		(u.Role == "admin")
 }
+
+type PageView struct {
+	Date string
+	Count int64
+}
