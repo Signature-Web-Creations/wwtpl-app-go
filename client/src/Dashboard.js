@@ -38,15 +38,15 @@ export default function Dashboard() {
 
   const toggleDelete = function (id) {
     let deleted = false
-    let updatedRecords = records.map((r) => { 
+    let updatedRecords = records.map((r) => {
       if (r.id === id) {
         r.deleted = !r.deleted
         deleted = r.deleted
         return r
       } else {
         return r
-      } 
-    }) 
+      }
+    })
     if (deleted) {
       deleteRecord(id)
     } else {
@@ -74,7 +74,7 @@ export default function Dashboard() {
       searchRecordType,
       searchStatus,
     }
-    getListingData(params).then(({ records, pages, years}) => {
+    getListingData(params).then(({ records, pages, years }) => {
       setRecords(records)
       setPages(pages)
       setYears(years)
@@ -106,7 +106,6 @@ export default function Dashboard() {
 
   return (
     <>
-
       {auth.user.role === 'admin' && (
         <Link
           to={UrlFor('showUsers')}
@@ -140,14 +139,17 @@ export default function Dashboard() {
       {auth.user.role === 'admin' && (
         <Link
           to={UrlFor('showRecordTypes')}
-          className="uk-button uk-button-default uk-margin-right"
+          className="uk-button uk-button-default uk-margin-right uk-margin-top"
         >
           {' '}
           Manage Record Types{' '}
         </Link>
       )}
 
-      <Link to={UrlFor('newRecord')} className="uk-button uk-button-default">
+      <Link
+        to={UrlFor('newRecord')}
+        className="uk-button uk-button-default uk-margin-right uk-margin-top"
+      >
         {' '}
         New Record{' '}
       </Link>
@@ -171,7 +173,12 @@ export default function Dashboard() {
        * List of pending records by default
        * Needs to include a records status in the records
        */}
-      <AdminListings searched={searched} records={records} user={auth.user} onDelete={toggleDelete} />
+      <AdminListings
+        searched={searched}
+        records={records}
+        user={auth.user}
+        onDelete={toggleDelete}
+      />
     </>
   )
 }
