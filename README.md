@@ -69,16 +69,16 @@ Admins need the ability to add collections.
 # Running the go server
 
 Before you start the server you need to set an environment variable.
-Set env=dev for development. It will use the database development.db
+Set HISTORY_DB_ENV=dev for development. It will use the database development.db
 
 ```bash
-$ export env=dev
+$ export HISTORY_DB_ENV=dev
 ```
 
-Set env=prod for production. It will use the database archive.db
+Set HISTORY_DB_ENV=prod for production. It will use the database archive.db
 
 ```bash
-$ export env=prod
+$ export HISTORY_DB_ENV=prod
 ```
 
 Failure to set this environment variable will cause the server to crash.

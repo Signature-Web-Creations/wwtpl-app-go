@@ -43,16 +43,16 @@ func createUser() {
 }
 
 func main() {
-	env := os.Getenv("env") 
+	env := os.Getenv("HISTORY_DB_ENV") 
 	if env == "" {
-		panic("env is not set to dev or prod")
+		panic("HISTORY_DB_ENV is not set to dev or prod")
 	} else if env == "dev" {
 		database.Connect("development.db")
 	} else if env == "prod" {
 		database.Connect("archive.db")
 		gin.SetMode(gin.ReleaseMode)
 	} else {
-		panic("env is not set to dev or prod")
+		panic("HISTORY_DB_ENV is not set to dev or prod")
 	}
 
 	if (len(os.Args) == 1) {
