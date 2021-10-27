@@ -917,9 +917,13 @@ func LogPageViews() error {
 
 	var count int64
 	if err = row.Scan(&count); err == sql.ErrNoRows {
-		insert := sq.Insert("page_views").Columns("date", "count").Values(`"date('now')"`, 1) 
-		fmt.Println("Inserting count for today") 
-		if _, err = insert.RunWith(db).Exec(); err != nil {
+		_, err := db.Exec(
+			`INSERT INTO page_views 
+			 (date, count)
+			 VALUES 
+			 (date('now'), 1)`)
+			
+		if err != nil {
 			return err
 		}
 	} else {

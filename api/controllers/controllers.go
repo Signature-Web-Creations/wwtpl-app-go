@@ -899,3 +899,7 @@ func UpdateName(displayName, tableName string) func(c *gin.Context) {
 			gin.H{"success": fmt.Sprintf("Successfully updated %s", displayName)})
 	}
 }
+
+func ExportPageViews(c *gin.Context) {
+	
+}
