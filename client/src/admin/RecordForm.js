@@ -1,10 +1,15 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
-import { getRecordByID, saveRecord, updateRecord, changeRecordStatus } from '../api'
+import {
+  getRecordByID,
+  saveRecord,
+  updateRecord,
+  changeRecordStatus,
+} from '../api'
 
 import MessageBox from '../MessageBox'
 
-// Record Status 
+// Record Status
 const IN_PROGRESS = 1
 const PENDING_APPROVAL = 2
 const PUBLISHED = 3
@@ -22,28 +27,41 @@ function ValidationError(props) {
 function FileInput(props) {
   return (
     <div className="uk-form-controls">
-      <input
-        type="file"
-        name="file"
-        accept=".jpg, .jpeg, .png, .pdf"
-        onChange={props.onChange}
-      />
+      <div uk-form-custom="target: true">
+        <input
+          type="file"
+          name="file"
+          accept=".jpg, .jpeg, .png, .pdf"
+          onChange={props.onChange}
+        />
+        <input
+          class="uk-input uk-form-width-large"
+          type="text"
+          placeholder="Select file"
+          disabled
+        />
+      </div>
     </div>
   )
 }
 
 function FileView(props) {
-  let embed = null;
-  if (props.attachmentType === "image") {
+  let embed = null
+  if (props.attachmentType === 'image') {
     embed = <img alt="file attachment" src={`/media/${props.fileName}`} />
-  } else if (props.attachmentType === "document") {
-    embed = <embed src={`/media/${props.fileName}`} type="application/pdf" width="100%" height="600px" />
+  } else if (props.attachmentType === 'document') {
+    embed = (
+      <embed
+        src={`/media/${props.fileName}`}
+        type="application/pdf"
+        width="100%"
+        height="600px"
+      />
+    )
   }
-  return (
-    embed
-  )
+  return <div className="uk-form-controls">{embed}</div>
 }
-  
+
 function RecordForm(props) {
   let { id } = useParams()
 
@@ -52,9 +70,9 @@ function RecordForm(props) {
 
   const [file, setFile] = useState(null)
   const [fileName, setFileName] = useState(null)
-  const [attachmentType, setAttachmentType] = useState(null) 
+  const [attachmentType, setAttachmentType] = useState(null)
   const [shouldKeepFile, setShouldKeepFile] = useState(false)
-  const [hasFile, setHasFile] = useState(null) 
+  const [hasFile, setHasFile] = useState(null)
 
   const [date, setDate] = useState('')
   const [origin, setOrigin] = useState('')
@@ -140,12 +158,12 @@ function RecordForm(props) {
     errors.date = validateDate()
     valid = valid && errors.date === null
 
-    if (recordType === "") {
+    if (recordType === '') {
       errors.recordType = 'You need to select a record type'
       valid = false
     }
 
-    if (sourceArchive === "") {
+    if (sourceArchive === '') {
       errors.sourceArchive = 'You need to select a source archive'
       valid = false
     }
@@ -175,14 +193,13 @@ function RecordForm(props) {
           if (r.recordType !== null) {
             setRecordType(r.recordType.id)
           }
-          
+
           if (r.attachmentType !== null) {
             setAttachmentType(r.attachmentType)
             setFileName(r.fileName)
             setShouldKeepFile(true)
             setHasFile(true)
           }
-
 
           // Some records did not have a source archive
           // this if keeps them from crashing the site
@@ -198,8 +215,8 @@ function RecordForm(props) {
           }
 
           let c = []
-          // Some of the older entries do not have belong to 
-          // any collections. Viewing them will break the 
+          // Some of the older entries do not have belong to
+          // any collections. Viewing them will break the
           // app.
           if (r.collections !== null) {
             r.collections.split(';').forEach((col) => {
@@ -258,13 +275,12 @@ function RecordForm(props) {
       } else {
         updateRecord(parseIntOrError(id), formData).then((data) => {
           if (data.error) {
-            setMessage({message: data.error, type: 'error' })
+            setMessage({ message: data.error, type: 'error' })
           } else {
-            setMessage({ message: data.success, type: 'success' })
+            window.location = '/'
           }
         })
       }
-
     } else {
       setMessage({
         message: 'Please fill out required fields correctly',
@@ -320,34 +336,35 @@ function RecordForm(props) {
       </div>
 
       <div className="uk-margin">
-        <label htmlFor="file" className="uk-form-label"> File </label>
-        { shouldKeepFile ? 
-            <FileView 
-              fileName = {fileName}
-              attachmentType = {attachmentType}
-            /> : 
-
-            <FileInput 
-              fileName={fileName} 
-              attachmentType={attachmentType}
-              onChange={(e) => {
-                setFile(e.target.files[0])
-              }}
-            />
-        }
-        { hasFile && 
-          <div>
+        <label htmlFor="file" className="uk-form-label">
+          {' '}
+          File{' '}
+        </label>
+        {shouldKeepFile ? (
+          <FileView fileName={fileName} attachmentType={attachmentType} />
+        ) : (
+          <FileInput
+            fileName={fileName}
+            attachmentType={attachmentType}
+            onChange={(e) => {
+              setFile(e.target.files[0])
+            }}
+          />
+        )}
+        {hasFile && (
+          <div className="uk-form-controls">
             <button
+              className="uk-button uk-button-secondary uk-margin-top"
               onClick={(e) => {
                 e.preventDefault()
                 setShouldKeepFile(!shouldKeepFile)
               }}
             >
-              {shouldKeepFile ? "Remove File" : "Undo"}
+              {shouldKeepFile ? 'Remove File' : 'Undo'}
             </button>
           </div>
-        }
-      </div> 
+        )}
+      </div>
       <div className="uk-margin">
         <label className="uk-form-label"> Content </label>
         <div className="uk-form-controls">
@@ -493,11 +510,13 @@ function RecordForm(props) {
       <div className="uk-form-width-large">
         <input
           className="uk-button uk-button-default uk-margin-top uk-margin-right"
-          onClick={() => {handleSubmit(recordStatus)}}
+          onClick={() => {
+            handleSubmit(recordStatus)
+          }}
           type="button"
           value="Save"
         />
-        {(!newRecord && recordStatus !== IN_PROGRESS) && (
+        {!newRecord && recordStatus !== IN_PROGRESS && (
           <input
             className="uk-button uk-button-primary uk-margin-top"
             onClick={() => {
