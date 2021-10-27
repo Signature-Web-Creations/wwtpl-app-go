@@ -1,39 +1,39 @@
-import {useState} from 'react'
+import { useState } from 'react'
 
-// Each row has a single column name. 
-// You can click on the edit button to 
+// Each row has a single column name.
+// You can click on the edit button to
 // edit the name on the row and click
 // save to save changes to the database.
 // Only one row can be edited at a time
 function Row(props) {
-  const {name, editable} = props
+  const { name, editable } = props
 
   return (
     <tr>
       <td>
-      {editable ? 
-        <input
-          type="text"
-          value={name}
-          onChange={props.onChange}
-        /> :
+        {editable ? (
+          <input
+            type="text"
+            className="uk-input"
+            value={name}
+            onChange={props.onChange}
+            autoFocus
+          />
+        ) : (
           <> {name} </>
-      }
+        )}
       </td>
-     
-      <td>
-      {editable ? 
-        <button 
-          onClick={props.onClickSave}
-        >
-          Save
-        </button> :
-        <button
-          onClick={props.onClickEdit}
-        >
-          Edit
-        </button>
-      } 
+
+      <td align="right">
+        {editable ? (
+          <button className="uk-button" onClick={props.onClickSave}>
+            Save
+          </button>
+        ) : (
+          <button className="uk-button" onClick={props.onClickEdit}>
+            Edit
+          </button>
+        )}
       </td>
     </tr>
   )
@@ -41,7 +41,7 @@ function Row(props) {
 
 // Props:
 // - handleAdd: function that is used to add data to the table
-//   Called when you click the add button. 
+//   Called when you click the add button.
 //   Given the name being added as an argument
 // - handleUpdate: function that is used to update a row in the table
 //   Called when you click save on a row that you were edititng
@@ -69,32 +69,35 @@ export default function EditableNameTable(props) {
         <tbody>
           <tr>
             <td>
-              <input 
-                type="text" 
+              <input
+                type="text"
+                className="uk-input"
+                placeholder="Enter Name"
                 value={name}
-                onChange={(e) => 
-                    setName(e.target.value)
-                }
+                onChange={(e) => setName(e.target.value)}
+                autoFocus
               />
             </td>
-            <td>
+            <td align="right">
               <button
+                className="uk-button uk-button-primary"
                 onClick={() => {
-                  if(props.handleAdd(name)) {
+                  if (props.handleAdd(name)) {
                     setName('')
                   }
-              }}>
+                }}
+              >
                 Add
               </button>
             </td>
           </tr>
-          {props.rows.map(({id, name}) => (
+          {props.rows.map(({ id, name }) => (
             <Row
               id={id}
               key={id}
               name={name}
               editable={id === editId}
-              onChange={(e) => { 
+              onChange={(e) => {
                 props.handleChange(id, e.target.value)
               }}
               onClickSave={() => {
@@ -102,7 +105,7 @@ export default function EditableNameTable(props) {
                   setEditId(-1)
                 }
               }}
-              onClickEdit={() => setEditId(id)} 
+              onClickEdit={() => setEditId(id)}
             />
           ))}
         </tbody>
