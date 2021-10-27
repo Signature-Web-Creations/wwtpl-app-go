@@ -27,8 +27,12 @@ func adminOnly(fn func(c *gin.Context)) func(c *gin.Context){
 
 func logPageView(fn func(c *gin.Context)) func(c *gin.Context) {
 	return func(c *gin.Context) {
-		fmt.Println("Visiting the home page")
-		database.LogPageViews() 
+		_, ok := controllers.GetAuthenticatedUser(c)
+		if !ok {
+			// We only to log page views when they are made by the 
+			// public
+			database.LogPageViews() 
+		} 
 		fn(c) 
 	}
 }
