@@ -14,15 +14,7 @@ const routes = {
 
   showSourceArchives: '/sourceArchives',
   showCollections: '/collections',
-
   showRecordTypes: '/recordTypes',
-  addRecordType: '/recordTypes/new',
-  editRecordType: {
-    url: '/recordType/edit',
-    params: {
-      id: ':id',
-    },
-  },
 
   showCollections: '/collections',
   addCollection: '/collections/new',
