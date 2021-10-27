@@ -1,16 +1,24 @@
-import {Link} from 'react-router-dom'
-import {getUsers, disableUser, enableUser} from '../api'
-import {useState, useEffect} from 'react'
-import {UrlFor} from '../routes.js'
+import { Link } from 'react-router-dom'
+import { getUsers, disableUser, enableUser } from '../api'
+import { useState, useEffect } from 'react'
+import { UrlFor } from '../routes.js'
 
 function UserRow(props) {
-  const {id, firstName, lastName, username, role, active} = props
+  const { id, firstName, lastName, username, role, active } = props
+
+  const handleStatusColor = (active) => {
+    if (!active) {
+      return 'uk-label uk-label-warning'
+    } else {
+      return 'uk-label uk-label-success'
+    }
+  }
 
   return (
     <tr>
-      <td> 
+      <td>
         <Link
-          to={UrlFor('editUser', {id})}
+          to={UrlFor('editUser', { id })}
           className="uk-icon-link uk-margin-small-right"
           uk-icon="file-edit"
         ></Link>
@@ -19,24 +27,28 @@ function UserRow(props) {
         <button
           onClick={props.changeStatus}
           className="uk-icon-link uk-margin-small-right"
-          uk-icon={active ? "trash" : "refresh"}
+          uk-icon={active ? 'trash' : 'refresh'}
         ></button>
-      </td> 
+      </td>
       <td>{lastName}</td>
       <td>{firstName}</td>
       <td>{username}</td>
       <td>{role}</td>
-      <td>{active ? "Active" : "Inactive"}</td>
+      <td>
+        <span className={handleStatusColor(active)}>
+          {active ? 'Active' : 'Inactive'}
+        </span>
+      </td>
     </tr>
   )
 }
 
 export default function UserListings(props) {
-  const [users, setUsers] = useState([]) 
+  const [users, setUsers] = useState([])
 
   const toggleStatus = (userId) => {
-    let active = true;
-    const updatedUsers = users.map(user => {
+    let active = true
+    const updatedUsers = users.map((user) => {
       if (user.id === userId) {
         user.active = !user.active
         active = !user.active
@@ -71,7 +83,6 @@ export default function UserListings(props) {
         Add New User{' '}
       </Link>
 
-
       <table className="uk-table uk-table-middle uk-table-divider uk-table-hover uk-margin-medium">
         <thead>
           <tr>
@@ -85,7 +96,7 @@ export default function UserListings(props) {
           </tr>
         </thead>
         <tbody>
-          {users.map(({id, firstName, lastName, username, role, active}) => (
+          {users.map(({ id, firstName, lastName, username, role, active }) => (
             <UserRow
               id={id}
               firstName={firstName}
