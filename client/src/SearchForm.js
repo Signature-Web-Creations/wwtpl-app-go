@@ -40,7 +40,7 @@ export default function SearchForm(props) {
 
   return (
     <form
-      className="uk-margin-large-top"
+      className="uk-margin-medium-top"
       onSubmit={(e) => {
         e.preventDefault()
         performSearch()
