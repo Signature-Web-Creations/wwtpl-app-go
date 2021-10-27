@@ -109,7 +109,7 @@ export default function Dashboard() {
       {auth.user.role === 'admin' && (
         <Link
           to={UrlFor('showUsers')}
-          className="uk-button uk-button-default uk-margin-right"
+          className="uk-button uk-button-default uk-margin-right uk-margin-bottom"
         >
           {' '}
           Manage Users{' '}
@@ -119,7 +119,7 @@ export default function Dashboard() {
       {auth.user.role === 'admin' && (
         <Link
           to={UrlFor('showSourceArchives')}
-          className="uk-button uk-button-default uk-margin-right"
+          className="uk-button uk-button-default uk-margin-right uk-margin-bottom"
         >
           {' '}
           Manage Source Archives{' '}
@@ -129,7 +129,7 @@ export default function Dashboard() {
       {auth.user.role === 'admin' && (
         <Link
           to={UrlFor('showCollections')}
-          className="uk-button uk-button-default uk-margin-right"
+          className="uk-button uk-button-default uk-margin-right uk-margin-bottom"
         >
           {' '}
           Manage Collections{' '}
@@ -139,7 +139,7 @@ export default function Dashboard() {
       {auth.user.role === 'admin' && (
         <Link
           to={UrlFor('showRecordTypes')}
-          className="uk-button uk-button-default uk-margin-right uk-margin-top"
+          className="uk-button uk-button-default uk-margin-right uk-margin-bottom"
         >
           {' '}
           Manage Record Types{' '}
@@ -148,7 +148,7 @@ export default function Dashboard() {
 
       <Link
         to={UrlFor('newRecord')}
-        className="uk-button uk-button-default uk-margin-right uk-margin-top"
+        className="uk-button uk-button-default uk-margin-right uk-margin-bottom"
       >
         {' '}
         New Record{' '}
