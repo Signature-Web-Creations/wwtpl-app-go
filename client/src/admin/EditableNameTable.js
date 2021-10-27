@@ -58,6 +58,7 @@ export default function EditableNameTable(props) {
 
   return (
     <div>
+      <h2> {props.title} </h2>
       <table className="uk-table uk-table-middle uk-table-divider uk-table-hover uk-margin-medium">
         <thead>
           <tr>

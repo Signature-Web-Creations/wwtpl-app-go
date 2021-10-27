@@ -127,6 +127,16 @@ export default function Dashboard() {
         </Link>
       )}
 
+      {auth.user.role === 'admin' && (
+        <Link
+          to={UrlFor('showCollections')}
+          className="uk-button uk-button-default uk-margin-right"
+        >
+          {' '}
+          Manage Collections{' '}
+        </Link>
+      )}
+
       <Link to={UrlFor('newRecord')} className="uk-button uk-button-default">
         {' '}
         New Record{' '}

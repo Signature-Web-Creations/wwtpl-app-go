@@ -57,9 +57,11 @@ export default function SourceArchiveListings(props) {
 
   return (
     <EditableNameTable
+      title={"Manage Source Archives"}
       rows={sourceArchives}
       handleAdd={handleAdd}
       handleChange={handleChange}
       handleUpdate={handleUpdate} />
+    
   )
 }

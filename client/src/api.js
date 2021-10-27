@@ -333,3 +333,85 @@ export async function updateSourceArchive(id, name) {
   })
   return response.json()
 }
+
+export async function getCollections() {
+  const response = await fetch('/api/collections', {
+    method: 'GET', 
+    mode: 'same-origin', 
+    cache: 'no-cache', 
+    credentials: 'include', 
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+  return response.json()
+}
+
+export async function addCollection(name) {
+  let formData = new FormData()
+  formData.append("name", name)
+
+  const response = await fetch('/api/collections', {
+    method: 'POST', 
+    mode: 'same-origin', 
+    cache: 'no-cache', 
+    credentials: 'include', 
+    body: formData,
+  })
+  return response.json()
+}
+
+export async function updateCollection(id, name) {
+  let formData = new FormData()
+  formData.append("name", name)
+
+  const response = await fetch(`/api/collections/${id}`, {
+    method: 'POST', 
+    mode: 'same-origin', 
+    cache: 'no-cache', 
+    credentials: 'include', 
+    body: formData,
+  })
+  return response.json()
+}
+
+export async function getRecordTypes() {
+  const response = await fetch('/api/recordTypes', {
+    method: 'GET', 
+    mode: 'same-origin', 
+    cache: 'no-cache', 
+    credentials: 'include', 
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+  return response.json()
+}
+
+export async function addRecordType(name) {
+  let formData = new FormData()
+  formData.append("name", name)
+
+  const response = await fetch('/api/recordTypes', {
+    method: 'POST', 
+    mode: 'same-origin', 
+    cache: 'no-cache', 
+    credentials: 'include', 
+    body: formData,
+  })
+  return response.json()
+}
+
+export async function updateRecordType(id, name) {
+  let formData = new FormData()
+  formData.append("name", name)
+
+  const response = await fetch(`/api/recordTypes/${id}`, {
+    method: 'POST', 
+    mode: 'same-origin', 
+    cache: 'no-cache', 
+    credentials: 'include', 
+    body: formData,
+  })
+  return response.json()
+}

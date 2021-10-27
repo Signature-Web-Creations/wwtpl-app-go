@@ -13,13 +13,7 @@ const routes = {
   },
 
   showSourceArchives: '/sourceArchives',
-  addSourceArchive: '/sourceArchives/new',
-  editSourceArchive: {
-    url: '/sourceArchive/edit',
-    params: {
-      id: ':id',
-    },
-  },
+  showCollections: '/collections',
 
   showRecordTypes: '/recordTypes',
   addRecordType: '/recordTypes/new',

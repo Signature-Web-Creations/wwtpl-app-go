@@ -19,6 +19,7 @@ import RecordForm from './admin/RecordForm'
 import UserForm from './admin/UserForm'
 import UserListings from './admin/UserListings'
 import SourceArchiveListings from './admin/SourceArchiveListings'
+import CollectionListings from './admin/CollectionListings'
 
 function getOffset(searchParameters) {
   let offsetParam = searchParameters.get('offset')
@@ -189,6 +190,10 @@ function App() {
 
         <PrivateRoute path={UrlFor('showSourceArchives')}>
           <SourceArchiveListings />
+        </PrivateRoute>
+
+        <PrivateRoute path={UrlFor('showCollections')}>
+          <CollectionListings />
         </PrivateRoute>
 
         <PrivateRoute path={UrlFor('showUsers')}>
