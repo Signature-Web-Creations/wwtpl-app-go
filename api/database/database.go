@@ -55,10 +55,12 @@ func init() {
 }
 
 func Connect(filename string) {
-	dsn := fmt.Sprintf("file:%s", filename)
+	dsn := fmt.Sprintf("file:%s?cache=shared", filename)
 
 	var err error
 	db, err = sql.Open("sqlite3", dsn)
+	db.SetMaxOpenConns(1)
+	
 
 	if err != nil {
 		log.Fatal(err)
