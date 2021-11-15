@@ -151,7 +151,7 @@ export default function Dashboard() {
           href="/api/exportCSV"
           target="_blank"
           download
-          className="uk-button uk-button-default uk-margin-right uk-margin-top">
+          className="uk-button uk-button-default uk-margin-right uk-margin-bottom">
           Export CSV
         </a>
       )}
